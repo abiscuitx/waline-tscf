@@ -10,7 +10,7 @@ const instance = new Application({
   ROOT_PATH: __dirname,
   APP_PATH: path.join(__dirname, 'src'),
   proxy: true, // 启用代理
-  env: 'production',
+  env: 'dev',
   RUNTIME_PATH: '/tmp',
 });
 
