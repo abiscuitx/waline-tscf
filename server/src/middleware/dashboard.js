@@ -10,7 +10,7 @@ module.exports = function () {
     ctx.type = 'html';
 
     // 构建管理界面HTML内容
-    ctx.body = `<!doctype html>
+    ctx.body = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">

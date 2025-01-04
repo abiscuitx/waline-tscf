@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "1.3.37-beta",
+  "version": "2.0.0-beta.2",
   "description": "Debugging, temporarily unavailable. A personal waline backend deployed on Tencent Cloud SCF",
   "main": "index.js",
   "keywords": [
@@ -10,7 +10,7 @@
     "blog"
   ],
   "repository": {
-    "url": "git+https://github.com/abiscuit9/waline-tscf.git",
+    "url": "git+https://github.com/abiscuitx/waline-tscf.git",
     "directory": "server"
   },
   "license": "MIT",

@@ -11,6 +11,7 @@ const instance = new Application({
   APP_PATH: path.join(__dirname, 'src'),
   proxy: true, // 启用代理
   env: 'production',
+  RUNTIME_PATH: '/tmp',
 });
 
 // 启动应用

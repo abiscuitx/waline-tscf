@@ -2,17 +2,9 @@
 const fetch = require('node-fetch');
 const Model = require('think-model');
 const Mongo = require('think-mongo');
-const { isNetlify, netlifyFunctionPrefix } = require('./netlify');
 
 // 环境检查
-const isDeta = think.env === 'deta' || process.env.DETA_RUNTIME === 'true';
 const isSCF = think.env === 'scf' || process.env.TENCENTCLOUD_RUNENV === 'SCF';
-
-think.logger.debug('[扩展] 检测运行环境', {
-  isDeta,
-  isSCF,
-  isNetlify
-});
 
 // 扩展配置 - 添加数据库模型和上下文扩展
 module.exports = [
@@ -36,13 +28,7 @@ module.exports = [
         let url;
 
         // 根据不同环境生成服务器URL
-        if (isNetlify) {
-          url = `${protocol}://${host}${netlifyFunctionPrefix}`;
-          think.logger.debug('[扩展] 生成Netlify环境URL');
-        } else if (isDeta) {
-          url = `https://${host}`;
-          think.logger.debug('[扩展] 生成Deta环境URL');
-        } else if (isSCF) {
+        if (isSCF) {
           url = `https://${host}`;
           think.logger.debug('[扩展] 生成腾讯云函数环境URL');
         } else {
