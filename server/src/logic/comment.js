@@ -117,13 +117,12 @@ module.exports = class extends Base {
    */
   getAction() {
     const { type, path } = this.get();
-    console.log('【评论】原始请求参数:', this.ctx.request.query);  // 打印原始请求参数
-    console.log('【评论】this.get()结果:', this.get());  // 打印 this.get() 的完整结果
+    think.logger.debug('【评论】this.get()结果:', this.get());  // 打印 this.get() 的完整结果
     think.logger.debug('【评论】处理获取评论请求:', type, path);
 
     // 检查是否允许获取评论列表
     const isAllowedGet = type !== 'list' || path;
-    console.log('【评论】isAllowedGet:', isAllowedGet, 'type:', type, 'path:', path);
+    think.logger.debug('【评论】isAllowedGet:', isAllowedGet, 'type:', type, 'path:', path);
 
     if (!isAllowedGet) {
       think.logger.debug('【评论】需要管理员权限');
@@ -175,7 +174,7 @@ module.exports = class extends Base {
 
       default:
         think.logger.debug('【评论】获取指定路径的评论');
-        console.log('【评论】设置验证规则前的参数:', path);
+        think.logger.debug('【评论】设置验证规则前的参数:', path);
         this.rules = {
           path: {
             string: true,        // 路径必须是字符串
@@ -194,7 +193,7 @@ module.exports = class extends Base {
             default: 'insertedAt_desc',                              // 默认按时间倒序
           },
         };
-        console.log('【评论】设置验证规则后的 rules:', this.rules);
+        think.logger.debug('【评论】设置验证规则后的 rules:', this.rules);
         break;
     }
   }

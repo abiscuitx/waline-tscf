@@ -2,9 +2,7 @@
 const cors = require('@koa/cors');
 const routerREST = require('think-router-rest');
 
-const isDev = think.env === 'dev';
-const isTcb = think.env === 'scf';
-
+think.logger.debug('【中间件】 初始化中间件配置');
 // 中间件配置数组
 module.exports = [
   // 管理界面中间件 - 处理UI路由
@@ -15,29 +13,26 @@ module.exports = [
   // 元信息中间件 - 处理请求元数据
   {
     handle: 'meta',
-    logRequest: isDev,
-    sendResponseTime: isDev,
-    requestTimeoutCallback:isDev,
   },
-  // CORS中间件 - 处理跨域请求
-  { 
-    handle: () => {
-      think.logger.debug('【中间件】加载 CORS 中间件');
-      return cors({
-        origin: '*',
-        allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
-        allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-        credentials: true
-      });
-    }
-  },
+// CORS中间件 - 处理跨域请求
+{ 
+  handle: () => {
+    think.logger.debug('【中间件】加载 CORS');
+    return cors({
+      origin: '*',
+      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+      allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      credentials: true
+    });
+  }
+},
 
   // 请求追踪中间件 - 处理请求日志和错误
   {
     handle: 'trace',
-    enable: !think.isCli,
+    enable: think.env === 'dev',
     options: {
-      debug: isDev,
+      debug: true,
       contentType: () => 'json',
       error(err, ctx) {
         if (/favicon.ico$/.test(ctx.url)) {
@@ -46,7 +41,8 @@ module.exports = [
         if (think.isPrevent(err)) {
           return false;
         }
-        think.logger.debug('[中间件] trace检查错误:', err);
+
+        think.logger.debug('【中间件】 请求处理发生错误:', err);
       },
     },
   },
@@ -82,3 +78,4 @@ module.exports = [
   // 控制器中间件
   'controller',
 ];
+think.logger.debug('【中间件】 已加载中间件配置');

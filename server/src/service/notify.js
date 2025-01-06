@@ -356,7 +356,7 @@ module.exports = class extends think.Service {
     ).then((resp) => resp.json());
 
     if (!resp.ok) {
-      console.log('Telegram Notification Failed:' + JSON.stringify(resp));
+      think.logger.debug('Telegram Notification Failed:' + JSON.stringify(resp));
     }
   }
 
@@ -529,10 +529,10 @@ module.exports = class extends think.Service {
     }).then((resp) => resp.json());
 
     if (resp.status !== 200) {
-      console.log('Lark Notification Failed:' + JSON.stringify(resp));
+      think.logger.debug('Lark Notification Failed:' + JSON.stringify(resp));
     }
 
-    console.log('FeiShu Notification Success:' + JSON.stringify(resp));
+    think.logger.debug('FeiShu Notification Success:' + JSON.stringify(resp));
   }
 
   // 执行通知流程
@@ -608,13 +608,10 @@ module.exports = class extends think.Service {
     // 发送所有邮件通知
     for (const mail of mailList) {
       try {
-        think.logger.debug('【通知】尝试发送通知邮件');
         const response = await this.mail(mail, comment, parent);
-        think.logger.debug('【通知】邮件发送成功');
-        console.log('Notification mail send success: %s', response);
+        think.logger.debug('【通知】邮件发送成功', response);
       } catch (e) {
         think.logger.debug('【通知】邮件发送失败:', e);
-        console.log('Mail send fail:', e);
       }
     }
   }

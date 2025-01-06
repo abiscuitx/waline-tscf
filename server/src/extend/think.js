@@ -107,8 +107,7 @@ module.exports = {
 
       return address.slice(0, depth).join(' ');
     } catch (e) {
-      console.log(e);
-      think.logger.debug('【系统】IP地址解析失败');
+      think.logger.debug('【系统】IP地址解析失败',e);
       return '';
     }
   },

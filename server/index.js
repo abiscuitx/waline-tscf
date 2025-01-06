@@ -39,11 +39,8 @@ module.exports = function(configParams = {}) {
         think.logger.debug('【waline】应用实例已创建');
       }
 
-      // 创建Node.js HTTP服务器
-      const server = http.createServer();
-      think.logger.debug('【waline】HTTP服务器实例已创建');
-      
-      // 构造请求对象
+      // 构造请求，响应对象
+      const server = http.createServer();      
       const req = new http.IncomingMessage(server);
       Object.assign(req, {
         method: event.httpMethod,
@@ -55,13 +52,11 @@ module.exports = function(configParams = {}) {
           remoteAddress: event.headers['x-scf-remote-addr'] || ''
         }
       });
-      console.log('【waline】构造请求:', JSON.stringify(req, null, 2));
-      
-      // 构造响应对象
       const res = new http.ServerResponse(req);
       const originalEnd = res.end;
       let responseData = null;
-      
+      // think.logger.debug('【waline】构造请求:', JSON.stringify(req, null, 2));
+
       // 重写 res.end 来捕获响应
       res.end = function(data) {
         // 恢复原始的 res.end
@@ -77,19 +72,14 @@ module.exports = function(configParams = {}) {
       
       // 初始化服务器
       think.beforeStartServer();
-      think.logger.debug('【waline】开始处理请求');
-      
+      think.logger.debug('【waline】开始初始化');
       // 执行请求处理
       const callback = think.app.callback();
       callback(req, res);
-      
-      think.logger.debug('【waline】请求处理完成');
+      think.logger.debug('【waline】开始处理请求');
       think.app.emit('appReady');
-      think.logger.debug('【waline】应用待机中');
-      
     } catch (err) {
       // 发生错误时拒绝 Promise
-      think.logger.error('【waline】请求处理失败:', err);
       reject(err);
     }
   });

@@ -142,8 +142,7 @@ module.exports = class extends BaseRest {
 
       think.logger.debug('【用户系统】验证邮件发送成功');
     } catch (e) {
-      console.log(e);
-      think.logger.debug('【用户系统】验证邮件发送失败');
+      think.logger.debug('【用户系统】验证邮件发送失败',e);
 
       return this.fail(
         this.locale(

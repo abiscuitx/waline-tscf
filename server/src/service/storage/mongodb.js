@@ -122,90 +122,141 @@ module.exports = class extends Base {
   // 查询数据列表
   async select(where, { desc, limit, offset, field } = {}) {
     think.logger.debug('【MongoDB】执行查询操作');
-    const instance = this.mongo(this.tableName);
+    let retries = 3;
+    
+    while (retries > 0) {
+      try {
+        const instance = this.mongo(this.tableName);
+        this.where(instance, where);
+        if (desc) {
+          instance.order(`${desc} DESC`);
+        }
+        if (limit || offset) {
+          instance.limit(offset || 0, limit);
+        }
+        if (field) {
+          instance.field(field);
+        }
 
-    this.where(instance, where);
-    if (desc) {
-      instance.order(`${desc} DESC`);
+        const data = await instance.select();
+        return data.map(({ _id, ...cmt }) => ({
+          ...cmt,
+          objectId: _id.toString(),
+        }));
+      } catch (err) {
+        retries--;
+        if (retries === 0 || err.name !== 'MongoServerError') {
+          throw err;
+        }
+        think.logger.warn(`【MongoDB】查询操作失败，剩余重试次数: ${retries}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
-    if (limit || offset) {
-      instance.limit(offset || 0, limit);
-    }
-    if (field) {
-      instance.field(field);
-    }
-
-    const data = await instance.select();
-
-    // 转换_id为objectId格式返回
-    return data.map(({ _id, ...cmt }) => ({
-      ...cmt,
-      objectId: _id.toString(),
-    }));
   }
 
   // 统计数据
   async count(where = {}, { group } = {}) {
     think.logger.debug('【MongoDB】执行统计操作');
-    const instance = this.mongo(this.tableName);
+    let retries = 3;
 
-    this.where(instance, where);
-    if (group) {
-      instance.group(group);
+    while (retries > 0) {
+      try {
+        const instance = this.mongo(this.tableName);
+        this.where(instance, where);
+        if (group) {
+          instance.group(group);
+        }
+        const data = await instance.count({ raw: group });
+        return Array.isArray(data) 
+          ? data.map(({ _id, total: count }) => ({ ..._id, count }))
+          : data;
+      } catch (err) {
+        retries--;
+        if (retries === 0 || err.name !== 'MongoServerError') {
+          throw err;
+        }
+        think.logger.warn(`【MongoDB】统计操作失败，剩余重试次数: ${retries}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
-    const data = await instance.count({ raw: group });
-
-    if (!Array.isArray(data)) {
-      return data;
-    }
-
-    // 转换分组统计结果格式
-    return data.map(({ _id, total: count }) => ({ ..._id, count }));
   }
 
   // 添加数据
   async add(data) {
     think.logger.debug('【MongoDB】执行添加操作');
-    if (data.objectId) {
-      data._id = data.objectId;
-      delete data.objectId;
+    let retries = 3;
+
+    while (retries > 0) {
+      try {
+        if (data.objectId) {
+          data._id = data.objectId;
+          delete data.objectId;
+        }
+
+        const instance = this.mongo(this.tableName);
+        const id = await instance.add(data);
+        return { ...data, objectId: id.toString() };
+      } catch (err) {
+        retries--;
+        if (retries === 0 || err.name !== 'MongoServerError') {
+          throw err;
+        }
+        think.logger.warn(`【MongoDB】添加操作失败，剩余重试次数: ${retries}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
-
-    const instance = this.mongo(this.tableName);
-    const id = await instance.add(data);
-
-    return { ...data, objectId: id.toString() };
   }
 
   // 更新数据
   async update(data, where) {
     think.logger.debug('【MongoDB】执行更新操作');
-    const instance = this.mongo(this.tableName);
+    let retries = 3;
 
-    this.where(instance, where);
-    const list = await instance.select();
-
-    // 批量更新数据
-    return Promise.all(
-      list.map(async (item) => {
-        const updateData = typeof data === 'function' ? data(item) : data;
+    while (retries > 0) {
+      try {
         const instance = this.mongo(this.tableName);
-
         this.where(instance, where);
-        await instance.update(updateData);
+        const list = await instance.select();
 
-        return { ...item, ...updateData };
-      }),
-    );
+        // 批量更新数据
+        return Promise.all(
+          list.map(async (item) => {
+            const updateData = typeof data === 'function' ? data(item) : data;
+            const instance = this.mongo(this.tableName);
+            this.where(instance, where);
+            await instance.update(updateData);
+            return { ...item, ...updateData };
+          }),
+        );
+      } catch (err) {
+        retries--;
+        if (retries === 0 || err.name !== 'MongoServerError') {
+          throw err;
+        }
+        think.logger.warn(`【MongoDB】更新操作失败，剩余重试次数: ${retries}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
   }
 
   // 删除数据
   async delete(where) {
     think.logger.debug('【MongoDB】执行删除操作');
-    const instance = this.mongo(this.tableName);
+    let retries = 3;
 
-    this.where(instance, where);
-
-    return instance.delete();
+    while (retries > 0) {
+      try {
+        const instance = this.mongo(this.tableName);
+        this.where(instance, where);
+        return instance.delete();
+      } catch (err) {
+        retries--;
+        if (retries === 0 || err.name !== 'MongoServerError') {
+          throw err;
+        }
+        think.logger.warn(`【MongoDB】删除操作失败，剩余重试次数: ${retries}`);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
   }
 };

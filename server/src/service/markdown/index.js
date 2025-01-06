@@ -11,8 +11,19 @@ const { resolveHighlighter } = require('./highlight.js');
 const { mathjaxPlugin } = require('./mathjax.js');
 const { sanitize } = require('./xss.js');
 
+// 使用懒加载
+let markdownParser = null;
+
+function getMarkdownParser() {
+  if (!markdownParser) {
+    // 仅在需要时初始化
+    markdownParser = initMarkdownParser();
+  }
+  return markdownParser;
+}
+
 // 获取Markdown解析器实例
-const getMarkdownParser = () => {
+const initMarkdownParser = () => {
   think.logger.debug('【Markdown】初始化Markdown解析器');
   // 获取Markdown配置
   const { markdown = {} } = think.config();

@@ -1,3 +1,5 @@
+
+console.log('【配置】 初始化配置');
 // 从环境变量获取配置参数
 const {
   // JWT和存储相关配置
@@ -94,10 +96,12 @@ console.log('[Waline] 配置加载完成');
 
 // 处理禁用词配置
 const forbiddenWords = FORBIDDEN_WORDS ? FORBIDDEN_WORDS.split(/\s*,\s*/) : [];
+console.log('[Waline] 禁用词配置加载完成');
 
 // 判断配置值是否为false的辅助函数
 const isFalse = (content) =>
   content && ['0', 'false'].includes(content.toLowerCase());
+console.log('[Waline] 配置值是否为false辅助函数加载完成');
 
 
 // Markdown配置项
@@ -114,6 +118,7 @@ const markdown = {
 };
 
 if (isFalse(MARKDOWN_HIGHLIGHT)) markdown.config.highlight = false;
+console.log('[Waline] markdown配置加载完成');
 
 // 头像代理配置
 let avatarProxy = '';
@@ -154,3 +159,5 @@ module.exports = {
   DiscordTemplate: DISCORD_TEMPLATE,
   LarkTemplate: LARK_TEMPLATE,
 };
+
+console.log('【配置】 已加载配置');

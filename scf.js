@@ -2,8 +2,8 @@ const waline = require('@waline-tscf/server');
 
 // 导出云函数处理方法
 exports.main_handler = async (event, context) => {
-  console.log('[函数] 收到新请求 - event参数:', JSON.stringify(event, null, 2));
-  console.log('[函数] 收到新请求 - context参数:', JSON.stringify(context, null, 2));
+  // console.log('[函数] 收到新请求 - event参数:', JSON.stringify(event, null, 2));
+  // console.log('[函数] 收到新请求 - context参数:', JSON.stringify(context, null, 2));
   
   try {
     // 创建Waline实例并处理请求，传入完整的配置对象
@@ -15,9 +15,7 @@ exports.main_handler = async (event, context) => {
       // database: {...},
       // secureDomains: [...],
     });
-    
-    console.log('[函数] 响应处理完成');
-    console.log(JSON.stringify(response, null, 2));
+    // console.log('[函数] 响应处理完成', JSON.stringify(response, null, 2));
     
     // 返回符合腾讯云函数规范的响应格式
     return {
