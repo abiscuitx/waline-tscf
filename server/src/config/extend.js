@@ -1,3 +1,5 @@
+think.logger.debug('【扩展】 初始化扩展配置');
+
 // 导入必要的模块
 const fetch = require('node-fetch');
 const Model = require('think-model');
@@ -5,26 +7,15 @@ const Mongo = require('think-mongo');
 
 // 环境检查
 const isSCF = think.env === 'scf' || process.env.TENCENTCLOUD_RUNENV === 'SCF';
-think.logger.debug('【扩展】 初始化扩展配置');
+
 // 扩展配置 - 添加数据库模型和上下文扩展
 module.exports = [
   // 添加关系型数据库支持
   Model(think.app),
   // 添加MongoDB支持
   Mongo(think.app),
+  // 添加缓存支持
   {
-    //  预热Markdown 模块
-    think: {
-      preloadMarkdown() {
-        try {
-          think.logger.debug('【预热】开始预热 Markdown 模块');
-          require('../service/markdown/index.js');
-          think.logger.debug('【预热】Markdown 模块预热完成');
-        } catch (err) {
-          think.logger.error('【预热】Markdown 模块预热失败:', err);
-        }
-      }
-    },
     // 扩展上下文
     context: {
       // 获取服务器URL

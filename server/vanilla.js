@@ -9,8 +9,8 @@ console.log('[Waline] 初始化服务实例');
 const instance = new Application({
   ROOT_PATH: __dirname,
   APP_PATH: path.join(__dirname, 'src'),
-  proxy: true, // 启用代理
-  env: 'dev',
+  proxy: false, // 启用代理
+  env: process.env.env || 'scf',
   RUNTIME_PATH: '/tmp',
 });
 
@@ -22,12 +22,6 @@ instance.run();
 think.logger.debug('[Waline] 加载自定义配置');
 let config = {};
 
-try {
-  config = require('./config.js');
-  think.logger.debug('[Waline] 成功加载配置文件');
-} catch (err) {
-  think.logger.debug('[Waline] 未找到配置文件,使用默认配置');
-}
 
 // 应用配置
 for (const k in config) {

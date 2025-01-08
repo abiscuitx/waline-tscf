@@ -7,6 +7,46 @@ const { getMarkdownParser } = require('../service/markdown/index.js');
 
 const markdownParser = getMarkdownParser();
 
+// 在类定义开始处添加缓存相关变量
+const CACHE_EXPIRE = 12 * 60 * 60 * 1000; // 12小时过期
+const commentCache = {
+  list: new Map(),
+  admin: new Map(),
+  recent: new Map(),
+  count: new Map()
+};
+
+// 缓存辅助函数
+function getCacheKey(type, params) {
+  return JSON.stringify({ type, params });
+}
+
+function getCache(type, params) {
+  const key = getCacheKey(type, params);
+  const cache = commentCache[type].get(key);
+  
+  if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
+    think.logger.debug(`【评论系统】从缓存获取${type}数据`);
+    return cache.data;
+  }
+  return null;
+}
+
+function setCache(type, params, data) {
+  const key = getCacheKey(type, params);
+  commentCache[type].set(key, {
+    data,
+    timestamp: Date.now()
+  });
+}
+
+function clearCache() {
+  think.logger.debug('【评论系统】清除评论相关缓存');
+  commentCache.list.clear();
+  commentCache.admin.clear();
+  commentCache.recent.clear();
+  commentCache.count.clear();
+}
 
 async function formatCmt(
   { ua, ip, ...comment },
@@ -265,6 +305,7 @@ module.exports = class extends BaseRest {
     await this.hook('postSave', resp, parentComment);
     think.logger.debug('【评论系统】postSave 钩子执行完成');
 
+    clearCache();
     return this.success(
       await formatCmt(
         resp,
@@ -377,6 +418,7 @@ module.exports = class extends BaseRest {
     await this.hook('postUpdate', data);
     think.logger.debug('【评论系统】更新后钩子执行完成');
 
+    clearCache();
     return this.success(cmtReturn);
   }
 
@@ -407,11 +449,16 @@ module.exports = class extends BaseRest {
     await this.hook('postDelete', this.id);
     think.logger.debug('【评论系统】删除后钩子执行完成');
 
+    clearCache();
     return this.success();
   }
 
   // 获取评论列表
   async getCommentList() {
+    // 尝试获取缓存
+    const cacheData = getCache('list', this.get());
+    if (cacheData) return cacheData;
+
     const { userInfo } = this.ctx.state;
     const { path: url, page, pageSize, sortBy } = this.get();
     const where = { url };
@@ -574,7 +621,7 @@ module.exports = class extends BaseRest {
 
     think.logger.debug('【评论系统】评论数据处理完成，准备返回');
 
-    return {
+    const result = {
       page,
       totalPages: Math.ceil(rootCount / pageSize),
       pageSize,
@@ -629,10 +676,18 @@ module.exports = class extends BaseRest {
         }),
       ),
     };
+
+    // 设置缓存
+    setCache('list', this.get(), result);
+    return result;
   }
 
   // 获取管理员评论列表
   async getAdminCommentList() {
+    // 尝试获取缓存
+    const cacheData = getCache('admin', this.get());
+    if (cacheData) return cacheData;
+
     const { userInfo } = this.ctx.state;
     const { page, pageSize, owner, status, keyword } = this.get();
     const where = {};
@@ -699,7 +754,7 @@ module.exports = class extends BaseRest {
 
     think.logger.debug('【评论系统】管理员评论列表数据处理完成');
 
-    return {
+    const result = {
       page,
       totalPages: Math.ceil(count / pageSize),
       pageSize,
@@ -716,10 +771,18 @@ module.exports = class extends BaseRest {
         ),
       ),
     };
+
+    // 设置缓存
+    setCache('admin', this.get(), result);
+    return result;
   }
 
   // 获取最近评论列表
   async getRecentCommentList() {
+    // 尝试获取缓存
+    const cacheData = getCache('recent', this.get());
+    if (cacheData) return cacheData;
+
     const { count } = this.get();
     const { userInfo } = this.ctx.state;
     const where = {};
@@ -781,7 +844,7 @@ module.exports = class extends BaseRest {
 
     think.logger.debug('【评论系统】最近评论列表数据处理完成');
 
-    return Promise.all(
+    const result = Promise.all(
       comments.map((cmt) =>
         formatCmt(
           cmt,
@@ -791,10 +854,18 @@ module.exports = class extends BaseRest {
         ),
       ),
     );
+
+    // 设置缓存
+    setCache('recent', this.get(), result);
+    return result;
   }
 
   // 获取评论计数
   async getCommentCount() {
+    // 尝试获取缓存
+    const cacheData = getCache('count', this.get());
+    if (cacheData) return cacheData;
+
     const { url } = this.get();
     const { userInfo } = this.ctx.state;
     const where = Array.isArray(url) && url.length ? { url: ['IN', url] } : {};
