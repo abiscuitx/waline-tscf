@@ -25,7 +25,7 @@ module.exports = function(configParams = {}) {
           VIEW_PATH: path.join(__dirname, 'view'),
           RUNTIME_PATH: '/tmp',
           proxy: false,
-          env: process.env.env || 'scf'
+          env: 'dev'
         });
         
         // 加载应用配置

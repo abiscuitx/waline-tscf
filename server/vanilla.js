@@ -9,8 +9,8 @@ console.log('[Waline] 初始化服务实例');
 const instance = new Application({
   ROOT_PATH: __dirname,
   APP_PATH: path.join(__dirname, 'src'),
-  proxy: false, // 启用代理
-  env: process.env.env || 'scf',
+  proxy: true, // 启用代理
+  env: 'dev',
   RUNTIME_PATH: '/tmp',
 });
 

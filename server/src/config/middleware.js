@@ -1,8 +1,8 @@
-think.logger.debug('【中间件】 初始化中间件配置');
 // 导入必要的中间件模块
 const cors = require('@koa/cors');
 const routerREST = require('think-router-rest');
 
+think.logger.debug('【中间件】 初始化中间件配置');
 // 中间件配置数组
 module.exports = [
   // 管理界面中间件 - 处理UI路由
@@ -16,7 +16,15 @@ module.exports = [
   },
 // CORS中间件 - 处理跨域请求
 { 
-  handle:cors,
+  handle: () => {
+    think.logger.debug('【中间件】加载 CORS');
+    return cors({
+      origin: '*',
+      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+      allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      credentials: true
+    });
+  }
 },
 
   // 请求追踪中间件 - 处理请求日志和错误

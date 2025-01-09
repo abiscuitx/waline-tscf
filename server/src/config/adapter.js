@@ -1,10 +1,10 @@
-console.log('【适配器】 初始化适配器配置');
 // 引入数据库驱动和日志模块
 const { Console } = require('think-logger3');
 const Mysql = require('think-model-mysql');
 const Mysql2 = require('think-model-mysql2');
 const Postgresql = require('think-model-postgresql');
 
+console.log('【适配器】 初始化适配器配置');
 // 从环境变量获取数据库配置参数
 const {
   MYSQL_HOST,
@@ -49,13 +49,13 @@ const {
 let type = 'common';
 const mongoOpt = {
   // 增加连接超时设置
-  connectTimeoutMS: 5000,      // 连接超时时间
-  socketTimeoutMS: 180000,      // Socket 超时时间
+  connectTimeoutMS: 8000,      // 连接超时时间
+  socketTimeoutMS: 8000,      // Socket 超时时间
   serverSelectionTimeoutMS: 8000, // 服务器选择超时时间
-  maxPoolSize: 10,             // 减小连接池大小，适应内存限制
+  maxPoolSize: 8,             // 减小连接池大小，适应内存限制
   minPoolSize: 1,             // 最小保持一个连接
   keepAlive: true,            // 保持连接活跃
-  keepAliveInitialDelay: 60000, // 保活
+  keepAliveInitialDelay: 300000, // 5分钟后开始保活
   retryWrites: true,          // 启用重试写入
   w: 'majority',              // 写入确认级别
   wtimeoutMS: 5000,          // 写入超时时间
@@ -183,6 +183,5 @@ exports.logger = {
     handle: Console,
   },
 };
-
 
 console.log('【适配器】 已加载适配器配置');
