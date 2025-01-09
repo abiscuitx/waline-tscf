@@ -30,7 +30,7 @@ module.exports = [
   // 请求追踪中间件 - 处理请求日志和错误
   {
     handle: 'trace',
-    enable: think.env === 'dev',
+    enable: true,
     options: {
       debug: true,
       contentType: () => 'json',

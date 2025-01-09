@@ -1,5 +1,5 @@
 // 引入数据库驱动和日志模块
-const { Console } = require('think-logger3');
+const { Basic } = require('think-logger3');
 const Mysql = require('think-model-mysql');
 const Mysql2 = require('think-model-mysql2');
 const Postgresql = require('think-model-postgresql');
@@ -178,10 +178,26 @@ exports.model = {
  * @type {Object}
  */
 exports.logger = {
-  type: 'console',
-  console: {
-    handle: Console,
-  },
+  type: 'advanced',
+  advanced: {
+    handle: Basic,
+    appenders: {
+      everything: { 
+        type: 'console', 
+      },
+      'Filter': { 
+        type: 'logLevelFilter', 
+        appender: 'everything', 
+        level: 'info' // 日志级别：debug、info、warn、error
+      },
+    },
+    categories: {
+      default: { 
+        appenders: ['Filter'], 
+        level: 'debug' 
+      }
+    }
+  }
 };
 
 console.log('【适配器】 已加载适配器配置');
