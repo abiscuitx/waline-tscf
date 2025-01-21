@@ -1,12 +1,9 @@
 think.logger.debug('【扩展】 初始化扩展配置');
 
 // 导入必要的模块
-const fetch = require('node-fetch');
 const Model = require('think-model');
 const Mongo = require('think-mongo');
-
-// 环境检查
-const isSCF = think.env === 'scf' || process.env.TENCENTCLOUD_RUNENV === 'SCF';
+const fetch = require('node-fetch');
 
 // 扩展配置 - 添加数据库模型和上下文扩展
 module.exports = [
@@ -14,39 +11,26 @@ module.exports = [
   Model(think.app),
   // 添加MongoDB支持
   Mongo(think.app),
-  // 添加缓存支持
   {
-    // 扩展上下文
     context: {
       // 获取服务器URL
       get serverURL() {
         const { SERVER_URL } = process.env;
 
         if (SERVER_URL) {
-          think.logger.debug('【扩展】 使用环境变量配置的服务器URL');
+          think.logger.debug('【扩展】使用环境变量URL');
           return SERVER_URL;
-        }
-
-        const { protocol, host } = this;
-        let url;
-
-        // 根据不同环境生成服务器URL
-        if (isSCF) {
-          url = `https://${host}`;
-          think.logger.debug('【扩展】 生成腾讯云函数环境URL');
         } else {
-          url = `${protocol}://${host}`;
-          think.logger.debug('【扩展】 生成标准环境URL');
+            url = `${protocol}://${host}`;
+            think.logger.debug('【扩展】生成标准环境URL');
         }
-
-        think.logger.debug('【扩展】 最终服务器URL:', url);
+        think.logger.debug('【扩展】最终服务器URL:', url);
         return url;
       },
 
       // Webhook回调
       async webhook(type, data) {
         const { WEBHOOK } = process.env;
-
         if (!WEBHOOK) {
           think.logger.debug('[Webhook] 未配置webhook地址，跳过回调');
           return;

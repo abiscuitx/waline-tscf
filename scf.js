@@ -1,23 +1,19 @@
+// 引入waline-tscf/server
 const waline = require('@waline-tscf/server');
 
-// 导出云函数处理方法
+// 入口函数
 exports.main_handler = async (event, context) => {
-  // console.log('[函数] 收到新请求 - event参数:', JSON.stringify(event, null, 2));
-  // console.log('[函数] 收到新请求 - context参数:', JSON.stringify(context, null, 2));
-  
+  // console.log('【serverless】event参数:', JSON.stringify(event, null, 2));
+  // console.log('【serverless】context参数:', JSON.stringify(context, null, 2));
+  console.log('【serverless】转发请求到waline');
   try {
-    // 创建Waline实例并处理请求，传入完整的配置对象
-    console.log('[函数] 转发请求到Waline');
-    // 使用 await 等待 waline 处理完成
     const response = await waline({ 
       event,
       // 这里可以添加其他配置参数
       // database: {...},
       // secureDomains: [...],
     });
-    // console.log('[函数] 响应处理完成', JSON.stringify(response, null, 2));
-    
-    // 返回符合腾讯云函数规范的响应格式
+    // console.log('【serverless】响应参数', JSON.stringify(response, null, 2));
     return {
       isBase64Encoded: false,
       statusCode: response.statusCode,
@@ -29,9 +25,7 @@ exports.main_handler = async (event, context) => {
         ? response.body 
         : JSON.stringify(response.body || {})
     };
-
   } catch (err) {
-    console.error('[函数] 请求处理失败:', err);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

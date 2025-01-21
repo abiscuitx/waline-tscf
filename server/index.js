@@ -8,36 +8,34 @@ const Loader = require('thinkjs/lib/loader');
 
 // 创建一个单例应用实例
 let app = null;
-let loader = null;
 
-// 导出服务器初始化函数
+// 导出函数
 module.exports = function(configParams = {}) {
   return new Promise((resolve, reject) => {
     try {
       const { event, context, ...config } = configParams;
 
-      // 如果应用实例不存在，才创建新实例
+      // 如果应用实例不存在，创建thinkjs实例
       if (!app) {
-        // 创建ThinkJS应用实例
+        console.log('【waline】实例冷启动');
         app = new Application({
           ROOT_PATH: __dirname,
           APP_PATH: path.join(__dirname, 'src'),
           VIEW_PATH: path.join(__dirname, 'view'),
-          RUNTIME_PATH: '/tmp',
           proxy: false,
+          RUNTIME_PATH: '/tmp',
           env: 'dev'
         });
         
         // 加载应用配置
         loader = new Loader(app.options);
         loader.loadAll('worker');
-        
-        // 应用配置
         for (const k in config) {
           think.config(k === 'model' ? 'customModel' : k, config[k]);
         }
-        think.logger.debug('【waline】应用实例已创建');
+        think.logger.debug('【waline】实例已创建');
       }
+      console.log('【waline】实例热启动');
 
       // 构造请求，响应对象
       const server = http.createServer();      
@@ -54,32 +52,27 @@ module.exports = function(configParams = {}) {
       });
       const res = new http.ServerResponse(req);
       const originalEnd = res.end;
-      let responseData = null;
-      // think.logger.debug('【waline】构造请求:', JSON.stringify(req, null, 2));
+      think.logger.debug('构造请求对象:', req.method, req.url);
 
       // 重写 res.end 来捕获响应
+      let responseData = null;
       res.end = function(data) {
-        // 恢复原始的 res.end
         res.end = originalEnd;
         responseData = {
           statusCode: res.statusCode,
           headers: res.getHeaders(),
           body: data
         };
-        // 响应完成时解析 Promise
         resolve(responseData);
       };
       
-      // 初始化服务器
+      // 开始处理请求
       think.beforeStartServer();
-      think.logger.debug('【waline】开始初始化');
-      // 执行请求处理
+      think.logger.debug('【waline】开始处理请求');
       const callback = think.app.callback();
       callback(req, res);
-      think.logger.debug('【waline】开始处理请求');
       think.app.emit('appReady');
     } catch (err) {
-      // 发生错误时拒绝 Promise
       reject(err);
     }
   });
