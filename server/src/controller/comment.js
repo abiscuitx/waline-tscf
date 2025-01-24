@@ -131,10 +131,8 @@ module.exports = class extends BaseRest {
     };
 
     think.logger.debug('【评论系统】开始处理获取评论请求，类型:', type);
-
     const fn = fnMap[type] || this.getCommentList;
     const data = await fn.call(this);
-
     return this.jsonOrSuccess(data);
   }
 

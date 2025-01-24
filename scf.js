@@ -9,9 +9,8 @@ exports.main_handler = async (event, context) => {
   try {
     const response = await waline({ 
       event,
+      debugLevel: 'info' // 日志级别：debug、info、warn、error
       // 这里可以添加其他配置参数
-      // database: {...},
-      // secureDomains: [...],
     });
     // console.log('【serverless】响应参数', JSON.stringify(response, null, 2));
     return {

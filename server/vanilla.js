@@ -9,7 +9,7 @@ const instance = new Application({
   APP_PATH: path.join(__dirname, 'src'),
   proxy: false, // 启用代理
   RUNTIME_PATH: '/tmp',
-  env: 'dev',
+  env: 'dev'
 });
 instance.run();
 

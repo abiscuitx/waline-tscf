@@ -43,6 +43,7 @@ const {
   POSTGRES_USER,
   PG_SSL,
   POSTGRES_SSL,
+  DEBUG_LEVEL,
 } = process.env;
 
 // 初始化数据库类型和MongoDB选项
@@ -190,10 +191,9 @@ exports.logger = {
     categories: {
       default: { 
         appenders: ['Filter'], 
-        level: 'debug' 
+        level: DEBUG_LEVEL || 'info' // 默认日志级别：info
       }
     }
   }
 };
-
 console.log('【适配器】 已加载适配器配置');

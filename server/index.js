@@ -13,7 +13,7 @@ let app = null;
 module.exports = function(configParams = {}) {
   return new Promise((resolve, reject) => {
     try {
-      const { event, context, ...config } = configParams;
+      const { event, context, debugLevel,  ...config } = configParams;
 
       // 如果应用实例不存在，创建thinkjs实例
       if (!app) {

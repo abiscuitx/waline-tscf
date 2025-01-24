@@ -1,9 +1,47 @@
 // 引入MongoDB ObjectId类型
 const { ObjectID: ObjectId } = require('think-mongo/lib/model');
 
-
 // 引入基础存储类
 const Base = require('./base.js');
+
+// 添加缓存相关变量
+const CACHE_EXPIRE = 12 * 60 * 60 * 1000; // 12小时过期
+const mongoCache = {
+  select: new Map(),
+  count: new Map()
+};
+
+// 缓存辅助函数
+function getCacheKey(method, params) {
+  return JSON.stringify({ method, params });
+}
+
+function getCache(method, params) {
+  const key = getCacheKey(method, params);
+  think.logger.debug('【MongoDB】缓存键值:', key);
+  const cache = mongoCache[method].get(key);
+  
+  if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
+    think.logger.debug(`【MongoDB】从缓存获取${method}数据`);
+    return cache.data;
+  }
+  return null;
+}
+
+function setCache(method, params, data) {
+  const key = getCacheKey(method, params);
+  think.logger.debug('【MongoDB】设置缓存，键值:', key);
+  mongoCache[method].set(key, {
+    data,
+    timestamp: Date.now()
+  });
+}
+
+function clearCache() {
+  think.logger.debug('【MongoDB】清除MongoDB相关缓存');
+  mongoCache.select.clear();
+  mongoCache.count.clear();
+}
 
 module.exports = class extends Base {
   // 解析查询条件为MongoDB格式
@@ -119,8 +157,12 @@ module.exports = class extends Base {
     });
   }
 
-  // 查询数据列表
-  async select(where, { desc, limit, offset, field } = {}) {
+  // 修改 select 方法
+  async select(where, options = {}) {
+    // 尝试获取缓存
+    const cacheData = getCache('select', { where, options });
+    if (cacheData) return cacheData;
+
     think.logger.debug('【MongoDB】执行查询操作');
     let retries = 3;
     
@@ -128,21 +170,25 @@ module.exports = class extends Base {
       try {
         const instance = this.mongo(this.tableName);
         this.where(instance, where);
-        if (desc) {
-          instance.order(`${desc} DESC`);
+        if (options.desc) {
+          instance.order(`${options.desc} DESC`);
         }
-        if (limit || offset) {
-          instance.limit(offset || 0, limit);
+        if (options.limit || options.offset) {
+          instance.limit(options.offset || 0, options.limit);
         }
-        if (field) {
-          instance.field(field);
+        if (options.field) {
+          instance.field(options.field);
         }
 
         const data = await instance.select();
-        return data.map(({ _id, ...cmt }) => ({
+        const result = data.map(({ _id, ...cmt }) => ({
           ...cmt,
           objectId: _id.toString(),
         }));
+
+        // 设置缓存
+        setCache('select', { where, options }, result);
+        return result;
       } catch (err) {
         retries--;
         if (retries === 0 || err.name !== 'MongoServerError') {
@@ -154,8 +200,12 @@ module.exports = class extends Base {
     }
   }
 
-  // 统计数据
-  async count(where = {}, { group } = {}) {
+  // 修改 count 方法
+  async count(where = {}, options = {}) {
+    // 尝试获取缓存
+    const cacheData = getCache('count', { where, options });
+    if (cacheData) return cacheData;
+
     think.logger.debug('【MongoDB】执行统计操作');
     let retries = 3;
 
@@ -163,13 +213,17 @@ module.exports = class extends Base {
       try {
         const instance = this.mongo(this.tableName);
         this.where(instance, where);
-        if (group) {
-          instance.group(group);
+        if (options.group) {
+          instance.group(options.group);
         }
-        const data = await instance.count({ raw: group });
-        return Array.isArray(data) 
+        const data = await instance.count({ raw: options.group });
+        const result = Array.isArray(data) 
           ? data.map(({ _id, total: count }) => ({ ..._id, count }))
           : data;
+
+        // 设置缓存
+        setCache('count', { where, options }, result);
+        return result;
       } catch (err) {
         retries--;
         if (retries === 0 || err.name !== 'MongoServerError') {
@@ -195,6 +249,7 @@ module.exports = class extends Base {
 
         const instance = this.mongo(this.tableName);
         const id = await instance.add(data);
+        clearCache(); // 添加数据后清除缓存
         return { ...data, objectId: id.toString() };
       } catch (err) {
         retries--;
@@ -219,7 +274,7 @@ module.exports = class extends Base {
         const list = await instance.select();
 
         // 批量更新数据
-        return Promise.all(
+        const result = await Promise.all(
           list.map(async (item) => {
             const updateData = typeof data === 'function' ? data(item) : data;
             const instance = this.mongo(this.tableName);
@@ -228,6 +283,8 @@ module.exports = class extends Base {
             return { ...item, ...updateData };
           }),
         );
+        clearCache(); // 更新数据后清除缓存
+        return result;
       } catch (err) {
         retries--;
         if (retries === 0 || err.name !== 'MongoServerError') {
@@ -248,6 +305,7 @@ module.exports = class extends Base {
       try {
         const instance = this.mongo(this.tableName);
         this.where(instance, where);
+        clearCache();
         return instance.delete();
       } catch (err) {
         retries--;
