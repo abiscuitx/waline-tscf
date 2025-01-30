@@ -1,6 +1,4 @@
-
 const BaseRest = require('./rest.js');
-
 module.exports = class extends BaseRest {
   // 构造函数：初始化文章计数控制器类
   constructor(ctx) {

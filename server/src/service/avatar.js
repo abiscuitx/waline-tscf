@@ -36,26 +36,25 @@ const DEFAULT_GRAVATAR_STR = `{%- set numExp = r/^[0-9]+$/g -%}
 module.exports = class extends think.Service {
   // 生成头像URL的方法
   async stringify(comment) {
-    think.logger.debug('【头像】开始生成头像URL');
+    // think.logger.debug('【头像】开始生成头像URL');
 
     // 获取自定义头像生成函数
     const fn = think.config('avatarUrl');
 
     // 如果配置了自定义函数，优先使用
     if (think.isFunction(fn)) {
-      think.logger.debug('【头像】使用自定义头像生成函数');
+      // think.logger.debug('【头像】使用自定义头像生成函数');
       const ret = await fn(comment);
 
       if (think.isString(ret) && ret) {
-        think.logger.debug('【头像】自定义头像URL生成成功');
+        // think.logger.debug('【头像】自定义头像URL生成成功');
         return ret;
       }
     }
 
     // 使用配置的或默认的头像生成规则
     const gravatarStr = GRAVATAR_STR || DEFAULT_GRAVATAR_STR;
-
-    think.logger.debug('【头像】使用模板生成头像URL');
+    // think.logger.debug('【头像】使用模板生成头像URL');
     return env.renderString(gravatarStr, comment);
   }
 };

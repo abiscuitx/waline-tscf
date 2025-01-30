@@ -17,7 +17,7 @@ module.exports = function(configParams = {}) {
 
       // 如果应用实例不存在，创建thinkjs实例
       if (!app) {
-        console.log('【waline】实例冷启动');
+        console.log(new Date(),'【waline】实例冷启动');
         app = new Application({
           ROOT_PATH: __dirname,
           APP_PATH: path.join(__dirname, 'src'),
@@ -33,10 +33,10 @@ module.exports = function(configParams = {}) {
         for (const k in config) {
           think.config(k === 'model' ? 'customModel' : k, config[k]);
         }
-        think.logger.debug('【waline】实例已创建');
-      }
-      console.log('【waline】实例热启动');
-
+      } else {
+        console.log(new Date(),'【waline】实例热启动');
+      } 
+      
       // 构造请求，响应对象
       const server = http.createServer();      
       const req = new http.IncomingMessage(server);
@@ -52,7 +52,7 @@ module.exports = function(configParams = {}) {
       });
       const res = new http.ServerResponse(req);
       const originalEnd = res.end;
-      think.logger.debug('构造请求对象:', req.method, req.url);
+      // think.logger.debug('构造请求对象:', req.method, req.url);
 
       // 重写 res.end 来捕获响应
       let responseData = null;

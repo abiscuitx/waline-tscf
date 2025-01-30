@@ -117,22 +117,19 @@ module.exports = class extends Base {
    */
   getAction() {
     const { type, path } = this.get();
-    think.logger.debug('【评论】this.get()结果:', this.get());  // 打印 this.get() 的完整结果
-    think.logger.debug('【评论】处理获取评论请求:', type, path);
+    // think.logger.debug('【评论】this.get()结果:', this.get()); 
 
     // 检查是否允许获取评论列表
     const isAllowedGet = type !== 'list' || path;
-    think.logger.debug('【评论】isAllowedGet:', isAllowedGet, 'type:', type, 'path:', path);
-
     if (!isAllowedGet) {
-      think.logger.debug('【评论】需要管理员权限');
+      // think.logger.debug('【评论】需要管理员权限');
       this.checkAdmin();
     }
 
     // 根据不同类型设置不同的验证规则
     switch (type) {
       case 'recent':
-        think.logger.debug('【评论】获取最近评论');
+        // think.logger.debug('【评论】获取最近评论');
         this.rules = {
           count: {
             int: { max: 50 },    // 最大返回50条评论
@@ -142,7 +139,7 @@ module.exports = class extends Base {
         break;
 
       case 'count':
-        think.logger.debug('【评论】获取评论数量');
+        // think.logger.debug('【评论】获取评论数量');
         this.rules = {
           url: {
             array: true,         // URL必须是数组格式
@@ -151,12 +148,12 @@ module.exports = class extends Base {
         break;
 
       case 'list': {
-        think.logger.debug('【评论】获取评论列表');
+        // think.logger.debug('【评论】获取评论列表');
         const { userInfo } = this.ctx.state;
 
         // 检查管理员权限
         if (userInfo.type !== 'administrator') {
-          think.logger.debug('【评论】非管理员，拒绝访问');
+          // think.logger.debug('【评论】非管理员，拒绝访问');
           return this.fail();
         }
         this.rules = {
@@ -173,8 +170,7 @@ module.exports = class extends Base {
       }
 
       default:
-        think.logger.debug('【评论】获取指定路径的评论');
-        think.logger.debug('【评论】设置验证规则前的参数:', path);
+        // think.logger.debug('【评论】设置验证规则前的参数:', path);
         this.rules = {
           path: {
             string: true,        // 路径必须是字符串
@@ -193,7 +189,6 @@ module.exports = class extends Base {
             default: 'insertedAt_desc',                              // 默认按时间倒序
           },
         };
-        think.logger.debug('【评论】设置验证规则后的 rules:', this.rules);
         break;
     }
   }

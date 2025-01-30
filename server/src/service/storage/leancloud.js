@@ -1,19 +1,24 @@
-const AV = require('leancloud-storage');
+const { LEAN_ID, LEAN_KEY, LEAN_MASTER_KEY, LEAN_SERVER } = process.env;
+// 如果缺少必要的环境变量配置，直接返回空类
+if (!LEAN_ID || !LEAN_KEY || !LEAN_MASTER_KEY) {
+  module.exports = class {};
+  return;
+}
 
+// 仅在配置完整时才加载依赖
+const AV = require('leancloud-storage');
 const Base = require('./base.js');
 
-const { LEAN_ID, LEAN_KEY, LEAN_MASTER_KEY, LEAN_SERVER } = process.env;
+// 初始化 LeanCloud
+AV.Cloud.useMasterKey(true);
+AV.init({
+  appId: LEAN_ID,
+  appKey: LEAN_KEY,
+  masterKey: LEAN_MASTER_KEY,
+  serverURL: LEAN_SERVER,
+});
 
-if (LEAN_ID && LEAN_KEY && LEAN_MASTER_KEY) {
-  AV.Cloud.useMasterKey(true);
-  AV.init({
-    appId: LEAN_ID,
-    appKey: LEAN_KEY,
-    masterKey: LEAN_MASTER_KEY,
-    // required for leancloud china
-    serverURL: LEAN_SERVER,
-  });
-}
+// 导出 LeanCloud 存储类
 module.exports = class extends Base {
   parseWhere(className, where) {
     const instance = new AV.Query(className);
@@ -437,3 +442,4 @@ module.exports = class extends Base {
     return AV.Object.destroyAll(data);
   }
 };
+s

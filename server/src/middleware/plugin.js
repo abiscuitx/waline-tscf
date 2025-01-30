@@ -12,7 +12,7 @@ module.exports = () => async (ctx, next) => {
 
   // 如果没有可用的插件中间件，直接执行下一个中间件
   if (!think.isArray(middlewares) || !middlewares.length) {
-    think.logger.debug('【插件】未找到可用的插件中间件');
+    // think.logger.debug('【插件】未找到可用的插件中间件');
     return next();
   }
 

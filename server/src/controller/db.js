@@ -1,6 +1,4 @@
-
 const BaseRest = require('./rest.js');
-
 module.exports = class extends BaseRest {
   // 导出数据库数据的处理方法
   async getAction() {

@@ -1,3 +1,11 @@
+const { GITHUB_TOKEN, GITHUB_REPO, GITHUB_PATH } = process.env;
+// 如果缺少必要的环境变量配置，直接返回空类
+if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_PATH) {
+  module.exports = class {};
+  return;
+}
+
+
 const path = require('node:path');
 
 const { parseString, writeToString } = require('fast-csv');
@@ -138,8 +146,6 @@ module.exports = class extends Base {
   constructor(tableName) {
     super();
     this.tableName = tableName;
-
-    const { GITHUB_TOKEN, GITHUB_REPO, GITHUB_PATH } = process.env;
 
     this.git = new Github(GITHUB_REPO, GITHUB_TOKEN);
     this.basePath = GITHUB_PATH;
@@ -379,3 +385,4 @@ module.exports = class extends Base {
     await this.save(this.tableName, data, instance.sha);
   }
 };
+console.log(new Date(), '55');

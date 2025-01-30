@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "2.0.0-beta.27",
+  "version": "2.0.0-beta.36",
   "description": "Debugging, temporarily unavailable. A personal waline backend deployed on Tencent Cloud SCF",
   "main": "index.js",
   "keywords": [
@@ -16,7 +16,6 @@
   "license": "MIT",
   "author": "abiscuit",
   "dependencies": {
-    "@cloudbase/node-sdk": "^3.3.7",
     "@koa/cors": "^5.0.0",
     "@mdit/plugin-katex": "0.8.0",
     "@mdit/plugin-mathjax": "0.4.8",

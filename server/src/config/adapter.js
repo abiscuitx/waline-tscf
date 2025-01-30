@@ -1,9 +1,13 @@
-console.log('【适配器】 初始化适配器配置');
 // 引入数据库驱动和日志模块
 const { Basic } = require('think-logger3');
-const Mysql = require('think-model-mysql');
-const Mysql2 = require('think-model-mysql2');
-const Postgresql = require('think-model-postgresql');
+// 数据库驱动延迟加载函数
+let Mysql, Mysql2, Postgresql;
+// 加载器函数
+const load = {
+  mysql: () => Mysql || (Mysql = require('think-model-mysql')),
+  mysql2: () => Mysql2 || (Mysql2 = require('think-model-mysql2')),
+  postgresql: () => Postgresql || (Postgresql = require('think-model-postgresql'))
+};
 
 // 从环境变量获取数据库配置参数
 const {
@@ -87,10 +91,6 @@ if (MONGO_DB) {
   console.warn('【适配器】未检测到数据库配置');
 }
 
-// 判断是否是Vercel环境下的PostgreSQL数据库
-const isVercelPostgres =
-  type === 'postgresql' && POSTGRES_HOST?.endsWith('vercel-storage.com');
-
 // 导出数据库配置对象
 exports.model = {
   type,
@@ -121,7 +121,7 @@ exports.model = {
 
   // MySQL配置项
   mysql: {
-    handle: Mysql,
+    handle: type === 'mysql' ? load.mysql() : null,
     dateStrings: true,
     host: MYSQL_HOST || '127.0.0.1',
     port: MYSQL_PORT || '3306',
@@ -140,7 +140,7 @@ exports.model = {
 
   // TiDB配置项
   tidb: {
-    handle: Mysql2,
+    handle: type === 'tidb' ? load.Mysql2() : null,
     dateStrings: true,
     host: TIDB_HOST || '127.0.0.1',
     port: TIDB_PORT || '4000',
@@ -156,16 +156,16 @@ exports.model = {
   },
     // PostgreSQL配置项
     postgresql: {
-      handle: Postgresql,
+      handle: type === 'postgresql' ? load.Postgresql() : null,
       user: PG_USER || POSTGRES_USER,
       password: PG_PASSWORD || POSTGRES_PASSWORD,
       database: PG_DB || POSTGRES_DATABASE,
       host: PG_HOST || POSTGRES_HOST || '127.0.0.1',
-      port: PG_PORT || POSTGRES_PORT || (isVercelPostgres ? '5432' : '3211'),
+      port: PG_PORT || POSTGRES_PORT ,
       connectionLimit: 1,
       prefix: PG_PREFIX || POSTGRES_PREFIX || 'wl_',
       ssl:
-        (PG_SSL || POSTGRES_SSL) == 'true' || isVercelPostgres
+        (PG_SSL || POSTGRES_SSL) == 'true'
           ? {
               rejectUnauthorized: false,
             }
@@ -196,4 +196,4 @@ exports.logger = {
     }
   }
 };
-console.log('【适配器】 已加载适配器配置');
+console.log(new Date(),'【适配器】 已加载适配器配置');

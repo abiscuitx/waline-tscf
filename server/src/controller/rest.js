@@ -1,6 +1,5 @@
 const path = require('node:path');
 
-
 module.exports = class extends think.Controller {
   // 标识当前类为 REST 控制器
   static get _REST() {
@@ -28,8 +27,7 @@ module.exports = class extends think.Controller {
     const filename = this.__filename || __filename;
     const last = filename.lastIndexOf(path.sep);
     const resource = filename.substr(last + 1, filename.length - last - 4);
-    
-    think.logger.debug('【REST】解析资源名称:', resource);
+    // think.logger.debug('【REST】解析资源名称:', resource);
     return resource;
   }
 
@@ -39,7 +37,7 @@ module.exports = class extends think.Controller {
 
     // 检查请求参数中的ID
     if (id && (think.isString(id) || think.isNumber(id))) {
-      think.logger.debug('【REST】从请求参数获取ID:', id);
+      // think.logger.debug('【REST】从请求参数获取ID:', id);
       return id;
     }
 
@@ -48,11 +46,11 @@ module.exports = class extends think.Controller {
 
     // 验证URL中的ID格式
     if (last !== this.resource && /^([a-z0-9]+,?)*$/i.test(last)) {
-      think.logger.debug('【REST】从URL路径获取ID:', last);
+      // think.logger.debug('【REST】从URL路径获取ID:', last);
       return last;
     }
 
-    think.logger.debug('【REST】未找到有效ID');
+    // think.logger.debug('【REST】未找到有效ID');
     return '';
   }
 

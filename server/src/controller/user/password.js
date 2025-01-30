@@ -1,9 +1,7 @@
-
+console.log(new Date(),' password.js');
 const jwt = require('jsonwebtoken');
-
 // 引入基础 REST 控制器
 const BaseRest = require('../rest.js');
-
 module.exports = class extends BaseRest {
   // 处理密码重置请求的方法
   async putAction() {

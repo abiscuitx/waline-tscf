@@ -1,3 +1,9 @@
+const {   MONGO_DB, MONGO_PASSWORD } = process.env;
+// 如果缺少必要的环境变量配置，直接返回空类
+if (!MONGO_DB || ! MONGO_PASSWORD) {
+  module.exports = class {};
+  return;
+}
 // 引入MongoDB ObjectId类型
 const { ObjectID: ObjectId } = require('think-mongo/lib/model');
 
@@ -18,11 +24,11 @@ function getCacheKey(method, params) {
 
 function getCache(method, params) {
   const key = getCacheKey(method, params);
-  think.logger.debug('【MongoDB】缓存键值:', key);
+  // think.logger.debug('【MongoDB】缓存键值:', key);
   const cache = mongoCache[method].get(key);
   
   if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
-    think.logger.debug(`【MongoDB】从缓存获取${method}数据`);
+    // think.logger.debug(`【MongoDB】从缓存获取${method}数据`);
     return cache.data;
   }
   return null;
@@ -30,7 +36,7 @@ function getCache(method, params) {
 
 function setCache(method, params, data) {
   const key = getCacheKey(method, params);
-  think.logger.debug('【MongoDB】设置缓存，键值:', key);
+  // think.logger.debug('【MongoDB】设置缓存，键值:', key);
   mongoCache[method].set(key, {
     data,
     timestamp: Date.now()
@@ -38,7 +44,7 @@ function setCache(method, params, data) {
 }
 
 function clearCache() {
-  think.logger.debug('【MongoDB】清除MongoDB相关缓存');
+  // think.logger.debug('【MongoDB】清除MongoDB相关缓存');
   mongoCache.select.clear();
   mongoCache.count.clear();
 }
@@ -46,7 +52,7 @@ function clearCache() {
 module.exports = class extends Base {
   // 解析查询条件为MongoDB格式
   parseWhere(where) {
-    think.logger.debug('【MongoDB】开始解析查询条件:', JSON.stringify(where));
+    // think.logger.debug('【MongoDB】开始解析查询条件:', JSON.stringify(where));
     if (think.isEmpty(where)) {
       return {};
     }
@@ -125,13 +131,13 @@ module.exports = class extends Base {
       }
     }
 
-    think.logger.debug('【MongoDB】查询条件解析完成, 结果:', JSON.stringify(filter));
+    // think.logger.debug('【MongoDB】查询条件解析完成, 结果:', JSON.stringify(filter));
     return filter;
   }
 
   // 构建MongoDB查询条件
   where(instance, where) {
-    think.logger.debug('【MongoDB】构建查询条件');
+    // think.logger.debug('【MongoDB】构建查询条件');
     const filter = this.parseWhere(where);
 
     if (!where._complex) {
@@ -162,8 +168,7 @@ module.exports = class extends Base {
     // 尝试获取缓存
     const cacheData = getCache('select', { where, options });
     if (cacheData) return cacheData;
-
-    think.logger.debug('【MongoDB】执行查询操作');
+    // think.logger.debug('【MongoDB】执行查询操作');
     let retries = 3;
     
     while (retries > 0) {
@@ -194,7 +199,7 @@ module.exports = class extends Base {
         if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
-        think.logger.warn(`【MongoDB】查询操作失败，剩余重试次数: ${retries}`);
+        // think.logger.warn(`【MongoDB】查询操作失败，剩余重试次数: ${retries}`);
         await new Promise(r => setTimeout(r, 1000));
       }
     }
@@ -205,8 +210,7 @@ module.exports = class extends Base {
     // 尝试获取缓存
     const cacheData = getCache('count', { where, options });
     if (cacheData) return cacheData;
-
-    think.logger.debug('【MongoDB】执行统计操作');
+    // think.logger.debug('【MongoDB】执行统计操作');
     let retries = 3;
 
     while (retries > 0) {
@@ -229,7 +233,7 @@ module.exports = class extends Base {
         if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
-        think.logger.warn(`【MongoDB】统计操作失败，剩余重试次数: ${retries}`);
+        // think.logger.warn(`【MongoDB】统计操作失败，剩余重试次数: ${retries}`);
         await new Promise(r => setTimeout(r, 1000));
       }
     }
@@ -237,7 +241,7 @@ module.exports = class extends Base {
 
   // 添加数据
   async add(data) {
-    think.logger.debug('【MongoDB】执行添加操作');
+    // think.logger.debug('【MongoDB】执行添加操作');
     let retries = 3;
 
     while (retries > 0) {
@@ -256,7 +260,7 @@ module.exports = class extends Base {
         if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
-        think.logger.warn(`【MongoDB】添加操作失败，剩余重试次数: ${retries}`);
+        // think.logger.warn(`【MongoDB】添加操作失败，剩余重试次数: ${retries}`);
         await new Promise(r => setTimeout(r, 1000));
       }
     }
@@ -264,7 +268,7 @@ module.exports = class extends Base {
 
   // 更新数据
   async update(data, where) {
-    think.logger.debug('【MongoDB】执行更新操作');
+    // think.logger.debug('【MongoDB】执行更新操作');
     let retries = 3;
 
     while (retries > 0) {
@@ -290,7 +294,7 @@ module.exports = class extends Base {
         if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
-        think.logger.warn(`【MongoDB】更新操作失败，剩余重试次数: ${retries}`);
+        // think.logger.warn(`【MongoDB】更新操作失败，剩余重试次数: ${retries}`);
         await new Promise(r => setTimeout(r, 1000));
       }
     }
@@ -298,7 +302,7 @@ module.exports = class extends Base {
 
   // 删除数据
   async delete(where) {
-    think.logger.debug('【MongoDB】执行删除操作');
+    // think.logger.debug('【MongoDB】执行删除操作');
     let retries = 3;
 
     while (retries > 0) {
@@ -312,7 +316,7 @@ module.exports = class extends Base {
         if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
-        think.logger.warn(`【MongoDB】删除操作失败，剩余重试次数: ${retries}`);
+        // think.logger.warn(`【MongoDB】删除操作失败，剩余重试次数: ${retries}`);
         await new Promise(r => setTimeout(r, 1000));
       }
     }

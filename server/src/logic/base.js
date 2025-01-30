@@ -20,7 +20,7 @@ module.exports = class extends think.Logic {
 
   // 请求前置处理方法
   async __before() {
-    think.logger.debug('【基础逻辑】开始前置处理');
+    // think.logger.debug('【基础逻辑】开始前置处理');
     const referrer = this.ctx.referrer(true);
     let { secureDomains } = this.config();
 
@@ -140,7 +140,7 @@ module.exports = class extends think.Logic {
 
   // 从请求中获取资源ID
   getId() {
-    think.logger.debug('【基础逻辑】获取资源ID');
+    // think.logger.debug('【基础逻辑】获取资源ID');
     const id = this.get('id');
 
     if (id && (think.isString(id) || think.isNumber(id))) {

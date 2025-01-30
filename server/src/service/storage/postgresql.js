@@ -1,5 +1,4 @@
 const MySQL = require('./mysql.js');
-
 function mapKeys({ insertedat, createdat, updatedat, ...item }) {
   const mapFields = {
     insertedAt: insertedat,

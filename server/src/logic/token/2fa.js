@@ -41,3 +41,4 @@ module.exports = class extends Base {
     };
   }
 };
+console.log(new Date(), '3');

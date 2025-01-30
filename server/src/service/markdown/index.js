@@ -84,7 +84,7 @@ const initMarkdownParser = () => {
 
   // 返回解析函数
   return (content) => {
-    think.logger.debug('【Markdown】开始解析Markdown内容');
+    // think.logger.debug('【Markdown】开始解析Markdown内容');
     return sanitize(markdownIt.render(content));
   };
 };

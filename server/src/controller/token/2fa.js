@@ -1,8 +1,6 @@
-
+console.log(new Date(),' 2fa.js');
 const speakeasy = require('speakeasy');
-
 const BaseRest = require('../rest.js');
-
 module.exports = class extends BaseRest {
   // 获取2FA配置信息
   async getAction() {

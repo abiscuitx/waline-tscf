@@ -3,7 +3,7 @@ const path = require('node:path');
 const Application = require('thinkjs');
 
 // 初始化Waline服务实例
-console.log('[Waline] 初始化应用实例');
+console.log(new Date(),'[Waline] 初始化应用实例');
 const instance = new Application({
   ROOT_PATH: __dirname,
   APP_PATH: path.join(__dirname, 'src'),
@@ -22,4 +22,4 @@ let config = {
 for (const k in config) {
   think.config(k, config[k]);
 }
-think.logger.debug('[Waline] 服务初始化完成');  
+console.log(new Date(),'[Waline] 服务初始化完成');

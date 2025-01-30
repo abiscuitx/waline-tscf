@@ -1,48 +1,52 @@
 // 引入Node.js内置加密模块
-const crypto = require('node:crypto');
+let crypto, FormData, fetch, nodemailer, nunjucks;
 
-// 引入第三方依赖
-const FormData = require('form-data');
-const fetch = require('node-fetch');
-const nodemailer = require('nodemailer');
-const nunjucks = require('nunjucks');
+// 懒加载辅助函数
+const load = {
+  crypto: () => crypto || (crypto = require('node:crypto')),
+  formData: () => FormData || (FormData = require('form-data')),
+  fetch: () => fetch || (fetch = require('node-fetch')),
+  nodemailer: () => nodemailer || (nodemailer = require('nodemailer')),
+  nunjucks: () => nunjucks || (nunjucks = require('nunjucks'))
+};
 
 // 导出通知服务类
 module.exports = class extends think.Service {
   // 初始化通知服务
   constructor(ctx) {
     super(ctx);
-    think.logger.debug('【通知】初始化通知服务');
-
     this.ctx = ctx;
-    // 从环境变量获取SMTP配置
-    const {
-      SMTP_USER,
-      SMTP_PASS,
-      SMTP_HOST,
-      SMTP_PORT,
-      SMTP_SECURE,
-      SMTP_SERVICE,
-    } = process.env;
-
-    // 如果配置了SMTP服务，初始化邮件发送器
-    if (SMTP_HOST || SMTP_SERVICE) {
-      think.logger.debug('【通知】配置SMTP邮件服务');
-      const config = {
-        auth: { user: SMTP_USER, pass: SMTP_PASS },
-      };
-
-      if (SMTP_SERVICE) {
-        config.service = SMTP_SERVICE;
-      } else {
-        config.host = SMTP_HOST;
-        config.port = parseInt(SMTP_PORT);
-        config.secure = SMTP_SECURE && SMTP_SECURE !== 'false';
-      }
-      this.transporter = nodemailer.createTransport(config);
-    }
   }
+ // 从环境变量获取SMTP配置
+  getTransporter() {
+    if (!this._transporter) {
+      const {
+        SMTP_USER,
+        SMTP_PASS,
+        SMTP_HOST,
+        SMTP_PORT,
+        SMTP_SECURE,
+        SMTP_SERVICE,
+      } = process.env;
 
+      if (SMTP_HOST || SMTP_SERVICE) {
+        think.logger.debug('【通知】配置SMTP邮件服务');
+        const config = {
+          auth: { user: SMTP_USER, pass: SMTP_PASS },
+        };
+
+        if (SMTP_SERVICE) {
+          config.service = SMTP_SERVICE;
+        } else {
+          config.host = SMTP_HOST;
+          config.port = parseInt(SMTP_PORT);
+          config.secure = SMTP_SECURE && SMTP_SECURE !== 'false';
+        }
+        this._transporter = load.nodemailer().createTransport(config);
+      }
+    }
+    return this._transporter;
+  }
   // 延迟执行指定秒数
   async sleep(second) {
     return new Promise((resolve) => setTimeout(resolve, second * 1000));
@@ -50,11 +54,11 @@ module.exports = class extends think.Service {
 
   // 发送邮件通知
   async mail({ to, title, content }, self, parent) {
-    if (!this.transporter) {
+    const transporter = this.getTransporter();
+    if (!transporter) {
       think.logger.debug('【通知】未配置SMTP服务，跳过邮件发送');
       return;
     }
-
     think.logger.debug('【通知】准备发送邮件通知');
     // 获取站点配置信息
     const { SITE_NAME, SITE_URL, SMTP_USER, SENDER_EMAIL, SENDER_NAME } =
@@ -73,7 +77,7 @@ module.exports = class extends think.Service {
     content = this.ctx.locale(content, data);
 
     think.logger.debug('【通知】发送邮件到:', to);
-    return this.transporter.sendMail({
+    return transporter.sendMail({
       from:
         SENDER_EMAIL && SENDER_NAME
           ? `"${SENDER_NAME}" <${SENDER_EMAIL}>`
@@ -117,12 +121,13 @@ module.exports = class extends think.Service {
     title = this.ctx.locale(title, data);
     content = this.ctx.locale(contentWechat, data);
 
+    const FormData = load.formData();
     const form = new FormData();
     form.append('text', title);
     form.append('desp', content);
 
     think.logger.debug('【通知】发送Server酱请求');
-    return fetch(`https://sctapi.ftqq.com/${SC_KEY}.send`, {
+    return load.fetch(`https://sctapi.ftqq.com/${SC_KEY}.send`, {
       method: 'POST',
       headers: form.getHeaders(),
       body: form,
@@ -190,7 +195,7 @@ module.exports = class extends think.Service {
     }
 
     // 获取访问令牌
-    const { access_token } = await fetch(
+    const { access_token } = await load.fetch(
       `${baseUrl}/cgi-bin/gettoken?${querystring.toString()}`,
       {
         headers: {
@@ -200,7 +205,7 @@ module.exports = class extends think.Service {
     ).then((resp) => resp.json());
 
     // 发送企业微信通知
-    return fetch(`${baseUrl}/cgi-bin/message/send?access_token=${access_token}`, {
+    return load.fetch(`${baseUrl}/cgi-bin/message/send?access_token=${access_token}`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -260,6 +265,7 @@ module.exports = class extends think.Service {
 {{self.comment}}
 仅供预览评论，请前往上述页面查看完整內容。`;
 
+    const FormData = load.formData();
     const form = new FormData();
     form.append('msg', this.ctx.locale(contentQQ, data));
     form.append('qq', QQ_ID);
@@ -270,7 +276,7 @@ module.exports = class extends think.Service {
       : 'https://qmsg.zendee.cn';
 
     // 发送QQ通知
-    return fetch(`${qmsgHost}/send/${QMSG_KEY}`, {
+    return load.fetch(`${qmsgHost}/send/${QMSG_KEY}`, {
       method: 'POST',
       header: form.getHeaders(),
       body: form,
@@ -340,13 +346,14 @@ module.exports = class extends think.Service {
       },
     };
 
+    const FormData = load.formData();
     const form = new FormData();
     form.append('text', this.ctx.locale(contentTG, data));
     form.append('chat_id', TG_CHAT_ID);
     form.append('parse_mode', 'MarkdownV2');
 
     // 发送Telegram通知
-    const resp = await fetch(
+    const resp = await load.fetch(
       `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',
@@ -392,7 +399,8 @@ module.exports = class extends think.Service {
     content = this.ctx.locale(content, data);
 
     // 构建请求表单
-    const form = new FormData();
+    const FormData = load.formData();
+const form = new FormData();
     if (topic) form.append('topic', topic);
     if (template) form.append('template', template);
     if (channel) form.append('channel', channel);
@@ -402,7 +410,7 @@ module.exports = class extends think.Service {
     if (content) form.append('content', content);
 
     // 发送PushPlus通知
-    return fetch(`http://www.pushplus.plus/send/${PUSH_PLUS_KEY}`, {
+    return load.fetch(`http://www.pushplus.plus/send/${PUSH_PLUS_KEY}`, {
       method: 'POST',
       header: form.getHeaders(),
       body: form,
@@ -440,11 +448,12 @@ module.exports = class extends think.Service {
       data,
     );
 
+    const FormData = load.formData();
     const form = new FormData();
     form.append('content', `${title}\n${content}`);
 
     // 发送Discord通知
-    return fetch(DISCORD_WEBHOOK, {
+    return load.fetch(DISCORD_WEBHOOK, {
       method: 'POST',
       header: form.getHeaders(),
       body: form,
@@ -474,7 +483,7 @@ module.exports = class extends think.Service {
     };
 
     // 渲染通知内容
-    content = nunjucks.renderString(
+    content = load.nunjucks().renderString(
       think.config('LarkTemplate') ||
         `【网站名称】：{{site.name|safe}} \n【评论者昵称】：{{self.nick}}\n【评论者邮箱】：{{self.mail}}\n【内容】：{{self.comment}}【地址】：{{site.postUrl}}`,
       data,
@@ -507,7 +516,7 @@ module.exports = class extends think.Service {
     // 生成签名
     const sign = (timestamp, secret) => {
       const signStr = timestamp + '\n' + secret;
-      return crypto.createHmac('sha256', signStr).update('').digest('base64');
+      return load.crypto().createHmac('sha256', signStr).update('').digest('base64');
     };
 
     // 如果配置了密钥，添加签名
@@ -517,7 +526,7 @@ module.exports = class extends think.Service {
     }
 
     // 发送飞书通知
-    const resp = await fetch(LARK_WEBHOOK, {
+    const resp = await load.fetch(LARK_WEBHOOK, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

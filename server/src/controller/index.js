@@ -1,6 +1,4 @@
-
 const { version } = require('../../package.json');
-
 module.exports = class extends think.Controller {
   indexAction() {
     think.logger.debug('【首页】开始渲染评论系统示例页面');

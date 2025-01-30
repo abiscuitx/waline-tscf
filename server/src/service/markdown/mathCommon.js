@@ -5,7 +5,7 @@
  * 假定在 state.src[pos] 位置有一个 "$" 符号
  */
 const isValidDelim = (state, pos) => {
-  think.logger.debug('【数学公式】检查分隔符有效性');
+  // think.logger.debug('【数学公式】检查分隔符有效性');
   const prevChar = pos > 0 ? state.src.charAt(pos - 1) : '';
   const nextChar = pos + 1 <= state.posMax ? state.src.charAt(pos + 1) : '';
 
@@ -25,7 +25,7 @@ const isValidDelim = (state, pos) => {
 
 // 处理行内TeX公式解析
 const inlineTeX = (state, silent) => {
-  think.logger.debug('【数学公式】处理行内TeX公式');
+  // think.logger.debug('【数学公式】处理行内TeX公式');
   let match;
   let pos;
   let res;
@@ -62,7 +62,7 @@ const inlineTeX = (state, silent) => {
 
   // 没有找到闭合分隔符，消耗$并继续
   if (match === -1) {
-    think.logger.debug('【数学公式】未找到闭合分隔符');
+    // think.logger.debug('【数学公式】未找到闭合分隔符');
     if (!silent) state.pending += '$';
     state.pos = start;
 
@@ -71,7 +71,7 @@ const inlineTeX = (state, silent) => {
 
   // 检查是否有空内容，即: $$，不进行解析
   if (match - start === 0) {
-    think.logger.debug('【数学公式】检测到空内容');
+    // think.logger.debug('【数学公式】检测到空内容');
     if (!silent) state.pending += '$$';
     state.pos = start + 1;
 
@@ -92,7 +92,7 @@ const inlineTeX = (state, silent) => {
     token = state.push('inlineTeX', 'math', 0);
     token.markup = '$';
     token.content = state.src.slice(start, match);
-    think.logger.debug('【数学公式】成功解析行内公式');
+    // think.logger.debug('【数学公式】成功解析行内公式');
   }
 
   state.pos = match + 1;
@@ -102,7 +102,7 @@ const inlineTeX = (state, silent) => {
 
 // 处理块级TeX公式解析
 const blockTeX = (state, start, end, silent) => {
-  think.logger.debug('【数学公式】处理块级TeX公式');
+  // think.logger.debug('【数学公式】处理块级TeX公式');
   let firstLine;
   let lastLine;
   let next;
@@ -155,8 +155,7 @@ const blockTeX = (state, start, end, silent) => {
       : '');
   token.map = [start, state.line];
   token.markup = '$$';
-
-  think.logger.debug('【数学公式】成功解析块级公式');
+  // think.logger.debug('【数学公式】成功解析块级公式');
   return true;
 };
 
