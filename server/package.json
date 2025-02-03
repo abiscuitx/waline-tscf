@@ -17,10 +17,10 @@
   "author": "abiscuit",
   "dependencies": {
     "@koa/cors": "^5.0.0",
-    "@mdit/plugin-katex": "0.8.0",
-    "@mdit/plugin-mathjax": "0.4.8",
-    "@mdit/plugin-sub": "0.8.0",
-    "@mdit/plugin-sup": "0.8.0",
+    "@mdit/plugin-katex": "0.16.6-cjs.0",
+    "@mdit/plugin-mathjax": "0.16.6-cjs.0",
+    "@mdit/plugin-sub": "0.16.6-cjs.0",
+    "@mdit/plugin-sup": "0.16.6-cjs.0",
     "akismet": "^2.0.7",
     "deta": "^2.0.0",
     "dompurify": "^3.2.2",
@@ -36,7 +36,7 @@
     "markdown-it-emoji": "^3.0.0",
     "mathjax-full": "^3.2.2",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^6.10.0",
     "nunjucks": "^3.2.4",
     "phpass": "^0.1.1",
     "prismjs": "^1.29.0",
@@ -52,8 +52,12 @@
     "thinkjs": "^3.2.15",
     "ua-parser-js": "^2.0.0"
   },
+  "devDependencies": {
+    "dotenv": "16.4.7",
+    "think-watcher": "3.0.4"
+  },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"

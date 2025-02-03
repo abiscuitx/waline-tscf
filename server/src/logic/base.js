@@ -5,7 +5,6 @@ const qs = require('node:querystring');
 
 // 引入第三方依赖
 const jwt = require('jsonwebtoken');
-const fetch = require('node-fetch');
 const helper = require('think-helper');
 
 module.exports = class extends think.Logic {
@@ -22,11 +21,21 @@ module.exports = class extends think.Logic {
   async __before() {
     // think.logger.debug('【基础逻辑】开始前置处理');
     const referrer = this.ctx.referrer(true);
+    let origin = this.ctx.origin;
+
+    if (origin) {
+      try {
+        const parsedOrigin = new URL(origin);
+
+        origin = parsedOrigin.hostname;
+      } catch (e) {
+        console.error('Invalid origin format:', origin, e);
+      }
+    }
+
     let { secureDomains } = this.config();
 
-    // 检查请求来源是否在安全域名列表中
-    if (secureDomains && referrer && this.ctx.host.indexOf(referrer) !== 0) {
-      think.logger.debug('【基础逻辑】检查安全域名');
+    if (secureDomains) {
       secureDomains = think.isArray(secureDomains)
         ? secureDomains
         : [secureDomains];
@@ -41,15 +50,41 @@ module.exports = class extends think.Logic {
         'graph.qq.com',
       );
 
-      // 检查请求来源是否匹配安全域名
-      const match = secureDomains.some((domain) =>
+      // 转换可能的正则表达式字符串为正则表达式对象
+      secureDomains = secureDomains
+        .map((domain) => {
+          // 如果是正则表达式字符串，创建一个 RegExp 对象
+          if (
+            typeof domain === 'string' &&
+            domain.startsWith('/') &&
+            domain.endsWith('/')
+          ) {
+            try {
+              return new RegExp(domain.slice(1, -1)); // 去掉斜杠并创建 RegExp 对象
+            } catch (e) {
+              console.error(
+                'Invalid regex pattern in secureDomains:',
+                domain,
+                e,
+              );
+
+              return null;
+            }
+          }
+
+          return domain;
+        })
+        .filter(Boolean); // 过滤掉无效的正则表达式
+
+      // 有 referrer 检查 referrer，没有则检查 origin
+      const checking = referrer ? referrer : origin;
+      const isSafe = secureDomains.some((domain) =>
         think.isFunction(domain.test)
-          ? domain.test(referrer)
-          : domain === referrer,
+          ? domain.test(checking)
+          : domain === checking,
       );
 
-      if (!match) {
-        think.logger.debug('【基础逻辑】请求来源不在安全域名列表中');
+      if (!isSafe) {
         return this.ctx.throw(403);
       }
     }

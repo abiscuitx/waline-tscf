@@ -9,7 +9,6 @@ if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_PATH) {
 const path = require('node:path');
 
 const { parseString, writeToString } = require('fast-csv');
-const fetch = require('node-fetch');
 
 const Base = require('./base.js');
 
