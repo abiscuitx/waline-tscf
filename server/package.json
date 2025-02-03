@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "2.0.0-beta.36",
+  "version": "2.0.0-beta.37",
   "description": "Debugging, temporarily unavailable. A personal waline backend deployed on Tencent Cloud SCF",
   "main": "index.js",
   "keywords": [
