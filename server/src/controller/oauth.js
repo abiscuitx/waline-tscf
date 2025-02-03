@@ -1,8 +1,5 @@
 // 引入 JWT 用于生成令牌
 const jwt = require('jsonwebtoken');
-// 引入 fetch 用于发送 HTTP 请求
-const fetch = require('node-fetch');
-
 
 module.exports = class extends think.Controller {
   // 构造函数：初始化用户模型实例
