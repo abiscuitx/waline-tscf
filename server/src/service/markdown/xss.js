@@ -1,3 +1,4 @@
+think.logger.debug('xss.js');
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const DOMPurify = createDOMPurify(new JSDOM('').window);
@@ -48,3 +49,4 @@ const sanitize = (content) =>
 module.exports = {
   sanitize,
 };
+think.logger.debug('xss.js');

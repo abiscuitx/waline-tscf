@@ -1,5 +1,4 @@
-
-
+think.logger.debug('mathCommon.js');
 /*
  * 检查潜在的开闭分隔符
  * 假定在 state.src[pos] 位置有一个 "$" 符号
@@ -164,3 +163,4 @@ module.exports = {
   inlineTeX,
   blockTeX,
 };
+think.logger.debug('mathCommon.js');

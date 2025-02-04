@@ -5,11 +5,10 @@ const waline = require('@waline-tscf/server');
 exports.main_handler = async (event, context) => {
   // console.log('【serverless】event参数:', JSON.stringify(event, null, 2));
   // console.log('【serverless】context参数:', JSON.stringify(context, null, 2));
-  console.log('【serverless】转发请求到waline');
+  console.log(new Date(), 'serverless】转发请求到waline');
   try {
     const response = await waline({ 
       event,
-      debugLevel: 'info' // 日志级别：debug、info、warn、error
       // 这里可以添加其他配置参数
     });
     // console.log('【serverless】响应参数', JSON.stringify(response, null, 2));

@@ -1,9 +1,8 @@
+think.logger.debug('akismet.js');
 // 使用懒加载方式引入Akismet
 let Akismet;
 const loadAkismet = () => {
-  if (!Akismet) {
-    Akismet = require('akismet');
-  }
+  Akismet = require('akismet');
   return Akismet;
 };
 
@@ -64,3 +63,4 @@ module.exports = function (comment, blog) {
     });
   });
 };
+think.logger.debug('akismet.js');

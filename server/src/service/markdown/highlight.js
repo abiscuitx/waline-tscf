@@ -1,3 +1,4 @@
+think.logger.debug('highlight.js');
 const prism = require('prismjs');
 const rawLoadLanguages = require('prismjs/components/index');
 
@@ -40,3 +41,4 @@ const resolveHighlighter = (language) => {
 module.exports = {
   resolveHighlighter,
 };
+think.logger.debug('highlight.js');

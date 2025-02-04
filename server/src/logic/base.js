@@ -2,7 +2,6 @@
 const path = require('node:path');
 const qs = require('node:querystring');
 
-
 // 引入第三方依赖
 const jwt = require('jsonwebtoken');
 const helper = require('think-helper');
@@ -20,16 +19,20 @@ module.exports = class extends think.Logic {
   // 请求前置处理方法
   async __before() {
     // think.logger.debug('【基础逻辑】开始前置处理');
-    const referrer = this.ctx.referrer(true);
-    let origin = this.ctx.origin;
+    const referrer = this.ctx.req.headers['Refer'] || this.ctx.referrer(true);
+    let origin = this.ctx.req.headers['origin'];
 
-    if (origin) {
+    if (origin && origin.length > 0) {
       try {
+        // 检查 origin 是否是一个完整的 URL
+        if (!origin.includes('://')) {
+          origin = `http://${origin}`;
+        }
         const parsedOrigin = new URL(origin);
-
         origin = parsedOrigin.hostname;
       } catch (e) {
-        console.error('Invalid origin format:', origin, e);
+        think.logger.debug('Invalid origin format:', origin, e);
+        origin = this.ctx.req.headers['host'] || '';
       }
     }
 

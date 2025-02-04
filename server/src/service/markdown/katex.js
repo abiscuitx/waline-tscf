@@ -1,6 +1,5 @@
+think.logger.debug('katex.js');
 const katex = require('katex');
-
-
 const { inlineTeX, blockTeX } = require('./mathCommon.js');
 const { escapeHtml } = require('./utils.js');
 
@@ -67,3 +66,4 @@ const katexPlugin = (md, options = { throwOnError: false }) => {
 module.exports = {
   katexPlugin,
 };
+think.logger.debug('katex.js');

@@ -1,3 +1,4 @@
+think.logger.debug('notify.js');
 // 引入Node.js内置加密模块
 let crypto, FormData, fetch, nodemailer, nunjucks;
 
@@ -625,3 +626,4 @@ const form = new FormData();
     }
   }
 };
+think.logger.debug('notify.js');

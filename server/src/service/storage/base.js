@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+think.logger.debug('base.js');
 
 module.exports = class extends think.Service {
   constructor(tableName) {
@@ -31,3 +31,4 @@ module.exports = class extends think.Service {
     //to be implemented
   }
 };
+think.logger.debug('base.js');

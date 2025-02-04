@@ -1,3 +1,4 @@
+think.logger.debug('postgresql.js');
 const MySQL = require('./mysql.js');
 function mapKeys({ insertedat, createdat, updatedat, ...item }) {
   const mapFields = {
@@ -82,3 +83,4 @@ module.exports = class extends MySQL {
     );
   }
 };
+think.logger.debug('postgresql.js');

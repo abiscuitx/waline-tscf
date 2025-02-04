@@ -1,3 +1,4 @@
+think.logger.debug('avatar.js');
 // 引入Node.js加密模块
 const crypto = require('crypto');
 
@@ -58,3 +59,4 @@ module.exports = class extends think.Service {
     return env.renderString(gravatarStr, comment);
   }
 };
+think.logger.debug('avatar.js');

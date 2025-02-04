@@ -1,3 +1,4 @@
+think.logger.debug('leancloud.js');
 const { LEAN_ID, LEAN_KEY, LEAN_MASTER_KEY, LEAN_SERVER } = process.env;
 // 如果缺少必要的环境变量配置，直接返回空类
 if (!LEAN_ID || !LEAN_KEY || !LEAN_MASTER_KEY) {
@@ -442,4 +443,4 @@ module.exports = class extends Base {
     return AV.Object.destroyAll(data);
   }
 };
-s
+think.logger.debug('leancloud.js');

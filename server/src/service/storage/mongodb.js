@@ -1,3 +1,4 @@
+think.logger.debug('monghodb.js');
 const {   MONGO_DB, MONGO_PASSWORD } = process.env;
 // 如果缺少必要的环境变量配置，直接返回空类
 if (!MONGO_DB || ! MONGO_PASSWORD) {
@@ -322,3 +323,4 @@ module.exports = class extends Base {
     }
   }
 };
+think.logger.debug('monghodb.js');

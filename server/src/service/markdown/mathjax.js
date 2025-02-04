@@ -1,3 +1,4 @@
+think.logger.debug('mathjax.js');
 const { liteAdaptor } = require('mathjax-full/js/adaptors/liteAdaptor.js');
 const { RegisterHTMLHandler } = require('mathjax-full/js/handlers/html.js');
 const { AllPackages } = require('mathjax-full/js/input/tex/AllPackages.js');
@@ -94,3 +95,4 @@ const mathjaxPlugin = (md) => {
 module.exports = {
   mathjaxPlugin,
 };
+think.logger.debug('mathjax.js');

@@ -1,3 +1,4 @@
+think.logger.debug('index.js');
 // 引入Markdown相关插件
 const { katex: katexPlugin } = require('@mdit/plugin-katex');
 const { sub: subPlugin } = require('@mdit/plugin-sub');
@@ -91,3 +92,4 @@ const initMarkdownParser = () => {
 
 // 导出Markdown解析器
 module.exports = { getMarkdownParser };
+think.logger.debug('index.js');
