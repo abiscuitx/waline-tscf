@@ -139,4 +139,4 @@ module.exports = {
   LarkTemplate: LARK_TEMPLATE,
 };
 
-console.log(new Date(),'【配置】 已加载配置，使用:', storage);
+console.log(new Date(),'已加载config.js，使用:', storage);

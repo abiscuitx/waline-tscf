@@ -1,22 +1,26 @@
 think.logger.debug('avatar.js');
-// 引入Node.js加密模块
-const crypto = require('crypto');
 
-// 引入模板引擎和辅助工具
-const nunjucks = require('nunjucks');
-const helper = require('think-helper');
+// 声明变量
+let nunjucks, helper, crypto;
+
+// 加载器函数
+const load = {
+  nunjucks: () => nunjucks || (nunjucks = require('nunjucks')),
+  helper: () => helper || (helper = require('think-helper')),
+  crypto: () => crypto || (crypto = require('crypto')),
+};
 
 // 从环境变量获取自定义Gravatar模板
 const { GRAVATAR_STR } = process.env;
 
 // 创建nunjucks模板环境
-const env = new nunjucks.Environment();
+const env = new (load.nunjucks().Environment)();
 
 // 添加md5哈希过滤器
-env.addFilter('md5', (str) => helper.md5(str));
+env.addFilter('md5', (str) => load.helper().md5(str));
 // 添加sha256哈希过滤器
 env.addFilter('sha256', (str) =>
-  crypto.createHash('sha256').update(str).digest('hex'),
+  load.crypto().createHash('sha256').update(str).digest('hex'),
 );
 
 // 默认的头像生成规则：
@@ -59,4 +63,5 @@ module.exports = class extends think.Service {
     return env.renderString(gravatarStr, comment);
   }
 };
+
 think.logger.debug('avatar.js');

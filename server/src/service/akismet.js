@@ -1,9 +1,10 @@
 think.logger.debug('akismet.js');
+
 // 使用懒加载方式引入Akismet
 let Akismet;
-const loadAkismet = () => {
-  Akismet = require('akismet');
-  return Akismet;
+
+const load = {
+  akismet: () => Akismet || (Akismet = require('akismet'))
 };
 
 // 默认的Akismet API密钥
@@ -30,7 +31,7 @@ module.exports = function (comment, blog) {
   return new Promise(function (resolve, reject) {
     think.logger.debug('【Akismet】初始化反垃圾检查客户端');
     // 创建Akismet客户端实例，使用懒加载
-    const akismet = loadAkismet().client({ blog, apiKey: AKISMET_KEY });
+    const akismet = load.akismet().client({ blog, apiKey: AKISMET_KEY });
 
     // 验证API密钥是否有效
     akismet.verifyKey(function (err, verifyKey) {

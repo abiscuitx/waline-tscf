@@ -1,13 +1,14 @@
-// 引入 JWT 用于生成令牌
-const jwt = require('jsonwebtoken');
-// 引入 speakeasy 用于双因素认证
-const speakeasy = require('speakeasy');
-// 引入工具函数库
-const helper = require('think-helper');
+think.logger.debug('token.js');
 
 // 引入基础 REST 控制器
 const BaseRest = require('./rest.js');
+let jwt, speakeasy, helper;
 
+const load = {
+  jwt: () => jwt || (jwt = require('jsonwebtoken')),
+  speakeasy: () => speakeasy || (speakeasy = require('speakeasy')),
+  helper: () => helper || (helper = require('think-helper')),
+};
 
 module.exports = class extends BaseRest {
   // 构造函数：初始化用户模型实例
@@ -50,7 +51,7 @@ module.exports = class extends BaseRest {
     // 如果启用了双因素认证，验证认证码
     if (twoFactorAuthSecret) {
       think.logger.debug('【Token】验证双因素认证码');
-      const verified = speakeasy.totp.verify({
+      const verified = load.speakeasy().totp.verify({
         secret: twoFactorAuthSecret,
         encoding: 'base32',
         token: code,
@@ -88,11 +89,13 @@ module.exports = class extends BaseRest {
     return this.success({
       ...user[0],
       password: null, // 清除密码信息
-      mailMd5: helper.md5(user[0].email.toLowerCase()), // 生成邮箱MD5用于头像
-      token: jwt.sign(user[0].email, this.config('jwtKey')), // 生成JWT令牌
+      mailMd5: load.helper().md5(user[0].email.toLowerCase()), // 生成邮箱MD5用于头像
+      token: load.jwt().sign(user[0].email, this.config('jwtKey')), // 生成JWT令牌
     });
   }
 
   // 登出处理方法（预留）
   deleteAction() {}
 };
+
+think.logger.debug('token.js');

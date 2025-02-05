@@ -6,23 +6,30 @@ if (!LEAN_ID || !LEAN_KEY || !LEAN_MASTER_KEY) {
   return;
 }
 
-// 仅在配置完整时才加载依赖
-const AV = require('leancloud-storage');
 const Base = require('./base.js');
 
-// 初始化 LeanCloud
-AV.Cloud.useMasterKey(true);
-AV.init({
-  appId: LEAN_ID,
-  appKey: LEAN_KEY,
-  masterKey: LEAN_MASTER_KEY,
-  serverURL: LEAN_SERVER,
-});
+let AV;
+const load = {
+  av: () => {
+    if (!AV) {
+      AV = require('leancloud-storage');
+      // 初始化 LeanCloud
+      AV.Cloud.useMasterKey(true);
+      AV.init({
+        appId: LEAN_ID,
+        appKey: LEAN_KEY,
+        masterKey: LEAN_MASTER_KEY,
+        serverURL: LEAN_SERVER,
+      });
+    }
+    return AV;
+  }
+};
 
 // 导出 LeanCloud 存储类
 module.exports = class extends Base {
   parseWhere(className, where) {
-    const instance = new AV.Query(className);
+    const instance = new load.av().Query(className);
 
     if (think.isEmpty(where)) {
       return instance;

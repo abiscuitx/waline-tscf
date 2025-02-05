@@ -1,7 +1,12 @@
 think.logger.debug('katex.js');
-const katex = require('katex');
-const { inlineTeX, blockTeX } = require('./mathCommon.js');
-const { escapeHtml } = require('./utils.js');
+
+let katex;
+
+const load = {
+  katex: () => katex || (katex = require('katex')),
+  mathCommon: () => require('./mathCommon.js'),
+  utils: () => require('./utils.js')
+};
 
 // 为markdown-it-simplemath设置KaTeX作为渲染器
 // 处理行内数学公式
@@ -9,7 +14,7 @@ const katexInline = (tex, options) => {
   think.logger.debug('【KaTeX】处理行内数学公式');
   options.displayMode = false;
   try {
-    return katex.renderToString(tex, options);
+    return load.katex().renderToString(tex, options);
   } catch (error) {
     if (options.throwOnError) {
       think.logger.debug('【KaTeX】行内公式渲染错误:', error);
@@ -17,9 +22,9 @@ const katexInline = (tex, options) => {
     }
 
     // 渲染错误时显示错误提示
-    return `<span class='katex-error' title='${escapeHtml(
+    return `<span class='katex-error' title='${load.utils().escapeHtml(
       error.toString(),
-    )}'>${escapeHtml(tex)}</span>`;
+    )}'>${load.utils().escapeHtml(tex)}</span>`;
   }
 };
 
@@ -28,7 +33,7 @@ const katexBlock = (tex, options) => {
   think.logger.debug('【KaTeX】处理块级数学公式');
   options.displayMode = true;
   try {
-    return `<p class='katex-block'>${katex.renderToString(tex, options)}</p>`;
+    return `<p class='katex-block'>${load.katex().renderToString(tex, options)}</p>`;
   } catch (error) {
     if (options.throwOnError) {
       think.logger.debug('【KaTeX】块级公式渲染错误:', error);
@@ -36,15 +41,17 @@ const katexBlock = (tex, options) => {
     }
 
     // 渲染错误时显示错误提示
-    return `<p class='katex-block katex-error' title='${escapeHtml(
+    return `<p class='katex-block katex-error' title='${load.utils().escapeHtml(
       error.toString(),
-    )}'>${escapeHtml(tex)}</p>`;
+    )}'>${load.utils().escapeHtml(tex)}</p>`;
   }
 };
 
 // KaTeX插件主函数
 const katexPlugin = (md, options = { throwOnError: false }) => {
   think.logger.debug('【KaTeX】初始化KaTeX插件');
+  const { inlineTeX, blockTeX } = load.mathCommon();
+  
   // 添加行内TeX语法规则
   md.inline.ruler.after('escape', 'inlineTeX', inlineTeX);
 

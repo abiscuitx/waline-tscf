@@ -1,10 +1,12 @@
 think.logger.debug('mysql.js');
 const {   MYSQL_DB, PG_DB, POSTGRES_DATABASE, TIDB_DB} = process.env;
+
 // 如果缺少必要的环境变量配置，直接返回空类
 if (!MYSQL_DB || !PG_DB|| !POSTGRES_DATABASE|| !TIDB_DB) {
   module.exports = class {};
   return;
 }
+
 const Base = require('./base.js');
 module.exports = class extends Base {
   parseWhere(filter) {

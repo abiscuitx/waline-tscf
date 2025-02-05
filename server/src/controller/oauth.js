@@ -1,5 +1,10 @@
-// 引入 JWT 用于生成令牌
-const jwt = require('jsonwebtoken');
+think.logger.debug('oauth.js');
+
+let jwt;
+
+const load = {
+  jwt: () => jwt || (jwt = require('jsonwebtoken'))
+};
 
 module.exports = class extends think.Controller {
   // 构造函数：初始化用户模型实例
@@ -82,7 +87,7 @@ module.exports = class extends think.Controller {
 
     // 如果找到已关联的用户，生成令牌并返回
     if (!think.isEmpty(userBySocial)) {
-      const token = jwt.sign(userBySocial[0].email, this.config('jwtKey'));
+      const token = load.jwt().sign(userBySocial[0].email, this.config('jwtKey'));
 
       think.logger.debug('【OAuth】用户已存在，生成新的登录令牌');
       if (redirect) {
@@ -152,7 +157,7 @@ module.exports = class extends think.Controller {
     }
 
     // 生成登录令牌
-    const token = jwt.sign(user.email, this.config('jwtKey'));
+    const token = load.jwt().sign(user.email, this.config('jwtKey'));
     think.logger.debug('【OAuth】认证完成，生成登录令牌');
 
     // 如果有重定向地址，附加令牌后重定向
@@ -165,3 +170,5 @@ module.exports = class extends think.Controller {
     return this.success();
   }
 };
+
+think.logger.debug('oauth.js');

@@ -1,12 +1,11 @@
-// 引入数据库驱动和日志模块
-const { Basic } = require('think-logger3');
-// 数据库驱动延迟加载函数
-let Mysql, Mysql2, Postgresql;
-// 加载器函数
+// 数据库驱动和日志模块延迟加载
+let Mysql, Mysql2, Postgresql, Basic;
+
 const load = {
   mysql: () => Mysql || (Mysql = require('think-model-mysql')),
   mysql2: () => Mysql2 || (Mysql2 = require('think-model-mysql2')),
-  postgresql: () => Postgresql || (Postgresql = require('think-model-postgresql'))
+  postgresql: () => Postgresql || (Postgresql = require('think-model-postgresql')),
+  basic: () => Basic || (Basic = require('think-logger3').Basic)
 };
 
 // 从环境变量获取数据库配置参数
@@ -91,6 +90,16 @@ if (MONGO_DB) {
   console.warn('【适配器】未检测到数据库配置');
 }
 
+// 根据数据库类型获取对应的 handle
+const getHandle = (dbType) => {
+  switch(dbType) {
+    case 'mysql': return () => load.mysql();
+    case 'tidb': return () => load.mysql2();
+    case 'postgresql': return () => load.postgresql();
+    default: return null;
+  }
+};
+
 // 导出数据库配置对象
 exports.model = {
   type,
@@ -121,7 +130,7 @@ exports.model = {
 
   // MySQL配置项
   mysql: {
-    handle: type === 'mysql' ? load.mysql() : null,
+    handle: getHandle(type),
     dateStrings: true,
     host: MYSQL_HOST || '127.0.0.1',
     port: MYSQL_PORT || '3306',
@@ -140,7 +149,7 @@ exports.model = {
 
   // TiDB配置项
   tidb: {
-    handle: type === 'tidb' ? load.Mysql2() : null,
+    handle: getHandle(type),
     dateStrings: true,
     host: TIDB_HOST || '127.0.0.1',
     port: TIDB_PORT || '4000',
@@ -156,7 +165,7 @@ exports.model = {
   },
     // PostgreSQL配置项
     postgresql: {
-      handle: type === 'postgresql' ? load.Postgresql() : null,
+      handle: getHandle(type),
       user: PG_USER || POSTGRES_USER,
       password: PG_PASSWORD || POSTGRES_PASSWORD,
       database: PG_DB || POSTGRES_DATABASE,
@@ -177,7 +186,7 @@ exports.model = {
 exports.logger = {
   type: 'advanced',
   advanced: {
-    handle: Basic,
+    handle: load.basic(),
     appenders: {
       everything: { 
         type: 'console', 
@@ -196,4 +205,4 @@ exports.logger = {
     }
   }
 };
-console.log(new Date(),'【适配器】 已加载适配器配置');
+console.log(new Date(),'已加载adapter.js');

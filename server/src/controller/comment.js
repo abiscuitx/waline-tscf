@@ -1,11 +1,15 @@
+think.logger.debug('comment.js');
 // 引入基础 REST 控制器
 const BaseRest = require('./rest.js');
-// 引入垃圾评论检测服务
-const akismet = require('../service/akismet.js');
-// 引入 Markdown 解析器
-const { getMarkdownParser } = require('../service/markdown/index.js');
+let akismet;
 
-const markdownParser = getMarkdownParser();
+const load = {
+  akismet: () => akismet || (akismet = require('../service/akismet.js')),
+  markdown: () => require('../service/markdown/index.js'),
+  base: () => require('./rest.js')
+};
+
+const markdownParser = load.markdown().getMarkdownParser();
 
 // 在类定义开始处添加缓存相关变量
 const CACHE_EXPIRE = 12 * 60 * 60 * 1000; // 12小时过期
@@ -213,7 +217,7 @@ module.exports = class extends BaseRest {
       think.logger.debug(`【评论系统】初始评论状态: ${data.status}`);
 
       if (data.status === 'approved') {
-        const spam = await akismet(data, this.ctx.serverURL).catch((e) =>
+        const spam = await load.akismet()(data, this.ctx.serverURL).catch((e) =>
           think.logger.debug(e),
         ); // 忽略 akismet 错误
 
@@ -897,3 +901,5 @@ module.exports = class extends BaseRest {
     return data;
   }
 };
+
+think.logger.debug('comment.js');

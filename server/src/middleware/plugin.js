@@ -1,7 +1,10 @@
+think.logger.debug('plugin.js');
 
+let compose;
 
-// 引入中间件组合工具
-const compose = require('koa-compose');
+const load = {
+  compose: () => compose || (compose = require('koa-compose'))
+};
 
 // 导出插件中间件函数
 module.exports = () => async (ctx, next) => {
@@ -18,5 +21,7 @@ module.exports = () => async (ctx, next) => {
 
   think.logger.debug('【插件】组合并执行插件中间件');
   // 组合所有插件中间件并执行
-  return compose(middlewares)(ctx, next);
+  return load.compose()(middlewares)(ctx, next);
 };
+
+think.logger.debug('plugin.js');

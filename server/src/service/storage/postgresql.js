@@ -1,5 +1,6 @@
 think.logger.debug('postgresql.js');
 const MySQL = require('./mysql.js');
+
 function mapKeys({ insertedat, createdat, updatedat, ...item }) {
   const mapFields = {
     insertedAt: insertedat,
@@ -16,6 +17,7 @@ function mapKeys({ insertedat, createdat, updatedat, ...item }) {
 
   return item;
 }
+
 module.exports = class extends MySQL {
   model(tableName) {
     return super.model(tableName.toLowerCase());

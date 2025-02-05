@@ -1,30 +1,31 @@
 think.logger.debug('mathjax.js');
-const { liteAdaptor } = require('mathjax-full/js/adaptors/liteAdaptor.js');
-const { RegisterHTMLHandler } = require('mathjax-full/js/handlers/html.js');
-const { AllPackages } = require('mathjax-full/js/input/tex/AllPackages.js');
-const { TeX } = require('mathjax-full/js/input/tex.js');
-const { mathjax } = require('mathjax-full/js/mathjax');
-const { SVG } = require('mathjax-full/js/output/svg.js');
 
+let liteAdaptor, RegisterHTMLHandler, AllPackages, TeX, mathjax, SVG;
 
-const { inlineTeX, blockTeX } = require('./mathCommon');
-const { escapeHtml } = require('./utils');
+const load = {
+  adaptor: () => liteAdaptor || (liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor),
+  handler: () => RegisterHTMLHandler || (RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler),
+  packages: () => AllPackages || (AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages),
+  tex: () => TeX || (TeX = require('mathjax-full/js/input/tex.js').TeX),
+  mathjax: () => mathjax || (mathjax = require('mathjax-full/js/mathjax').mathjax),
+  svg: () => SVG || (SVG = require('mathjax-full/js/output/svg.js').SVG),
+  mathCommon: () => require('./mathCommon'),
+  utils: () => require('./utils')
+};
 
 // 设置MathJax作为渲染器
 class MathToSvg {
   constructor() {
-    think.logger.debug('【MathJax】初始化MathJax渲染器');
-    const adaptor = liteAdaptor();
-
-    RegisterHTMLHandler(adaptor);
+    const adaptor = load.adaptor()();
+    load.handler()(adaptor);
 
     // 初始化TeX和SVG配置
-    const packages = AllPackages.sort();
-    const tex = new TeX({ packages });
-    const svg = new SVG({ fontCache: 'none' });
+    const packages = load.packages().sort();
+    const tex = new (load.tex())({ packages });
+    const svg = new (load.svg())({ fontCache: 'none' });
 
     this.adaptor = adaptor;
-    this.texToNode = mathjax.document('', { InputJax: tex, OutputJax: svg });
+    this.texToNode = load.mathjax().document('', { InputJax: tex, OutputJax: svg });
 
     // 处理行内公式
     this.inline = function (tex) {
@@ -36,10 +37,9 @@ class MathToSvg {
       if (svg.includes('data-mml-node="merror"')) {
         think.logger.debug('【MathJax】行内公式渲染出错');
         const errorTitle = svg.match(/<title>(.*?)<\/title>/)[1];
-
-        svg = `<span class='mathjax-error' title='${escapeHtml(
+        svg = `<span class='mathjax-error' title='${load.utils().escapeHtml(
           errorTitle,
-        )}'>${escapeHtml(tex)}</span>`;
+        )}'>${load.utils().escapeHtml(tex)}</span>`;
       }
 
       return svg;
@@ -55,10 +55,9 @@ class MathToSvg {
       if (svg.includes('data-mml-node="merror"')) {
         think.logger.debug('【MathJax】块级公式渲染出错');
         const errorTitle = svg.match(/<title>(.*?)<\/title>/)[1];
-
-        svg = `<p class='mathjax-block mathjax-error' title='${escapeHtml(
+        svg = `<p class='mathjax-block mathjax-error' title='${load.utils().escapeHtml(
           errorTitle,
-        )}'>${escapeHtml(tex)}</p>`;
+        )}'>${load.utils().escapeHtml(tex)}</p>`;
       } else {
         // 设置SVG宽度为100%
         svg = svg.replace(/(width=".*?")/, 'width="100%"');
@@ -73,6 +72,7 @@ class MathToSvg {
 const mathjaxPlugin = (md) => {
   think.logger.debug('【MathJax】初始化MathJax插件');
   const mathToSvg = new MathToSvg();
+  const { inlineTeX, blockTeX } = load.mathCommon();
 
   // 添加行内TeX语法规则
   md.inline.ruler.after('escape', 'inlineTeX', inlineTeX);
@@ -91,8 +91,5 @@ const mathjaxPlugin = (md) => {
     `${mathToSvg.block(tokens[idx].content)}\n`;
 };
 
-// 导出MathJax插件
-module.exports = {
-  mathjaxPlugin,
-};
+module.exports = { mathjaxPlugin };
 think.logger.debug('mathjax.js');

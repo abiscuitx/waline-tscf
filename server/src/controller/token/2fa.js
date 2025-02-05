@@ -1,6 +1,14 @@
-console.log(new Date(),' 2fa.js');
-const speakeasy = require('speakeasy');
+think.logger.debug('2fa.js');
+
+let speakeasy;
+
+const load = {
+  speakeasy: () => speakeasy || (speakeasy = require('speakeasy')),
+};
+
+// 引入基础 REST 控制器
 const BaseRest = require('../rest.js');
+
 module.exports = class extends BaseRest {
   // 获取2FA配置信息
   async getAction() {
@@ -16,9 +24,7 @@ module.exports = class extends BaseRest {
 
       const user = await userModel.select(
         { email },
-        {
-          field: ['2fa'],
-        },
+        { field: ['2fa'] },
       );
       const is2FAEnabled = !think.isEmpty(user) && Boolean(user[0]['2fa']);
 
@@ -39,7 +45,7 @@ module.exports = class extends BaseRest {
 
     // 生成新的2FA密钥
     think.logger.debug('[2FA] 生成新的2FA密钥');
-    const { otpauth_url, base32: secret } = speakeasy.generateSecret({
+    const { otpauth_url, base32: secret } = load.speakeasy().generateSecret({
       length: 20,
       name,
     });
@@ -53,7 +59,7 @@ module.exports = class extends BaseRest {
     think.logger.debug('[2FA] 开始验证2FA码');
 
     // 验证2FA验证码
-    const verified = speakeasy.totp.verify({
+    const verified = load.speakeasy().totp.verify({
       secret: data.secret,
       encoding: 'base32',
       token: data.code,
@@ -75,3 +81,5 @@ module.exports = class extends BaseRest {
     return this.success();
   }
 };
+
+think.logger.debug('2fa.js');

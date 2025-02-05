@@ -6,10 +6,19 @@ if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_PATH) {
   return;
 }
 
+let path, parseString, writeToString;
 
-const path = require('node:path');
-
-const { parseString, writeToString } = require('fast-csv');
+const load = {
+  path: () => path || (path = require('node:path')),
+  fastCsv: () => {
+    if (!parseString || !writeToString) {
+      const fastCsv = require('fast-csv');
+      parseString = fastCsv.parseString;
+      writeToString = fastCsv.writeToString;
+    }
+    return { parseString, writeToString };
+  }
+};
 
 const Base = require('./base.js');
 
@@ -62,7 +71,7 @@ class Github {
   async get(filename) {
     const resp = await fetch(
       'https://api.github.com/repos/' +
-        path.join(this.repo, 'contents', filename),
+        load.path().join(this.repo, 'contents', filename),
       {
         headers: {
           accept: 'application/vnd.github.v3+json',
@@ -92,7 +101,7 @@ class Github {
   async getLargeFile(filename) {
     const { tree } = await fetch(
       'https://api.github.com/repos/' +
-        path.join(this.repo, 'git/trees/HEAD') +
+        load.path().join(this.repo, 'git/trees/HEAD') +
         '?recursive=1',
       {
         headers: {
@@ -124,7 +133,7 @@ class Github {
   async set(filename, content, { sha }) {
     return fetch(
       'https://api.github.com/repos/' +
-        path.join(this.repo, 'contents', filename),
+        load.path().join(this.repo, 'contents', filename),
       {
         method: 'PUT',
         headers: {
@@ -152,7 +161,7 @@ module.exports = class extends Base {
   }
 
   async collection(tableName) {
-    const filename = path.join(this.basePath, tableName + '.csv');
+    const filename = load.path().join(this.basePath, tableName + '.csv');
     const file = await this.git.get(filename).catch((e) => {
       if (e.statusCode === 404) {
         return '';
@@ -165,7 +174,7 @@ module.exports = class extends Base {
 
       data.sha = file.sha;
 
-      return parseString(file.data, {
+      return load.fastCsv().parseString(file.data, {
         headers: file ? true : CSV_HEADERS[tableName],
       })
         .on('error', reject)
@@ -175,8 +184,8 @@ module.exports = class extends Base {
   }
 
   async save(tableName, data, sha) {
-    const filename = path.join(this.basePath, tableName + '.csv');
-    const csv = await writeToString(data, {
+    const filename = load.path().join(this.basePath, tableName + '.csv');
+    const csv = await load.fastCsv().writeToString(data, {
       headers: sha ? true : CSV_HEADERS[tableName],
       writeHeaders: true,
     });

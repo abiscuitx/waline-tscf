@@ -8,46 +8,64 @@ const load = {
   fetch: () => fetch || (fetch = require('node-fetch'))
 };
 
-// 扩展配置 - 添加数据库模型和上下文扩展
-module.exports = [
-  // 添加关系型数据库支持
-  load.model()(think.app),
-  // 添加MongoDB支持
-  load.mongo()(think.app),
-  { 
-    context: {
-      // 获取服务器URL
-      get serverURL() {
-        const { SERVER_URL } = process.env;
-        if (SERVER_URL) {
-          return SERVER_URL;
-        }
-        const { protocol, host } = this;
-        const url = `${protocol}://${host}`;
-        think.logger.debug('【扩展】最终服务器URL:', url);
-        return url;
-      },
+// 根据环境配置决定是否需要加载数据库模块
+const { 
+  MONGO_DB, 
+  MYSQL_DB, 
+  PG_DB, 
+  POSTGRES_DATABASE, 
+  TIDB_DB 
+} = process.env;
 
-      // Webhook回调
-      async webhook(type, data) {
-        const { WEBHOOK } = process.env;
-        if (!WEBHOOK) {
-          think.logger.debug('[Webhook] 未配置webhook地址，跳过回调');
-          return;
-        }
+// 扩展配置数组
+const extensions = [];
 
-        think.logger.debug('[Webhook] 发送回调请求');
-        return load.fetch()(WEBHOOK, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({ type, data }),
-        }).then((resp) => resp.json());
-      },
+// 只在配置了关系型数据库时添加支持
+if (MYSQL_DB || PG_DB || POSTGRES_DATABASE || TIDB_DB) {
+  extensions.push(load.model()(think.app));
+}
+
+// 只在配置了MongoDB时添加支持
+if (MONGO_DB) {
+  extensions.push(load.mongo()(think.app));
+}
+
+// 添加上下文扩展
+extensions.push({
+  context: {
+    // 获取服务器URL
+    get serverURL() {
+      const { SERVER_URL } = process.env;
+      if (SERVER_URL) {
+        return SERVER_URL;
+      }
+      const { protocol, host } = this;
+      const url = `${protocol}://${host}`;
+      think.logger.debug('【扩展】最终服务器URL:', url);
+      return url;
     },
-  
-  },
-];
 
-think.logger.debug('【扩展】 已加载扩展配置');
+    // Webhook回调
+    async webhook(type, data) {
+      const { WEBHOOK } = process.env;
+      if (!WEBHOOK) {
+        think.logger.debug('[Webhook] 未配置webhook地址，跳过回调');
+        return;
+      }
+
+      think.logger.debug('[Webhook] 发送回调请求');
+      return load.fetch()(WEBHOOK, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ type, data }),
+      }).then((resp) => resp.json());
+    },
+  },
+});
+
+// 导出扩展配置
+module.exports = extensions;
+
+think.logger.debug('【扩展】已加载扩展配置');
