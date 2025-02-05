@@ -12,14 +12,14 @@ module.exports = class extends BaseRest {
   async getAction() {
     // 获取验证令牌和邮箱参数
     const { token, email } = this.get();
-    think.logger.debug("【验证系统】开始处理邮箱验证请求:", email);
+    think.logger.debug("【verify】处理邮箱验证请求:", email);
 
     // 根据邮箱查询用户信息
     const users = await this.modelInstance.select({ email });
 
     // 如果用户不存在，返回错误
     if (think.isEmpty(users)) {
-      think.logger.debug("【验证系统】用户不存在");
+      think.logger.warn("【verify】验证失败: 用户不存在");
       return this.fail(this.locale("USER_NOT_EXIST"));
     }
 
@@ -29,13 +29,13 @@ module.exports = class extends BaseRest {
 
     // 如果用户不是待验证状态，返回错误
     if (!match) {
-      think.logger.debug("【验证系统】用户已完成注册，无需验证");
+      think.logger.debug("【verify】用户已完成注册");
       return this.fail(this.locale("USER_REGISTERED"));
     }
 
     // 验证令牌是否匹配且在有效期内
     if (token === match[1] && Date.now() < parseInt(match[2])) {
-      think.logger.debug("【验证系统】验证成功，更新用户状态为访客");
+      think.logger.debug("【verify】验证成功，更新用户状态");
       // 验证通过，将用户类型更新为访客
       await this.modelInstance.update({ type: "guest" }, { email });
 
@@ -44,7 +44,7 @@ module.exports = class extends BaseRest {
     }
 
     // 验证失败，返回令牌过期错误
-    think.logger.debug("【验证系统】验证令牌已过期或无效");
+    think.logger.warn("【verify】验证失败: 令牌已过期或无效");
     return this.fail(this.locale("TOKEN_EXPIRED"));
   }
 };

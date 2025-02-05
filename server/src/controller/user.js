@@ -13,22 +13,22 @@ module.exports = class extends BaseRest {
     const { page, pageSize, email } = this.get();
     const { userInfo } = this.ctx.state;
 
-    think.logger.debug("【用户系统】开始处理获取用户信息请求");
+    think.logger.debug("【user】处理获取用户信息请求");
 
     // 非管理员用户只能获取评论数量统计的用户列表
     if (think.isEmpty(userInfo) || userInfo.type !== "administrator") {
-      think.logger.debug("【用户系统】非管理员请求，返回评论统计用户列表");
+      think.logger.debug("【user】非管理员请求，返回统计列表");
       const users = await this.getUsersListByCount();
       return this.success(users);
     }
 
     // 根据邮箱查询单个用户信息
     if (email) {
-      think.logger.debug("【用户系统】查询指定邮箱的用户信息:", email);
+      think.logger.debug("【user】查询用户信息:", email);
       const user = await this.modelInstance.select({ email });
 
       if (think.isEmpty(user)) {
-        think.logger.debug("【用户系统】未找到指定用户");
+        think.logger.debug("【user】用户不存在");
         return this.success();
       }
 
@@ -36,7 +36,7 @@ module.exports = class extends BaseRest {
     }
 
     // 获取分页的用户列表
-    think.logger.debug("【用户系统】获取用户列表，页码:", page);
+    think.logger.debug("【user】获取用户列表, 页码:", page);
     const count = await this.modelInstance.count({});
     const users = await this.modelInstance.select(
       {},
@@ -58,7 +58,7 @@ module.exports = class extends BaseRest {
   // 用户注册的处理方法
   async postAction() {
     const data = this.post();
-    think.logger.debug("【用户系统】处理用户注册请求:", data.email);
+    think.logger.debug("【user】处理用户注册:", data.email);
 
     // 检查用户是否已存在
     const resp = await this.modelInstance.select({
@@ -70,7 +70,7 @@ module.exports = class extends BaseRest {
       !think.isEmpty(resp) &&
       ["administrator", "guest"].includes(resp[0].type)
     ) {
-      think.logger.debug("【用户系统】用户已存在");
+      think.logger.warn("【user】注册失败: 用户已存在");
       return this.fail(this.locale("USER_EXIST"));
     }
 
@@ -101,13 +101,18 @@ module.exports = class extends BaseRest {
     data.password = this.hashPassword(data.password);
     data.type = think.isEmpty(count) ? "administrator" : normalType;
 
-    think.logger.debug("【用户系统】保存用户数据，类型:", data.type);
+    think.logger.debug("【user】保存用户数据", {
+      类型: data.type,
+      是否首个用户: think.isEmpty(count)
+    });
 
     // 保存或更新用户数据
     if (think.isEmpty(resp)) {
       await this.modelInstance.add(data);
+      think.logger.debug("【user】创建新用户");
     } else {
       await this.modelInstance.update(data, { email: data.email });
+      think.logger.debug("【user】更新现有用户");
     }
 
     // 如果不需要验证，直接返回成功

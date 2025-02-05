@@ -16,12 +16,10 @@ module.exports = class extends think.Controller {
     super(ctx);
     this.resource = this.getResource();
     this.id = this.getId();
-    think.logger.debug(
-      "【REST】初始化控制器，资源:",
-      this.resource,
-      "，ID:",
-      this.id
-    );
+    think.logger.debug("【rest】初始化控制器", {
+      资源: this.resource,
+      ID: this.id
+    });
   }
 
   // 前置处理方法，可被子类重写
@@ -64,16 +62,13 @@ module.exports = class extends think.Controller {
     const { userInfo } = this.ctx.state;
     const isEmpty = think.isEmpty(userInfo);
 
-    think.logger.debug(
-      "【REST】检查用户登录状态:",
-      isEmpty ? "未登录" : "已登录"
-    );
+    think.logger.debug("【rest】用户登录状态:", isEmpty ? "未登录" : "已登录");
     return isEmpty;
   }
 
   // 执行钩子函数链
   async hook(name, ...args) {
-    think.logger.debug("【REST】执行钩子函数:", name);
+    think.logger.debug("【rest】执行钩子:", name);
 
     // 获取配置的钩子函数和插件钩子
     const fn = this.config(name);
@@ -94,12 +89,12 @@ module.exports = class extends think.Controller {
 
       // 如果钩子返回结果，中断执行并返回
       if (resp) {
-        think.logger.debug("【REST】钩子函数执行完成，有返回结果");
+        think.logger.debug("【rest】钩子执行完成，返回结果");
         return resp;
       }
     }
 
-    think.logger.debug("【REST】钩子函数执行完成");
+    think.logger.debug("【rest】钩子执行完成");
   }
 
   // 默认调用方法，处理未定义的方法调用

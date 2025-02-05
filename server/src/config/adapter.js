@@ -203,4 +203,4 @@ exports.logger = {
   },
 };
 
-console.log( new Date(), " 已加载config/adapter.js");
+console.log( new Date(), " 已加载config/adapter.js", "使用类型:", type);

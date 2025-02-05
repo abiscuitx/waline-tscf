@@ -1,4 +1,4 @@
-// 引入基础逻辑类
+// 引入base.js
 const Base = require("../base.js");
 
 module.exports = class extends Base {

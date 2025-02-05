@@ -2,7 +2,7 @@ const BaseRest = require("./rest.js");
 module.exports = class extends BaseRest {
   // 导出数据库数据的处理方法
   async getAction() {
-    think.logger.debug("【数据库】开始导出数据");
+    think.logger.debug("【db】开始导出数据");
 
     // 构建导出数据的基础结构
     const exportData = {
@@ -19,13 +19,13 @@ module.exports = class extends BaseRest {
 
     // 遍历所有表并导出数据
     for (const tableName of exportData.tables) {
-      think.logger.debug(`【数据库】正在导出 ${tableName} 表数据`);
+      think.logger.debug(`【db】正在导出 ${tableName} 表数据`);
       const model = this.getModel(tableName);
       const data = await model.select({});
       exportData.data[tableName] = data;
     }
 
-    think.logger.debug("【数据库】数据导出完成");
+    think.logger.debug("【db】数据导出完成");
     return this.success(exportData);
   }
 
@@ -36,7 +36,7 @@ module.exports = class extends BaseRest {
     const storage = this.config("storage");
     const model = this.getModel(table);
 
-    think.logger.debug(`【数据库】开始导入数据到 ${table} 表`);
+    think.logger.debug(`【db】开始导入数据到 ${table} 表`);
 
     // 针对 LeanCloud 和 MySQL 存储的时间字段处理
     if (storage === "leancloud" || storage === "mysql") {
@@ -62,7 +62,7 @@ module.exports = class extends BaseRest {
     delete item.objectId;
     const resp = await model.add(item);
 
-    think.logger.debug(`【数据库】数据导入完成`);
+    think.logger.debug(`【db】数据导入完成`);
     return this.success(resp);
   }
 
@@ -72,7 +72,7 @@ module.exports = class extends BaseRest {
     const data = this.post();
     const model = this.getModel(table);
 
-    think.logger.debug(`【数据库】开始更新 ${table} 表数据，ID: ${objectId}`);
+    think.logger.debug(`【db】开始更新 ${table} 表数据，ID: ${objectId}`);
 
     // 移除不需要更新的系统字段
     delete data.objectId;
@@ -80,7 +80,7 @@ module.exports = class extends BaseRest {
     delete data.updatedAt;
     await model.update(data, { objectId });
 
-    think.logger.debug(`【数据库】数据更新完成`);
+    think.logger.debug(`【db】数据更新完成`);
     return this.success();
   }
 
@@ -89,9 +89,9 @@ module.exports = class extends BaseRest {
     const { table } = this.get();
     const model = this.getModel(table);
 
-    think.logger.debug(`【数据库】开始清空 ${table} 表数据`);
+    think.logger.debug(`【db】开始清空 ${table} 表数据`);
     await model.delete({});
-    think.logger.debug(`【数据库】表数据清空完成`);
+    think.logger.debug(`【db】表数据清空完成`);
 
     return this.success();
   }

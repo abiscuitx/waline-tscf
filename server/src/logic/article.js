@@ -1,10 +1,10 @@
-// 引入基础逻辑类
+// 引入base.js
 const Base = require("./base.js");
 
 module.exports = class extends Base {
   // 获取文章统计信息的验证规则
   getAction() {
-    think.logger.debug("【文章】设置获取统计信息的验证规则");
+    think.logger.debug("【article】设置获取统计信息的验证规则");
 
     // 设置请求参数的验证规则
     this.rules = {
@@ -18,7 +18,7 @@ module.exports = class extends Base {
 
   // 更新文章统计数据的验证规则
   postAction() {
-    think.logger.debug("【文章】设置更新统计信息的验证规则");
+    think.logger.debug("【article】设置更新统计信息的验证规则");
 
     // 设置请求参数的验证规则
     this.rules = {

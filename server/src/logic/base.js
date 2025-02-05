@@ -13,7 +13,10 @@ module.exports = class extends think.Logic {
     this.modelInstance = this.getModel("Users");
     this.resource = this.getResource();
     this.id = this.getId();
-    think.logger.debug("【基础逻辑】初始化完成");
+    think.logger.debug("【base】初始化完成", {
+      资源: this.resource,
+      ID: this.id
+    });
   }
 
   // 请求前置处理方法
@@ -169,7 +172,7 @@ module.exports = class extends think.Logic {
 
   // 从文件名获取资源名称
   getResource() {
-    think.logger.debug("【基础逻辑】获取资源名称");
+    think.logger.debug("【base】获取资源名称");
     const filename = this.__filename || __filename;
     const last = filename.lastIndexOf(path.sep);
 
@@ -196,7 +199,7 @@ module.exports = class extends think.Logic {
 
   // 验证码检查方法
   async useCaptchaCheck() {
-    think.logger.debug("【基础逻辑】开始验证码检查");
+    think.logger.debug("【base】开始验证码检查");
     const { RECAPTCHA_V3_SECRET, TURNSTILE_SECRET } = process.env;
     const { turnstile, recaptchaV3 } = this.post();
 
@@ -223,13 +226,13 @@ module.exports = class extends think.Logic {
 
   // 执行验证码验证
   async useRecaptchaOrTurnstileCheck({ secret, token, api, method }) {
-    think.logger.debug("【基础逻辑】执行验证码验证");
+    think.logger.debug("【base】执行验证码验证");
     if (!secret) {
       return;
     }
 
     if (!token) {
-      think.logger.debug("【基础逻辑】缺少验证码令牌");
+      think.logger.warn("【base】验证失败: 缺少验证码令牌");
       return this.ctx.throw(403);
     }
 
@@ -260,14 +263,10 @@ module.exports = class extends think.Logic {
 
     // 处理验证结果
     if (!response.success) {
-      think.logger.debug(
-        "【基础逻辑】验证码验证失败:",
-        JSON.stringify(response, null, "\t")
-      );
-
+      think.logger.warn("【base】验证失败:", JSON.stringify(response, null, "\t"));
       return this.ctx.throw(403);
     }
-    think.logger.debug("【基础逻辑】验证码验证通过");
+    think.logger.debug("【base】验证通过");
   }
 };
 

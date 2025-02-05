@@ -29,7 +29,7 @@ function getCache(type, params) {
   const cache = commentCache[type].get(key);
 
   if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
-    think.logger.debug(`【评论系统】从缓存获取${type}数据`);
+    think.logger.debug(`【comment】从缓存获取${type}数据`);
     return cache.data;
   }
   return null;
@@ -44,7 +44,7 @@ function setCache(type, params, data) {
 }
 
 function clearCache() {
-  think.logger.debug("【评论系统】清除评论相关缓存");
+  think.logger.debug("【comment】清除评论相关缓存");
   commentCache.list.clear();
   commentCache.admin.clear();
   commentCache.recent.clear();
@@ -133,14 +133,14 @@ module.exports = class extends BaseRest {
       list: this.getAdminCommentList,
     };
 
-    // think.logger.debug('【评论系统】开始处理获取评论请求，类型:', type);
+    think.logger.debug('【comment】开始处理获取评论请求，类型:', type);
     const fn = fnMap[type] || this.getCommentList;
     const data = await fn.call(this);
     return this.jsonOrSuccess(data);
   }
 
   async postAction() {
-    think.logger.debug("【评论系统】开始处理新评论提交");
+    think.logger.debug("【comment】开始处理新评论提交");
 
     const { comment, link, mail, nick, pid, rid, ua, url, at } = this.post();
     const data = {
@@ -161,7 +161,7 @@ module.exports = class extends BaseRest {
       data.comment = `[@${at}](#${pid}): ` + data.comment;
     }
 
-    think.logger.debug("【评论系统】评论初始数据准备完成");
+    think.logger.debug("【comment】评论初始数据准备完成");
 
     const { userInfo } = this.ctx.state;
 
@@ -174,11 +174,11 @@ module.exports = class extends BaseRest {
         disallowIPList.length &&
         disallowIPList.includes(data.ip)
       ) {
-        think.logger.debug(`【评论系统】IP ${data.ip} 在黑名单中，拒绝评论`);
+        think.logger.debug(`【comment】IP ${data.ip} 在黑名单中，拒绝评论`);
         return this.ctx.throw(403);
       }
 
-      think.logger.debug("【评论系统】IP 检查通过");
+      think.logger.debug("【comment】IP 检查通过");
 
       /** 重复内容检测 */
       const duplicate = await this.modelInstance.select({
@@ -190,11 +190,9 @@ module.exports = class extends BaseRest {
       });
 
       if (!think.isEmpty(duplicate)) {
-        think.logger.debug("【评论系统】检测到重复评论内容");
+        think.logger.debug("【comment】检测到重复评论内容");
         return this.fail(this.locale("Duplicate Content"));
       }
-
-      think.logger.debug("【评论系统】重复内容检查通过");
 
       /** IP 频率限制 */
       const { IPQPS = 60 } = process.env;
@@ -205,15 +203,13 @@ module.exports = class extends BaseRest {
       });
 
       if (!think.isEmpty(recent)) {
-        think.logger.debug(`【评论系统】评论频率超限：${IPQPS}秒内已发表评论`);
+        think.logger.debug(`【comment】评论频率超限：${IPQPS}秒内已发表评论`);
         return this.fail(this.locale("Comment too fast!"));
       }
 
-      think.logger.debug("【评论系统】评论频率检查通过");
-
       /** 垃圾评论检测 */
       data.status = this.config("audit") ? "waiting" : "approved";
-      think.logger.debug(`【评论系统】初始评论状态: ${data.status}`);
+      think.logger.debug(`【comment】初始评论状态: ${data.status}`);
 
       if (data.status === "approved") {
         const spam = await load
@@ -225,7 +221,7 @@ module.exports = class extends BaseRest {
         }
       }
 
-      think.logger.debug(`【评论系统】垃圾评论检查结果: ${data.status}`);
+      think.logger.debug(`【comment】垃圾评论检查结果: ${data.status}`);
 
       if (data.status !== "spam") {
         /** 关键词过滤 */
@@ -240,7 +236,7 @@ module.exports = class extends BaseRest {
         }
       }
 
-      think.logger.debug(`【评论系统】关键词过滤检查完成: ${data.status}`);
+      think.logger.debug(`【comment】关键词过滤检查完成: ${data.status}`);
     } else {
       data.status = "approved";
     }
@@ -251,10 +247,10 @@ module.exports = class extends BaseRest {
       return this.fail(preSaveResp.errmsg);
     }
 
-    think.logger.debug("【评论系统】preSave 钩子执行完成");
+    think.logger.debug("【comment】preSave 钩子执行完成");
 
     const resp = await this.modelInstance.add(data);
-    think.logger.debug("【评论系统】评论已保存到数据库");
+    think.logger.debug("【comment】评论已保存到数据库");
 
     let parentComment;
     let parentUser;
@@ -299,10 +295,10 @@ module.exports = class extends BaseRest {
       );
     }
 
-    think.logger.debug("【评论系统】评论通知处理完成");
+    think.logger.debug("【comment】评论通知处理完成");
 
     await this.hook("postSave", resp, parentComment);
-    think.logger.debug("【评论系统】postSave 钩子执行完成");
+    think.logger.debug("【comment】postSave 钩子执行完成");
 
     clearCache();
     return this.success(
@@ -321,7 +317,7 @@ module.exports = class extends BaseRest {
     let data = isAdmin ? this.post() : this.post("comment,like");
     let oldData = await this.modelInstance.select({ objectId: this.id });
 
-    think.logger.debug("【评论系统】开始处理评论更新请求");
+    think.logger.debug("【comment】开始处理评论更新请求");
 
     if (think.isEmpty(oldData) || think.isEmpty(data)) {
       return this.success();
@@ -337,7 +333,7 @@ module.exports = class extends BaseRest {
         (data.like ? Math.ceil(Math.random() * likeIncMax) : -1);
       data.like = Math.max(data.like, 0);
 
-      think.logger.debug("【评论系统】处理点赞数据，新的点赞数:", data.like);
+      think.logger.debug("【comment】处理点赞数据，新的点赞数:", data.like);
     }
 
     // 执行更新前钩子
@@ -347,7 +343,7 @@ module.exports = class extends BaseRest {
     });
 
     if (preUpdateResp) {
-      think.logger.debug("【评论系统】更新前钩子返回错误");
+      think.logger.debug("【comment】更新前钩子返回错误");
       return this.fail(preUpdateResp);
     }
 
@@ -356,7 +352,7 @@ module.exports = class extends BaseRest {
       objectId: this.id,
     });
 
-    think.logger.debug("【评论系统】评论数据已更新");
+    think.logger.debug("【comment】评论数据已更新");
 
     // 获取评论用户信息
     let cmtUser;
@@ -381,7 +377,7 @@ module.exports = class extends BaseRest {
       data.status === "approved" &&
       oldData.pid
     ) {
-      think.logger.debug("【评论系统】处理评论审核通过通知");
+      think.logger.debug("【comment】处理评论审核通过通知");
       let pComment = await this.modelInstance.select({
         objectId: oldData.pid,
       });
@@ -410,25 +406,25 @@ module.exports = class extends BaseRest {
         true
       );
 
-      think.logger.debug("【评论系统】审核通过通知已发送");
+      think.logger.debug("【comment】审核通过通知已发送");
     }
 
     // 执行更新后钩子
     await this.hook("postUpdate", data);
-    think.logger.debug("【评论系统】更新后钩子执行完成");
+    think.logger.debug("【comment】更新后钩子执行完成");
 
     clearCache();
     return this.success(cmtReturn);
   }
 
   async deleteAction() {
-    think.logger.debug("【评论系统】开始处理删除评论请求");
+    think.logger.debug("【comment】开始处理删除评论请求");
 
     // 执行删除前钩子
     const preDeleteResp = await this.hook("preDelete", this.id);
 
     if (preDeleteResp) {
-      think.logger.debug("【评论系统】删除前钩子返回错误");
+      think.logger.debug("【comment】删除前钩子返回错误");
       return this.fail(preDeleteResp);
     }
 
@@ -442,11 +438,11 @@ module.exports = class extends BaseRest {
       },
     });
 
-    think.logger.debug("【评论系统】评论及其关联评论已删除");
+    think.logger.debug("【comment】评论及其关联评论已删除");
 
     // 执行删除后钩子
     await this.hook("postDelete", this.id);
-    think.logger.debug("【评论系统】删除后钩子执行完成");
+    think.logger.debug("【comment】删除后钩子执行完成");
 
     clearCache();
     return this.success();
@@ -509,7 +505,7 @@ module.exports = class extends BaseRest {
       }
     }
 
-    // think.logger.debug('【评论系统】评论总数:', totalCount);
+    think.logger.debug('【comment】评论总数:', totalCount);
 
     /**
      * 评论数据获取策略说明：
@@ -524,7 +520,7 @@ module.exports = class extends BaseRest {
      *    - 所以使用限制来避免这些问题
      */
     if (totalCount < 1000) {
-      // think.logger.debug('【评论系统】评论数小于1000，一次性获取所有评论');
+      think.logger.debug('【comment】评论数小于1000，一次性获取所有评论');
       comments = await this.modelInstance.select(where, selectOptions);
       rootCount = comments.filter(({ rid }) => !rid).length;
       rootComments = [
@@ -540,7 +536,7 @@ module.exports = class extends BaseRest {
         (cmt) => rootIds[cmt.objectId] || rootIds[cmt.rid]
       );
     } else {
-      // think.logger.debug('【评论系统】评论数过多，分批获取评论数据');
+      think.logger.debug('【comment】评论数过多，分批获取评论数据');
       comments = await this.modelInstance.select(
         { ...where, rid: undefined },
         { ...selectOptions }
@@ -560,7 +556,7 @@ module.exports = class extends BaseRest {
       );
 
       comments = [...rootComments, ...children];
-      think.logger.debug("【评论系统】子评论获取完成");
+      think.logger.debug("【comment】子评论获取完成");
     }
 
     // 获取用户信息
@@ -571,7 +567,7 @@ module.exports = class extends BaseRest {
     let users = [];
 
     if (user_ids.length) {
-      think.logger.debug("【评论系统】开始获取评论用户信息");
+      think.logger.debug("【comment】开始获取评论用户信息");
       users = await userModel.select(
         { objectId: ["IN", user_ids] },
         {
@@ -582,7 +578,7 @@ module.exports = class extends BaseRest {
 
     // 处理用户等级
     if (think.isArray(this.config("levels"))) {
-      think.logger.debug("【评论系统】开始处理用户等级信息");
+      think.logger.debug("【comment】开始处理用户等级信息");
       const countWhere = {
         status: ["NOT IN", ["waiting", "spam"]],
         _complex: {},
@@ -616,7 +612,7 @@ module.exports = class extends BaseRest {
       });
     }
 
-    // think.logger.debug('【评论系统】评论数据处理完成，准备返回');
+    think.logger.debug('【comment】评论数据处理完成，准备返回');
 
     const result = {
       page,
@@ -689,13 +685,13 @@ module.exports = class extends BaseRest {
     const { page, pageSize, owner, status, keyword } = this.get();
     const where = {};
 
-    think.logger.debug("【评论系统】开始获取管理员评论列表");
+    think.logger.debug("【comment】开始获取管理员评论列表");
 
     // 处理所属者筛选
     if (owner === "mine") {
       const { userInfo } = this.ctx.state;
       where.mail = userInfo.email;
-      think.logger.debug("【评论系统】筛选当前用户的评论");
+      think.logger.debug("【comment】筛选当前用户的评论");
     }
 
     // 处理状态筛选
@@ -706,13 +702,13 @@ module.exports = class extends BaseRest {
       if (status === "approved") {
         where.status = ["NOT IN", ["waiting", "spam"]];
       }
-      think.logger.debug("【评论系统】按状态筛选评论:", status);
+      think.logger.debug("【comment】按状态筛选评论:", status);
     }
 
     // 处理关键词搜索
     if (keyword) {
       where.comment = ["LIKE", `%${keyword}%`];
-      think.logger.debug("【评论系统】按关键词搜索评论:", keyword);
+      think.logger.debug("【comment】按关键词搜索评论:", keyword);
     }
 
     // 获取评论统计数据
@@ -723,7 +719,7 @@ module.exports = class extends BaseRest {
     });
 
     think.logger.debug(
-      "【评论系统】评论统计 - 总数:",
+      "【comment】评论统计 - 总数:",
       count,
       "垃圾评论:",
       spamCount,
@@ -747,7 +743,7 @@ module.exports = class extends BaseRest {
     let users = [];
 
     if (user_ids.length) {
-      think.logger.debug("【评论系统】获取评论用户信息");
+      think.logger.debug("【comment】获取评论用户信息");
       users = await userModel.select(
         { objectId: ["IN", user_ids] },
         {
@@ -756,7 +752,7 @@ module.exports = class extends BaseRest {
       );
     }
 
-    think.logger.debug("【评论系统】管理员评论列表数据处理完成");
+    think.logger.debug("【comment】管理员评论列表数据处理完成");
 
     const result = {
       page,
@@ -791,7 +787,7 @@ module.exports = class extends BaseRest {
     const { userInfo } = this.ctx.state;
     const where = {};
 
-    think.logger.debug("【评论系统】开始获取最近评论列表");
+    think.logger.debug("【comment】开始获取最近评论列表");
 
     // 设置查询条件
     if (think.isEmpty(userInfo) || this.config("storage") === "deta") {
@@ -826,7 +822,7 @@ module.exports = class extends BaseRest {
       ],
     });
 
-    think.logger.debug("【评论系统】获取到最近评论数:", comments.length);
+    think.logger.debug("【comment】获取到最近评论数:", comments.length);
 
     // 获取用户信息
     const userModel = this.getModel("Users");
@@ -837,7 +833,7 @@ module.exports = class extends BaseRest {
     let users = [];
 
     if (user_ids.length) {
-      think.logger.debug("【评论系统】获取评论用户信息");
+      think.logger.debug("【comment】获取评论用户信息");
       users = await userModel.select(
         { objectId: ["IN", user_ids] },
         {
@@ -846,7 +842,7 @@ module.exports = class extends BaseRest {
       );
     }
 
-    think.logger.debug("【评论系统】最近评论列表数据处理完成");
+    think.logger.debug("【comment】最近评论列表数据处理完成");
 
     const result = Promise.all(
       comments.map((cmt) =>
@@ -874,7 +870,7 @@ module.exports = class extends BaseRest {
     const { userInfo } = this.ctx.state;
     const where = Array.isArray(url) && url.length ? { url: ["IN", url] } : {};
 
-    think.logger.debug("【评论系统】开始获取评论计数");
+    think.logger.debug("【comment】开始获取评论计数");
 
     // 设置查询条件
     if (think.isEmpty(userInfo) || this.config("storage") === "deta") {
@@ -889,19 +885,19 @@ module.exports = class extends BaseRest {
 
     // 处理多 URL 计数
     if (Array.isArray(url) && (url.length > 1 || !this.ctx.state.deprecated)) {
-      think.logger.debug("【评论系统】处理多 URL 评论计数");
+      think.logger.debug("【comment】处理多 URL 评论计数");
       const data = await this.modelInstance.select(where, {
         field: ["url"],
       });
 
       const counts = url.map((u) => data.filter(({ url }) => url === u).length);
-      think.logger.debug("【评论系统】多 URL 评论计数完成");
+      think.logger.debug("【comment】多 URL 评论计数完成");
       return counts;
     }
 
     // 处理单 URL 计数
     const data = await this.modelInstance.count(where);
-    think.logger.debug("【评论系统】单 URL 评论计数完成:", data);
+    think.logger.debug("【comment】单 URL 评论计数完成:", data);
     return data;
   }
 };

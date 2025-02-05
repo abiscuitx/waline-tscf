@@ -1,5 +1,4 @@
-// 引入基础 REST 控制器
-const BaseRest = require("./rest.js");
+//懒加载
 let jwt, speakeasy, helper;
 
 const load = {
@@ -7,6 +6,9 @@ const load = {
   speakeasy: () => speakeasy || (speakeasy = require("speakeasy")),
   helper: () => helper || (helper = require("think-helper")),
 };
+
+// 引入基础 REST 控制器
+const BaseRest = require("./rest.js");
 
 module.exports = class extends BaseRest {
   // 构造函数：初始化用户模型实例

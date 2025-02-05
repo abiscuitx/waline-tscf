@@ -1,20 +1,21 @@
+//引入base.js
 const Base = require("./base.js");
 
 module.exports = class extends Base {
   // 检查是否具有管理员权限
   checkAdmin() {
-    think.logger.debug("【评论】检查管理员权限");
+    think.logger.debug("【comment】检查管理员权限");
     const { userInfo } = this.ctx.state;
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug("【评论】用户未登录，拒绝访问");
+      think.logger.warn("【comment】拒绝访问: 用户未登录");
       return this.ctx.throw(401);
     }
 
     // 检查用户是否为管理员
     if (userInfo.type !== "administrator") {
-      think.logger.debug("【评论】用户非管理员，拒绝访问");
+      think.logger.warn("【comment】拒绝访问: 用户非管理员");
       return this.ctx.throw(403);
     }
   }
@@ -153,6 +154,7 @@ module.exports = class extends Base {
         // 检查管理员权限
         if (userInfo.type !== "administrator") {
           // think.logger.debug('【评论】非管理员，拒绝访问');
+          think.logger.warn("【comment】拒绝访问: 非管理员请求评论列表");
           return this.fail();
         }
         this.rules = {
@@ -222,7 +224,7 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  data.type comment login user type
    */
   async postAction() {
-    think.logger.debug("【评论】处理发表评论请求");
+    think.logger.debug("【comment】处理发表评论请求");
     const { LOGIN } = process.env;
     const { userInfo } = this.ctx.state;
 
@@ -245,12 +247,12 @@ module.exports = class extends Base {
 
     // 检查是否强制要求登录
     if (LOGIN === "force") {
-      think.logger.debug("【评论】需要登录后才能评论");
+      think.logger.warn("【comment】拒绝评论: 需要登录");
       return this.ctx.throw(401);
     }
 
     // 执行验证码检查
-    think.logger.debug("【评论】执行验证码检查");
+    think.logger.debug("【comment】开始验证码检查");
     return this.useCaptchaCheck();
   }
 
@@ -271,7 +273,7 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  return error message if error
    */
   async putAction() {
-    think.logger.debug("【评论】处理更新评论请求");
+    think.logger.debug("【comment】处理评论更新");
     const { userInfo } = this.ctx.state;
     const data = this.post();
 
@@ -282,7 +284,7 @@ module.exports = class extends Base {
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug("【评论】用户未登录，拒绝访问");
+      think.logger.warn("【comment】拒绝更新: 用户未登录");
       return this.ctx.throw(401);
     }
 
@@ -302,7 +304,7 @@ module.exports = class extends Base {
       return;
     }
 
-    think.logger.debug("【评论】用户无权修改此评论");
+    think.logger.warn("【comment】拒绝更新: 用户无权限");
     return this.ctx.throw(403);
   }
 
@@ -317,12 +319,12 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  return error message if error
    */
   async deleteAction() {
-    think.logger.debug("【评论】处理删除评论请求");
+    think.logger.debug("【comment】处理评论删除");
     const { userInfo } = this.ctx.state;
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug("【评论】用户未登录，拒绝访问");
+      think.logger.warn("【comment】拒绝删除: 用户未登录");
       return this.ctx.throw(401);
     }
 
@@ -342,7 +344,7 @@ module.exports = class extends Base {
       return;
     }
 
-    think.logger.debug("【评论】用户无权删除此评论");
+    think.logger.warn("【comment】拒绝删除: 用户无权限");
     return this.ctx.throw(403);
   }
 };
