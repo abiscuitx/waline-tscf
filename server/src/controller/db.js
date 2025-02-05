@@ -1,15 +1,15 @@
-const BaseRest = require('./rest.js');
+const BaseRest = require("./rest.js");
 module.exports = class extends BaseRest {
   // 导出数据库数据的处理方法
   async getAction() {
-    think.logger.debug('【数据库】开始导出数据');
+    think.logger.debug("【数据库】开始导出数据");
 
     // 构建导出数据的基础结构
     const exportData = {
-      type: 'waline',
+      type: "waline",
       version: 1,
       time: Date.now(),
-      tables: ['Comment', 'Counter', 'Users'],
+      tables: ["Comment", "Counter", "Users"],
       data: {
         Comment: [],
         Counter: [],
@@ -25,7 +25,7 @@ module.exports = class extends BaseRest {
       exportData.data[tableName] = data;
     }
 
-    think.logger.debug('【数据库】数据导出完成');
+    think.logger.debug("【数据库】数据导出完成");
     return this.success(exportData);
   }
 
@@ -33,29 +33,29 @@ module.exports = class extends BaseRest {
   async postAction() {
     const { table } = this.get();
     const item = this.post();
-    const storage = this.config('storage');
+    const storage = this.config("storage");
     const model = this.getModel(table);
 
     think.logger.debug(`【数据库】开始导入数据到 ${table} 表`);
 
     // 针对 LeanCloud 和 MySQL 存储的时间字段处理
-    if (storage === 'leancloud' || storage === 'mysql') {
+    if (storage === "leancloud" || storage === "mysql") {
       if (item.insertedAt) item.insertedAt = new Date(item.insertedAt);
       if (item.createdAt) item.createdAt = new Date(item.createdAt);
       if (item.updatedAt) item.updatedAt = new Date(item.updatedAt);
     }
 
     // MySQL 存储需要特殊的时间格式处理
-    if (storage === 'mysql') {
+    if (storage === "mysql") {
       if (item.insertedAt)
         item.insertedAt = think.datetime(
           item.insertedAt,
-          'YYYY-MM-DD HH:mm:ss',
+          "YYYY-MM-DD HH:mm:ss"
         );
       if (item.createdAt)
-        item.createdAt = think.datetime(item.createdAt, 'YYYY-MM-DD HH:mm:ss');
+        item.createdAt = think.datetime(item.createdAt, "YYYY-MM-DD HH:mm:ss");
       if (item.updatedAt)
-        item.updatedAt = think.datetime(item.updatedAt, 'YYYY-MM-DD HH:mm:ss');
+        item.updatedAt = think.datetime(item.updatedAt, "YYYY-MM-DD HH:mm:ss");
     }
 
     // 移除 objectId 避免冲突
@@ -96,3 +96,5 @@ module.exports = class extends BaseRest {
     return this.success();
   }
 };
+
+think.logger.debug(" 已加载/controller/db.js");

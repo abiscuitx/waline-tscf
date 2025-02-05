@@ -1,15 +1,15 @@
 // 引入Node.js内置模块，ThinkJS框架
-const path = require('node:path');
-const Application = require('thinkjs');
+const path = require("node:path");
+const Application = require("thinkjs");
 
 // 初始化Waline服务实例
-console.log(new Date(),'[Waline] 初始化应用实例');
+console.log(new Date(), "【Waline】初始化应用实例");
 const instance = new Application({
   ROOT_PATH: __dirname,
-  APP_PATH: path.join(__dirname, 'src'),
-  proxy: false, // 启用代理
-  RUNTIME_PATH: '/tmp',
-  env: 'dev'
+  APP_PATH: path.join(__dirname, "src"),
+  proxy: false, // 代理
+  RUNTIME_PATH: "/tmp",
+  env: "dev",
 });
 instance.run();
 
@@ -22,4 +22,4 @@ let config = {
 for (const k in config) {
   think.config(k, config[k]);
 }
-console.log(new Date(),'[Waline] 服务初始化完成');
+console.log( new Date(), "【Waline】服务初始化完成");

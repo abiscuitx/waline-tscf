@@ -1,5 +1,4 @@
-const Base = require('./base.js');
-
+const Base = require("./base.js");
 
 module.exports = class extends Base {
   /**
@@ -23,7 +22,7 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  data.url 用户链接
    */
   getAction() {
-    think.logger.debug('【令牌】获取当前登录用户信息');
+    think.logger.debug("【令牌】获取当前登录用户信息");
   }
 
   /**
@@ -39,7 +38,7 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
   postAction() {
-    think.logger.debug('【令牌】处理用户登录请求');
+    think.logger.debug("【令牌】处理用户登录请求");
     return this.useCaptchaCheck();
   }
 
@@ -54,6 +53,8 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
   deleteAction() {
-    think.logger.debug('【令牌】处理用户登出请求');
+    think.logger.debug("【令牌】处理用户登出请求");
   }
 };
+
+think.logger.debug(" 已加载/logic/token.js");

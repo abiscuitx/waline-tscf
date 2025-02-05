@@ -1,21 +1,20 @@
-const Base = require('./base.js');
-
+const Base = require("./base.js");
 
 module.exports = class extends Base {
   // 检查是否具有管理员权限
   checkAdmin() {
-    think.logger.debug('【评论】检查管理员权限');
+    think.logger.debug("【评论】检查管理员权限");
     const { userInfo } = this.ctx.state;
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug('【评论】用户未登录，拒绝访问');
+      think.logger.debug("【评论】用户未登录，拒绝访问");
       return this.ctx.throw(401);
     }
 
     // 检查用户是否为管理员
-    if (userInfo.type !== 'administrator') {
-      think.logger.debug('【评论】用户非管理员，拒绝访问');
+    if (userInfo.type !== "administrator") {
+      think.logger.debug("【评论】用户非管理员，拒绝访问");
       return this.ctx.throw(403);
     }
   }
@@ -117,10 +116,10 @@ module.exports = class extends Base {
    */
   getAction() {
     const { type, path } = this.get();
-    // think.logger.debug('【评论】this.get()结果:', this.get()); 
+    // think.logger.debug('【评论】this.get()结果:', this.get());
 
     // 检查是否允许获取评论列表
-    const isAllowedGet = type !== 'list' || path;
+    const isAllowedGet = type !== "list" || path;
     if (!isAllowedGet) {
       // think.logger.debug('【评论】需要管理员权限');
       this.checkAdmin();
@@ -128,42 +127,42 @@ module.exports = class extends Base {
 
     // 根据不同类型设置不同的验证规则
     switch (type) {
-      case 'recent':
+      case "recent":
         // think.logger.debug('【评论】获取最近评论');
         this.rules = {
           count: {
-            int: { max: 50 },    // 最大返回50条评论
-            default: 10,         // 默认返回10条评论
+            int: { max: 50 }, // 最大返回50条评论
+            default: 10, // 默认返回10条评论
           },
         };
         break;
 
-      case 'count':
+      case "count":
         // think.logger.debug('【评论】获取评论数量');
         this.rules = {
           url: {
-            array: true,         // URL必须是数组格式
+            array: true, // URL必须是数组格式
           },
         };
         break;
 
-      case 'list': {
+      case "list": {
         // think.logger.debug('【评论】获取评论列表');
         const { userInfo } = this.ctx.state;
 
         // 检查管理员权限
-        if (userInfo.type !== 'administrator') {
+        if (userInfo.type !== "administrator") {
           // think.logger.debug('【评论】非管理员，拒绝访问');
           return this.fail();
         }
         this.rules = {
           page: {
-            int: true,           // 页码必须是整数
-            default: 1,          // 默认第1页
+            int: true, // 页码必须是整数
+            default: 1, // 默认第1页
           },
           pageSize: {
-            int: { max: 100 },   // 每页最多100条
-            default: 10,         // 默认每页10条
+            int: { max: 100 }, // 每页最多100条
+            default: 10, // 默认每页10条
           },
         };
         break;
@@ -173,20 +172,20 @@ module.exports = class extends Base {
         // think.logger.debug('【评论】设置验证规则前的参数:', path);
         this.rules = {
           path: {
-            string: true,        // 路径必须是字符串
-            required: true,      // 路径为必填项
+            string: true, // 路径必须是字符串
+            required: true, // 路径为必填项
           },
           page: {
-            int: true,           // 页码必须是整数
-            default: 1,          // 默认第1页
+            int: true, // 页码必须是整数
+            default: 1, // 默认第1页
           },
           pageSize: {
-            int: { max: 100 },   // 每页最多100条
-            default: 10,         // 默认每页10条
+            int: { max: 100 }, // 每页最多100条
+            default: 10, // 默认每页10条
           },
           sortBy: {
-            in: ['insertedAt_desc', 'insertedAt_asc', 'like_desc'],  // 排序方式限制
-            default: 'insertedAt_desc',                              // 默认按时间倒序
+            in: ["insertedAt_desc", "insertedAt_asc", "like_desc"], // 排序方式限制
+            default: "insertedAt_desc", // 默认按时间倒序
           },
         };
         break;
@@ -223,19 +222,19 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  data.type comment login user type
    */
   async postAction() {
-    think.logger.debug('【评论】处理发表评论请求');
+    think.logger.debug("【评论】处理发表评论请求");
     const { LOGIN } = process.env;
     const { userInfo } = this.ctx.state;
 
     // 设置评论提交的验证规则
     this.rules = {
       url: {
-        string: true,      // URL必须是字符串
-        required: true,    // URL为必填项
+        string: true, // URL必须是字符串
+        required: true, // URL为必填项
       },
       comment: {
-        string: true,      // 评论内容必须是字符串
-        required: true,    // 评论内容为必填项
+        string: true, // 评论内容必须是字符串
+        required: true, // 评论内容为必填项
       },
     };
 
@@ -245,13 +244,13 @@ module.exports = class extends Base {
     }
 
     // 检查是否强制要求登录
-    if (LOGIN === 'force') {
-      think.logger.debug('【评论】需要登录后才能评论');
+    if (LOGIN === "force") {
+      think.logger.debug("【评论】需要登录后才能评论");
       return this.ctx.throw(401);
     }
 
     // 执行验证码检查
-    think.logger.debug('【评论】执行验证码检查');
+    think.logger.debug("【评论】执行验证码检查");
     return this.useCaptchaCheck();
   }
 
@@ -272,28 +271,28 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  return error message if error
    */
   async putAction() {
-    think.logger.debug('【评论】处理更新评论请求');
+    think.logger.debug("【评论】处理更新评论请求");
     const { userInfo } = this.ctx.state;
     const data = this.post();
 
     // 处理点赞操作
-    if (think.isBoolean(data.like) && Object.keys(data).toString() === 'like') {
+    if (think.isBoolean(data.like) && Object.keys(data).toString() === "like") {
       return;
     }
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug('【评论】用户未登录，拒绝访问');
+      think.logger.debug("【评论】用户未登录，拒绝访问");
       return this.ctx.throw(401);
     }
 
     // 管理员可以修改任何评论
-    if (userInfo.type === 'administrator') {
+    if (userInfo.type === "administrator") {
       return;
     }
 
     // 检查是否为评论作者
-    const modelInstance = this.getModel('Comment');
+    const modelInstance = this.getModel("Comment");
     const commentData = await modelInstance.select({
       user_id: userInfo.objectId,
       objectId: this.id,
@@ -303,7 +302,7 @@ module.exports = class extends Base {
       return;
     }
 
-    think.logger.debug('【评论】用户无权修改此评论');
+    think.logger.debug("【评论】用户无权修改此评论");
     return this.ctx.throw(403);
   }
 
@@ -318,22 +317,22 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  return error message if error
    */
   async deleteAction() {
-    think.logger.debug('【评论】处理删除评论请求');
+    think.logger.debug("【评论】处理删除评论请求");
     const { userInfo } = this.ctx.state;
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug('【评论】用户未登录，拒绝访问');
+      think.logger.debug("【评论】用户未登录，拒绝访问");
       return this.ctx.throw(401);
     }
 
     // 管理员可以删除任何评论
-    if (userInfo.type === 'administrator') {
+    if (userInfo.type === "administrator") {
       return;
     }
 
     // 检查是否为评论作者
-    const modelInstance = this.getModel('Comment');
+    const modelInstance = this.getModel("Comment");
     const commentData = await modelInstance.select({
       user_id: userInfo.objectId,
       objectId: this.id,
@@ -343,7 +342,9 @@ module.exports = class extends Base {
       return;
     }
 
-    think.logger.debug('【评论】用户无权删除此评论');
+    think.logger.debug("【评论】用户无权删除此评论");
     return this.ctx.throw(403);
   }
 };
+
+think.logger.debug(" 已加载/logic/comment.js");

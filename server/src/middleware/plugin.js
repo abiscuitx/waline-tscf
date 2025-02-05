@@ -1,14 +1,13 @@
-think.logger.debug('plugin.js');
 
 let compose;
 
 const load = {
-  compose: () => compose || (compose = require('koa-compose'))
+  compose: () => compose || (compose = require("koa-compose")),
 };
 
 // 导出插件中间件函数
 module.exports = () => async (ctx, next) => {
-  think.logger.debug('【插件】开始加载插件中间件');
+  think.logger.debug("【插件】开始加载插件中间件");
 
   // 获取所有插件中间件
   const middlewares = think.getPluginMiddlewares();
@@ -19,9 +18,9 @@ module.exports = () => async (ctx, next) => {
     return next();
   }
 
-  think.logger.debug('【插件】组合并执行插件中间件');
+  think.logger.debug("【插件】组合并执行插件中间件");
   // 组合所有插件中间件并执行
   return load.compose()(middlewares)(ctx, next);
 };
 
-think.logger.debug('plugin.js');
+think.logger.debug(" 已加载/middleware/plugin.js");

@@ -1,4 +1,3 @@
-think.logger.debug('leancloud.js');
 const { LEAN_ID, LEAN_KEY, LEAN_MASTER_KEY, LEAN_SERVER } = process.env;
 // 如果缺少必要的环境变量配置，直接返回空类
 if (!LEAN_ID || !LEAN_KEY || !LEAN_MASTER_KEY) {
@@ -6,13 +5,13 @@ if (!LEAN_ID || !LEAN_KEY || !LEAN_MASTER_KEY) {
   return;
 }
 
-const Base = require('./base.js');
+const Base = require("./base.js");
 
 let AV;
 const load = {
   av: () => {
     if (!AV) {
-      AV = require('leancloud-storage');
+      AV = require("leancloud-storage");
       // 初始化 LeanCloud
       AV.Cloud.useMasterKey(true);
       AV.init({
@@ -23,7 +22,7 @@ const load = {
       });
     }
     return AV;
-  }
+  },
 };
 
 // 导出 LeanCloud 存储类
@@ -36,7 +35,7 @@ module.exports = class extends Base {
     }
 
     for (const k in where) {
-      if (k === '_complex') {
+      if (k === "_complex") {
         continue;
       }
 
@@ -54,29 +53,29 @@ module.exports = class extends Base {
           const handler = where[k][0].toUpperCase();
 
           switch (handler) {
-            case 'IN':
+            case "IN":
               instance.containedIn(k, where[k][1]);
               break;
-            case 'NOT IN':
+            case "NOT IN":
               instance.notContainedIn(k, where[k][1]);
               break;
-            case 'LIKE': {
+            case "LIKE": {
               const first = where[k][1][0];
               const last = where[k][1].slice(-1);
 
-              if (first === '%' && last === '%') {
+              if (first === "%" && last === "%") {
                 instance.contains(k, where[k][1].slice(1, -1));
-              } else if (first === '%') {
+              } else if (first === "%") {
                 instance.endsWith(k, where[k][1].slice(1));
-              } else if (last === '%') {
+              } else if (last === "%") {
                 instance.startsWith(k, where[k][1].slice(0, -1));
               }
               break;
             }
-            case '!=':
+            case "!=":
               instance.notEqualTo(k, where[k][1]);
               break;
-            case '>':
+            case ">":
               instance.greaterThan(k, where[k][1]);
               break;
           }
@@ -95,7 +94,7 @@ module.exports = class extends Base {
     const filters = [];
 
     for (const k in where._complex) {
-      if (k === '_logic') {
+      if (k === "_logic") {
         continue;
       }
 
@@ -152,9 +151,9 @@ module.exports = class extends Base {
 
   async _getCmtGroupByMailUserIdCache(key, where) {
     if (
-      this.tableName !== 'Comment' ||
-      key !== 'user_id_mail' ||
-      !think.isArray(think.config('levels'))
+      this.tableName !== "Comment" ||
+      key !== "user_id_mail" ||
+      !think.isArray(think.config("levels"))
     ) {
       return [];
     }
@@ -172,9 +171,9 @@ module.exports = class extends Base {
 
   async _setCmtGroupByMailUserIdCache(key, data) {
     if (
-      this.tableName !== 'Comment' ||
-      key !== 'user_id_mail' ||
-      !think.isArray(think.config('levels'))
+      this.tableName !== "Comment" ||
+      key !== "user_id_mail" ||
+      !think.isArray(think.config("levels"))
     ) {
       return;
     }
@@ -192,15 +191,15 @@ module.exports = class extends Base {
 
         return this.add(item);
       }),
-      1,
+      1
     );
     this.tableName = currentTableName;
   }
 
   async _updateCmtGroupByMailUserIdCache(data, method) {
     if (
-      this.tableName !== 'Comment' ||
-      !think.isArray(think.config('levels'))
+      this.tableName !== "Comment" ||
+      !think.isArray(think.config("levels"))
     ) {
       return;
     }
@@ -212,7 +211,7 @@ module.exports = class extends Base {
     const cacheTableName = `cache_group_count_user_id_mail`;
     const cacheData = await this.select({
       _complex: {
-        _logic: 'or',
+        _logic: "or",
         user_id: think.isObject(data.user_id)
           ? data.user_id.toString()
           : data.user_id,
@@ -227,19 +226,19 @@ module.exports = class extends Base {
     let count = cacheData[0].count;
 
     switch (method) {
-      case 'add':
-        if (data.status === 'approved') {
+      case "add":
+        if (data.status === "approved") {
           count += 1;
         }
         break;
-      case 'udpate_status':
-        if (data.status === 'approved') {
+      case "udpate_status":
+        if (data.status === "approved") {
           count += 1;
         } else {
           count -= 1;
         }
         break;
-      case 'delete':
+      case "delete":
         count -= 1;
         break;
     }
@@ -253,7 +252,7 @@ module.exports = class extends Base {
           return;
         }
         throw e;
-      },
+      }
     );
     this.tableName = currentTableName;
   }
@@ -272,8 +271,8 @@ module.exports = class extends Base {
 
     // get group count cache by group field where data
     const cacheData = await this._getCmtGroupByMailUserIdCache(
-      options.group.join('_'),
-      where,
+      options.group.join("_"),
+      where
     );
 
     if (!where._complex) {
@@ -287,7 +286,7 @@ module.exports = class extends Base {
       for (const count of counts) {
         const key = options.group
           .map((item) => count[item] || undefined)
-          .join('_');
+          .join("_");
 
         if (!countsMap[key]) {
           countsMap[key] = {};
@@ -303,7 +302,7 @@ module.exports = class extends Base {
       const ret = Object.values(countsMap);
 
       // cache data
-      await this._setCmtGroupByMailUserIdCache(options.group.join('_'), ret);
+      await this._setCmtGroupByMailUserIdCache(options.group.join("_"), ret);
 
       return ret;
     }
@@ -313,7 +312,7 @@ module.exports = class extends Base {
     for (const item of cacheData) {
       const key = options.group
         .map((item) => item[item] || undefined)
-        .join('_');
+        .join("_");
 
       cacheDataMap[key] = item;
     }
@@ -341,9 +340,9 @@ module.exports = class extends Base {
               ({
                 ...groupFlatValue,
                 [groupName]: item,
-              })[item] || undefined,
+              }[item] || undefined)
           )
-          .join('_');
+          .join("_");
 
         if (cacheDataMap[cacheKey]) {
           continue;
@@ -372,21 +371,19 @@ module.exports = class extends Base {
 
     await think.promiseAllQueue(countsPromise, 1);
     // cache data
-    await this._setCmtGroupByMailUserIdCache(options.group.join('_'), counts);
+    await this._setCmtGroupByMailUserIdCache(options.group.join("_"), counts);
 
     return [...cacheData, ...counts];
   }
 
   async add(
     data,
-    {
-      access: { read = true, write = true } = { read: true, write: true },
-    } = {},
+    { access: { read = true, write = true } = { read: true, write: true } } = {}
   ) {
     const Table = AV.Object.extend(this.tableName);
     const instance = new Table();
 
-    const REVERSED_KEYS = ['objectId', 'createdAt', 'updatedAt'];
+    const REVERSED_KEYS = ["objectId", "createdAt", "updatedAt"];
 
     for (const k in data) {
       if (REVERSED_KEYS.includes(k)) {
@@ -403,7 +400,7 @@ module.exports = class extends Base {
 
     const resp = await instance.save();
 
-    await this._updateCmtGroupByMailUserIdCache(data, 'add');
+    await this._updateCmtGroupByMailUserIdCache(data, "add");
 
     return resp.toJSON();
   }
@@ -414,12 +411,12 @@ module.exports = class extends Base {
 
     return Promise.all(
       ret.map(async (item) => {
-        const _oldStatus = item.get('status');
+        const _oldStatus = item.get("status");
 
         const updateData =
-          typeof data === 'function' ? data(item.toJSON()) : data;
+          typeof data === "function" ? data(item.toJSON()) : data;
 
-        const REVERSED_KEYS = ['createdAt', 'updatedAt'];
+        const REVERSED_KEYS = ["createdAt", "updatedAt"];
 
         for (const k in updateData) {
           if (REVERSED_KEYS.includes(k)) {
@@ -428,16 +425,16 @@ module.exports = class extends Base {
           item.set(k, updateData[k]);
         }
 
-        const _newStatus = item.get('status');
+        const _newStatus = item.get("status");
 
         if (_newStatus && _oldStatus !== _newStatus) {
-          await this._updateCmtGroupByMailUserIdCache(data, 'update_status');
+          await this._updateCmtGroupByMailUserIdCache(data, "update_status");
         }
 
         const resp = await item.save();
 
         return resp.toJSON();
-      }),
+      })
     );
   }
 
@@ -445,9 +442,10 @@ module.exports = class extends Base {
     const instance = this.where(this.tableName, where);
     const data = await instance.find();
 
-    await this._updateCmtGroupByMailUserIdCache(data, 'delete');
+    await this._updateCmtGroupByMailUserIdCache(data, "delete");
 
     return AV.Object.destroyAll(data);
   }
 };
-think.logger.debug('leancloud.js');
+
+think.logger.debug(" 已加载/service/storage/leancloud.js");

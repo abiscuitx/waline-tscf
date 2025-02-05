@@ -1,5 +1,4 @@
-think.logger.debug('postgresql.js');
-const MySQL = require('./mysql.js');
+const MySQL = require("./mysql.js");
 
 function mapKeys({ insertedat, createdat, updatedat, ...item }) {
   const mapFields = {
@@ -44,14 +43,14 @@ module.exports = class extends MySQL {
   }
 
   async add(data) {
-    ['insertedAt', 'createdAt', 'updatedAt']
+    ["insertedAt", "createdAt", "updatedAt"]
       .filter((key) => data[key])
       .forEach((key) => {
         const val = data[key];
 
         data[key.toLowerCase()] =
           val instanceof Date
-            ? think.datetime(val, 'YYYY-MM-DD HH:mm:ss')
+            ? think.datetime(val, "YYYY-MM-DD HH:mm:ss")
             : val;
         delete data[key];
       });
@@ -81,8 +80,9 @@ module.exports = class extends MySQL {
     const instance = this.model(this.tableName);
 
     return instance.query(
-      `ALTER SEQUENCE ${instance.tableName}_seq RESTART WITH ${id};`,
+      `ALTER SEQUENCE ${instance.tableName}_seq RESTART WITH ${id};`
     );
   }
 };
-think.logger.debug('postgresql.js');
+
+think.logger.debug(" 已加载/service/storage/postgresql.js");

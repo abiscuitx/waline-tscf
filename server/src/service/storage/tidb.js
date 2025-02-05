@@ -1,5 +1,5 @@
-think.logger.debug('tidb.js');
-const MySQL = require('./mysql.js');
+const MySQL = require("./mysql.js");
 
 module.exports = class extends MySQL {};
-think.logger.debug('tidb.js');
+
+think.logger.debug(" 已加载/service/storage/tidb.js");

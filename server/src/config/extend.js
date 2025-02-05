@@ -1,21 +1,13 @@
-// 懒加载依赖
+// 懒加载
 let Model, Mongo, fetch;
-
-// 加载器函数
 const load = {
-  model: () => Model || (Model = require('think-model')),
-  mongo: () => Mongo || (Mongo = require('think-mongo')),
-  fetch: () => fetch || (fetch = require('node-fetch'))
+  model: () => Model || (Model = require("think-model")),
+  mongo: () => Mongo || (Mongo = require("think-mongo")),
+  fetch: () => fetch || (fetch = require("node-fetch")),
 };
 
 // 根据环境配置决定是否需要加载数据库模块
-const { 
-  MONGO_DB, 
-  MYSQL_DB, 
-  PG_DB, 
-  POSTGRES_DATABASE, 
-  TIDB_DB 
-} = process.env;
+const { MONGO_DB, MYSQL_DB, PG_DB, POSTGRES_DATABASE, TIDB_DB } = process.env;
 
 // 扩展配置数组
 const extensions = [];
@@ -41,7 +33,7 @@ extensions.push({
       }
       const { protocol, host } = this;
       const url = `${protocol}://${host}`;
-      think.logger.debug('【扩展】最终服务器URL:', url);
+      think.logger.debug(" 【extend】服务器URL:", url);
       return url;
     },
 
@@ -49,18 +41,20 @@ extensions.push({
     async webhook(type, data) {
       const { WEBHOOK } = process.env;
       if (!WEBHOOK) {
-        think.logger.debug('[Webhook] 未配置webhook地址，跳过回调');
+        think.logger.debug(" 【extend】未配置webhook地址，跳过回调");
         return;
       }
 
-      think.logger.debug('[Webhook] 发送回调请求');
-      return load.fetch()(WEBHOOK, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ type, data }),
-      }).then((resp) => resp.json());
+      think.logger.debug(" 【extend】发送回调请求");
+      return load
+        .fetch()(WEBHOOK, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ type, data }),
+        })
+        .then((resp) => resp.json());
     },
   },
 });
@@ -68,4 +62,4 @@ extensions.push({
 // 导出扩展配置
 module.exports = extensions;
 
-think.logger.debug('【扩展】已加载扩展配置');
+think.logger.debug(" 已加载config/extend.js");

@@ -1,9 +1,9 @@
-const { version } = require('../../package.json');
+const { version } = require("../../package.json");
 module.exports = class extends think.Controller {
   indexAction() {
-    think.logger.debug('【首页】开始渲染评论系统示例页面');
+    think.logger.debug("【首页】开始渲染评论系统示例页面");
 
-    this.type = 'html';
+    this.type = "html";
     this.body = `
     <!DOCTYPE html>
     <html lang="en">
@@ -29,13 +29,15 @@ module.exports = class extends think.Controller {
           path: params.get('path') || '/',
           lang: params.get('lng') || undefined,
           serverURL: location.protocol + '//' + location.host + location.pathname.replace(/\\/+$/, ''),
-          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ''}',
-          turnstileKey: '${process.env.TURNSTILE_KEY || ''}',
+          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ""}',
+          turnstileKey: '${process.env.TURNSTILE_KEY || ""}',
         });
       </script>
     </body>
     </html>`;
 
-    think.logger.debug('【首页】评论系统示例页面渲染完成');
+    think.logger.debug("【首页】评论系统示例页面渲染完成");
   }
 };
+
+think.logger.debug(" 已加载/controller/index.js");

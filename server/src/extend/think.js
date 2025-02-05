@@ -3,22 +3,24 @@ let ip2region, helper, parser, regionSearch;
 
 // 懒加载辅助函数
 const load = {
-  ip2region: () => ip2region || (ip2region = require('dy-node-ip2region')),
-  helper: () => helper || (helper = require('think-helper')),
-  parser: () => parser || (parser = require('ua-parser-js')),
-  regionSearch: () => regionSearch || (regionSearch = load.ip2region().create(process.env.IP2REGION_DB))
+  ip2region: () => ip2region || (ip2region = require("dy-node-ip2region")),
+  helper: () => helper || (helper = require("think-helper")),
+  parser: () => parser || (parser = require("ua-parser-js")),
+  regionSearch: () =>
+    regionSearch ||
+    (regionSearch = load.ip2region().create(process.env.IP2REGION_DB)),
 };
 
 // 创建IP地址查询实例
 regionSearch = load.ip2region().create(process.env.IP2REGION_DB);
 
 // 定义防止后续处理的消息
-const preventMessage = 'PREVENT_NEXT_PROCESS';
+const preventMessage = "PREVENT_NEXT_PROCESS";
 
 // 操作系统版本映射表
 const OS_VERSION_MAP = {
   Windows: {
-    'NT 11.0': '11',
+    "NT 11.0": "11",
   },
 };
 
@@ -93,25 +95,27 @@ module.exports = {
   // IP地址转换为地理位置信息
   async ip2region(ip, { depth = 1 }) {
     // think.logger.debug('【系统】解析IP地址:', ip);
-    if (!ip || ip.includes(':')) return '';
+    if (!ip || ip.includes(":")) return "";
 
     try {
-      const search = load.helper().promisify(load.regionSearch().btreeSearch, load.regionSearch());
+      const search = load
+        .helper()
+        .promisify(load.regionSearch().btreeSearch, load.regionSearch());
       const result = await search(ip);
 
       if (!result) {
-        return '';
+        return "";
       }
       const { region } = result;
-      const [, , province, city, isp] = region.split('|');
+      const [, , province, city, isp] = region.split("|");
       const address = Array.from(
-        new Set([province, city, isp].filter((v) => v)),
+        new Set([province, city, isp].filter((v) => v))
       );
 
-      return address.slice(0, depth).join(' ');
+      return address.slice(0, depth).join(" ");
     } catch (e) {
-      think.logger.debug('【系统】IP地址解析失败',e);
-      return '';
+      think.logger.debug("【系统】IP地址解析失败", e);
+      return "";
     }
   },
 
@@ -129,8 +133,8 @@ module.exports = {
 
   // 根据值获取等级
   getLevel(val) {
-    think.logger.debug('【系统】计算等级值');
-    const levels = this.config('levels');
+    think.logger.debug("【系统】计算等级值");
+    const levels = this.config("levels");
     const defaultLevel = 0;
 
     if (!val) {
@@ -145,7 +149,7 @@ module.exports = {
   // 遍历插件并执行回调
   pluginMap(type, callback) {
     // think.logger.debug('【系统】遍历插件:', type);
-    const plugins = think.config('plugins');
+    const plugins = think.config("plugins");
     const fns = [];
 
     if (!think.isArray(plugins)) {
@@ -172,7 +176,7 @@ module.exports = {
   // 获取插件中间件列表
   getPluginMiddlewares() {
     // think.logger.debug('【系统】获取插件中间件列表');
-    const middlewares = think.pluginMap('middlewares', (middleware) => {
+    const middlewares = think.pluginMap("middlewares", (middleware) => {
       if (think.isFunction(middleware)) {
         return middleware;
       }
@@ -187,13 +191,13 @@ module.exports = {
 
   // 获取指定钩子的插件处理函数列表
   getPluginHook(hookName) {
-    think.logger.debug('【系统】获取钩子处理函数:', hookName);
+    think.logger.debug("【系统】获取钩子处理函数:", hookName);
     return think
-      .pluginMap('hooks', (hook) =>
-        think.isFunction(hook[hookName]) ? hook[hookName] : undefined,
+      .pluginMap("hooks", (hook) =>
+        think.isFunction(hook[hookName]) ? hook[hookName] : undefined
       )
       .filter((v) => v);
   },
 };
 
-think.logger.debug('【扩展】 已加载think扩展');
+think.logger.debug(" 已加载/extend/think.js");

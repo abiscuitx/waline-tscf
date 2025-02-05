@@ -1,5 +1,3 @@
-think.logger.debug('base.js');
-
 module.exports = class extends think.Service {
   constructor(tableName) {
     super();
@@ -16,9 +14,7 @@ module.exports = class extends think.Service {
 
   async add(
     data,
-    {
-      access: { read = true, write = true } = { read: true, write: true },
-    } = {},
+    { access: { read = true, write = true } = { read: true, write: true } } = {}
   ) {
     //to be implemented
   }
@@ -31,4 +27,5 @@ module.exports = class extends think.Service {
     //to be implemented
   }
 };
-think.logger.debug('base.js');
+
+think.logger.debug(" 已加载/service/storage/base.js");

@@ -1,16 +1,15 @@
-think.logger.debug('index.js');
-
 let MarkdownIt, katexPlugin, subPlugin, supPlugin, emojiPlugin;
 
 const load = {
-  markdownIt: () => MarkdownIt || (MarkdownIt = require('markdown-it')),
-  katex: () => katexPlugin || (katexPlugin = require('@mdit/plugin-katex').katex),
-  sub: () => subPlugin || (subPlugin = require('@mdit/plugin-sub').sub),
-  sup: () => supPlugin || (supPlugin = require('@mdit/plugin-sup').sup),
-  emoji: () => emojiPlugin || (emojiPlugin = require('markdown-it-emoji')),
-  highlight: () => require('./highlight.js'),
-  mathjax: () => require('./mathjax.js'),
-  xss: () => require('./xss.js')
+  markdownIt: () => MarkdownIt || (MarkdownIt = require("markdown-it")),
+  katex: () =>
+    katexPlugin || (katexPlugin = require("@mdit/plugin-katex").katex),
+  sub: () => subPlugin || (subPlugin = require("@mdit/plugin-sub").sub),
+  sup: () => supPlugin || (supPlugin = require("@mdit/plugin-sup").sup),
+  emoji: () => emojiPlugin || (emojiPlugin = require("markdown-it-emoji")),
+  highlight: () => require("./highlight.js"),
+  mathjax: () => require("./mathjax.js"),
+  xss: () => require("./xss.js"),
 };
 
 // 使用懒加载
@@ -26,7 +25,7 @@ function getMarkdownParser() {
 
 // 获取Markdown解析器实例
 const initMarkdownParser = () => {
-  think.logger.debug('【Markdown】初始化Markdown解析器');
+  think.logger.debug("【Markdown】初始化Markdown解析器");
   const { markdown = {} } = think.config();
   const { config = {}, plugin = {} } = markdown;
 
@@ -37,7 +36,7 @@ const initMarkdownParser = () => {
     typographer: true,
     highlight: (code, lang) => {
       const highlighter = load.highlight().resolveHighlighter(lang);
-      return highlighter ? highlighter(code) : '';
+      return highlighter ? highlighter(code) : "";
     },
     ...config,
     html: true,
@@ -48,7 +47,7 @@ const initMarkdownParser = () => {
 
   // 解析emoji表情
   if (emoji !== false) {
-    markdownIt.use(load.emoji().full, typeof emoji === 'object' ? emoji : {});
+    markdownIt.use(load.emoji().full, typeof emoji === "object" ? emoji : {});
   }
 
   // 解析下标
@@ -62,10 +61,10 @@ const initMarkdownParser = () => {
   }
 
   // 解析数学公式
-  if (tex === 'katex') {
+  if (tex === "katex") {
     markdownIt.use(load.katex(), {
       ...katex,
-      output: 'mathml',
+      output: "mathml",
     });
   } else if (tex !== false) {
     markdownIt.use(load.mathjax().mathjaxPlugin, mathjax);
@@ -75,4 +74,5 @@ const initMarkdownParser = () => {
 };
 
 module.exports = { getMarkdownParser };
-think.logger.debug('index.js');
+
+think.logger.debug(" 已加载/service/markdown/index.js");

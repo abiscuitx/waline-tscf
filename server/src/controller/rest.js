@@ -1,4 +1,4 @@
-const path = require('node:path');
+const path = require("node:path");
 
 module.exports = class extends think.Controller {
   // 标识当前类为 REST 控制器
@@ -8,7 +8,7 @@ module.exports = class extends think.Controller {
 
   // 定义请求方法的属性名
   static get _method() {
-    return 'method';
+    return "method";
   }
 
   // 构造函数：初始化资源和ID
@@ -16,7 +16,12 @@ module.exports = class extends think.Controller {
     super(ctx);
     this.resource = this.getResource();
     this.id = this.getId();
-    think.logger.debug('【REST】初始化控制器，资源:', this.resource, '，ID:', this.id);
+    think.logger.debug(
+      "【REST】初始化控制器，资源:",
+      this.resource,
+      "，ID:",
+      this.id
+    );
   }
 
   // 前置处理方法，可被子类重写
@@ -33,7 +38,7 @@ module.exports = class extends think.Controller {
 
   // 从请求中获取资源ID
   getId() {
-    const id = this.get('id');
+    const id = this.get("id");
 
     // 检查请求参数中的ID
     if (id && (think.isString(id) || think.isNumber(id))) {
@@ -42,7 +47,7 @@ module.exports = class extends think.Controller {
     }
 
     // 从URL路径中获取ID
-    const last = decodeURIComponent(this.ctx.path.split('/').pop());
+    const last = decodeURIComponent(this.ctx.path.split("/").pop());
 
     // 验证URL中的ID格式
     if (last !== this.resource && /^([a-z0-9]+,?)*$/i.test(last)) {
@@ -51,22 +56,25 @@ module.exports = class extends think.Controller {
     }
 
     // think.logger.debug('【REST】未找到有效ID');
-    return '';
+    return "";
   }
 
   // 检查用户登录状态
   isLogin() {
     const { userInfo } = this.ctx.state;
     const isEmpty = think.isEmpty(userInfo);
-    
-    think.logger.debug('【REST】检查用户登录状态:', isEmpty ? '未登录' : '已登录');
+
+    think.logger.debug(
+      "【REST】检查用户登录状态:",
+      isEmpty ? "未登录" : "已登录"
+    );
     return isEmpty;
   }
 
   // 执行钩子函数链
   async hook(name, ...args) {
-    think.logger.debug('【REST】执行钩子函数:', name);
-    
+    think.logger.debug("【REST】执行钩子函数:", name);
+
     // 获取配置的钩子函数和插件钩子
     const fn = this.config(name);
     const plugins = think.getPluginHook(name);
@@ -86,14 +94,16 @@ module.exports = class extends think.Controller {
 
       // 如果钩子返回结果，中断执行并返回
       if (resp) {
-        think.logger.debug('【REST】钩子函数执行完成，有返回结果');
+        think.logger.debug("【REST】钩子函数执行完成，有返回结果");
         return resp;
       }
     }
-    
-    think.logger.debug('【REST】钩子函数执行完成');
+
+    think.logger.debug("【REST】钩子函数执行完成");
   }
 
   // 默认调用方法，处理未定义的方法调用
   __call() {}
 };
+
+think.logger.debug(" 已加载/controller/rest.js");
