@@ -28,7 +28,6 @@ module.exports = function (comment, blog) {
   // 返回Promise进行异步检查
   return new Promise(function (resolve, reject) {
     think.logger.debug("【Akismet】初始化反垃圾检查客户端");
-    // 创建Akismet客户端实例，使用懒加载
     const akismet = load.akismet().client({ blog, apiKey: AKISMET_KEY });
 
     // 验证API密钥是否有效
@@ -42,7 +41,6 @@ module.exports = function (comment, blog) {
       }
 
       think.logger.debug("【Akismet】开始检查评论内容");
-      // 检查评论内容是否为垃圾评论
       akismet.checkComment(
         {
           user_ip: comment.ip, // 评论者IP地址

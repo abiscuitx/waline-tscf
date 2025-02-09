@@ -27,7 +27,7 @@ const OS_VERSION_MAP = {
 module.exports = {
   // 抛出阻止后续处理的错误
   prevent() {
-    think.logger.debug('【Think】阻止后续处理');
+    think.logger.debug("【Think】阻止后续处理");
     throw new Error(preventMessage);
   },
 
@@ -93,30 +93,34 @@ module.exports = {
 
   // IP地址转换为地理位置信息
   async ip2region(ip, { depth = 1 }) {
-    if (!ip || ip.includes(':')) {
-      think.logger.debug('【Think】无效的IP地址:', ip);
-      return '';
+    if (!ip || ip.includes(":")) {
+      think.logger.debug("【Think】无效的IP地址:", ip);
+      return "";
     }
 
     try {
-      think.logger.debug('【Think】开始解析IP地址:', ip);
-      const search = load.helper().promisify(load.regionSearch().btreeSearch, load.regionSearch());
+      think.logger.debug("【Think】开始解析IP地址:", ip);
+      const search = load
+        .helper()
+        .promisify(load.regionSearch().btreeSearch, load.regionSearch());
       const result = await search(ip);
 
       if (!result) {
-        think.logger.debug('【Think】IP地址解析无结果');
-        return '';
+        think.logger.debug("【Think】IP地址解析无结果");
+        return "";
       }
 
       const { region } = result;
-      const [, , province, city, isp] = region.split('|');
-      const address = Array.from(new Set([province, city, isp].filter(v => v)));
-      
-      think.logger.debug('【Think】IP地址解析结果:', address.join(' '));
-      return address.slice(0, depth).join(' ');
+      const [, , province, city, isp] = region.split("|");
+      const address = Array.from(
+        new Set([province, city, isp].filter((v) => v))
+      );
+
+      think.logger.debug("【Think】IP地址解析结果:", address.join(" "));
+      return address.slice(0, depth).join(" ");
     } catch (e) {
-      think.logger.error('【Think】IP地址解析错误:', e);
-      return '';
+      think.logger.error("【Think】IP地址解析错误:", e);
+      return "";
     }
   },
 
@@ -149,7 +153,7 @@ module.exports = {
 
   // 遍历插件并执行回调
   pluginMap(type, callback) {
-    // think.logger.debug('【系统】遍历插件:', type);
+    // think.logger.debug('【think】遍历插件:', type);
     const plugins = think.config("plugins");
     const fns = [];
 
@@ -176,8 +180,8 @@ module.exports = {
 
   // 获取插件中间件列表
   getPluginMiddlewares() {
-    think.logger.debug('【Think】获取插件中间件');
-    const middlewares = this.pluginMap('middlewares', middleware => {
+    think.logger.debug("【Think】获取插件中间件");
+    const middlewares = this.pluginMap("middlewares", (middleware) => {
       if (think.isFunction(middleware)) {
         return middleware;
       }
@@ -186,18 +190,21 @@ module.exports = {
       }
     });
 
-    think.logger.debug('【Think】找到插件中间件数量:', middlewares.flat().length);
+    think.logger.debug(
+      "【Think】找到插件中间件数量:",
+      middlewares.flat().length
+    );
     return middlewares.flat();
   },
 
   // 获取指定钩子的插件处理函数列表
   getPluginHook(hookName) {
-    think.logger.debug('【Think】获取插件钩子:', hookName);
-    const hooks = this.pluginMap('hooks', hook => 
+    think.logger.debug("【Think】获取插件钩子:", hookName);
+    const hooks = this.pluginMap("hooks", (hook) =>
       think.isFunction(hook[hookName]) ? hook[hookName] : undefined
-    ).filter(v => v);
+    ).filter((v) => v);
 
-    think.logger.debug('【Think】找到钩子处理函数数量:', hooks.length);
+    think.logger.debug("【Think】找到钩子处理函数数量:", hooks.length);
     return hooks;
   },
 };

@@ -39,13 +39,13 @@ class MathToSvg {
 
     // 处理行内公式
     this.inline = function (tex) {
-      think.logger.debug("【MathJax】处理行内公式");
+      think.logger.debug("【mathjax】处理行内公式");
       const node = this.texToNode.convert(tex, { display: false });
       let svg = this.adaptor.innerHTML(node);
 
       // 处理渲染错误
       if (svg.includes('data-mml-node="merror"')) {
-        think.logger.debug("【MathJax】行内公式渲染出错");
+        think.logger.warn("【mathjax】行内公式渲染出错");
         const errorTitle = svg.match(/<title>(.*?)<\/title>/)[1];
         svg = `<span class='mathjax-error' title='${load
           .utils()
@@ -57,13 +57,13 @@ class MathToSvg {
 
     // 处理块级公式
     this.block = function (tex) {
-      think.logger.debug("【MathJax】处理块级公式");
+      think.logger.debug("【mathjax】处理块级公式");
       const node = this.texToNode.convert(tex, { display: true });
       let svg = this.adaptor.innerHTML(node);
 
       // 处理渲染错误
       if (svg.includes('data-mml-node="merror"')) {
-        think.logger.debug("【MathJax】块级公式渲染出错");
+        think.logger.warn("【mathjax】块级公式渲染出错");
         const errorTitle = svg.match(/<title>(.*?)<\/title>/)[1];
         svg = `<p class='mathjax-block mathjax-error' title='${load
           .utils()
@@ -80,7 +80,7 @@ class MathToSvg {
 
 // MathJax插件主函数
 const mathjaxPlugin = (md) => {
-  think.logger.debug("【MathJax】初始化MathJax插件");
+  think.logger.debug("【mathjax】初始化MathJax插件");
   const mathToSvg = new MathToSvg();
   const { inlineTeX, blockTeX } = load.mathCommon();
 

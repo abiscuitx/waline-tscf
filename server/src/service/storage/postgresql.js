@@ -38,6 +38,10 @@ module.exports = class extends MySQL {
     }
 
     const data = await super.select(lowerWhere, options);
+    think.logger.debug("【postgresql】查询数据完成", {
+      条件: lowerWhere,
+      选项: options,
+    });
 
     return data.map(mapKeys);
   }
@@ -55,7 +59,9 @@ module.exports = class extends MySQL {
         delete data[key];
       });
 
-    return super.add(data).then(mapKeys);
+    const result = await super.add(data).then(mapKeys);
+    think.logger.debug("【postgresql】添加数据完成", { 数据: result });
+    return result;
   }
 
   async count(...args) {
@@ -70,9 +76,10 @@ module.exports = class extends MySQL {
         result = parseInt(result);
       }
     } catch (e) {
-      console.log(e);
+      think.logger.warn("【postgresql】计数出错:", e);
     }
 
+    think.logger.debug("【postgresql】计数完成", { 结果: result });
     return result;
   }
 

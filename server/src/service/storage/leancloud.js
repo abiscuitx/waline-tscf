@@ -83,6 +83,7 @@ module.exports = class extends Base {
       }
     }
 
+    think.logger.debug("【leancloud】构建查询条件完成", { 条件: where });
     return instance;
   }
 

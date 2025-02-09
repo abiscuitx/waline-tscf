@@ -7,6 +7,7 @@ if (!MYSQL_DB || !PG_DB || !POSTGRES_DATABASE || !TIDB_DB) {
 }
 
 const Base = require("./base.js");
+
 module.exports = class extends Base {
   parseWhere(filter) {
     const where = {};
@@ -43,6 +44,7 @@ module.exports = class extends Base {
       where[k] = filter[k];
     }
 
+    think.logger.debug("【mysql】解析查询条件完成", { 条件: where });
     return where;
   }
 
@@ -62,6 +64,7 @@ module.exports = class extends Base {
     }
 
     const data = await instance.select();
+    think.logger.debug("【mysql】查询数据完成", { 数据: data });
 
     return data.map(({ id, ...cmt }) => ({ ...cmt, objectId: id }));
   }
@@ -92,6 +95,9 @@ module.exports = class extends Base {
 
     const instance = this.model(this.tableName);
     const id = await instance.add(data);
+    think.logger.debug("【mysql】添加数据完成", {
+      数据: { ...data, objectId: id },
+    });
 
     return { ...data, objectId: id };
   }
@@ -101,6 +107,8 @@ module.exports = class extends Base {
       .where(this.parseWhere(where))
       .select();
 
+    think.logger.debug("【mysql】更新数据开始", { 条件: where });
+
     return Promise.all(
       list.map(async (item) => {
         const updateData = typeof data === "function" ? data(item) : data;
@@ -109,6 +117,9 @@ module.exports = class extends Base {
           .where({ id: item.id })
           .update(updateData);
 
+        think.logger.debug("【mysql】更新数据完成", {
+          数据: { ...item, ...updateData },
+        });
         return { ...item, ...updateData };
       })
     );
@@ -116,6 +127,7 @@ module.exports = class extends Base {
 
   async delete(where) {
     const instance = this.model(this.tableName);
+    think.logger.debug("【mysql】执行删除操作", { 条件: where });
 
     return instance.where(this.parseWhere(where)).delete();
   }

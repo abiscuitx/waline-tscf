@@ -22,4 +22,4 @@ let config = {
 for (const k in config) {
   think.config(k, config[k]);
 }
-console.log( new Date(), "【Waline】服务初始化完成");
+console.log(new Date(), "【Waline】服务初始化完成");

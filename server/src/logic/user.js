@@ -42,12 +42,12 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  data.data.label 用户标签
    */
   getAction() {
-    think.logger.debug("【用户】处理获取用户列表请求");
+    think.logger.debug("【user】处理获取用户列表请求");
     const { userInfo } = this.ctx.state;
 
     // 非管理员用户获取排行榜
     if (think.isEmpty(userInfo) || userInfo.type !== "administrator") {
-      think.logger.debug("【用户】非管理员获取用户排行榜");
+      think.logger.debug("【user】非管理员获取用户排行榜");
       this.rules = {
         pageSize: {
           int: { max: 50 }, // 最多返回50条
@@ -59,7 +59,7 @@ module.exports = class extends Base {
     }
 
     // 管理员获取完整用户列表
-    think.logger.debug("【用户】管理员获取完整用户列表");
+    think.logger.debug("【user】管理员获取完整用户列表");
     this.rules = {
       page: {
         int: true, // 页码必须是整数
@@ -90,7 +90,7 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
   postAction() {
-    think.logger.debug("【用户】处理用户注册请求");
+    think.logger.debug("【user】处理用户注册请求");
     // 执行验证码检查
     return this.useCaptchaCheck();
   }
@@ -110,18 +110,18 @@ module.exports = class extends Base {
    * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
   putAction() {
-    think.logger.debug("【用户】处理更新用户资料请求");
+    think.logger.debug("【user】处理更新用户资料请求");
     const { userInfo } = this.ctx.state;
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
-      think.logger.debug("【用户】用户未登录，拒绝访问");
+      think.logger.debug("【user】用户未登录，拒绝访问");
       return this.fail();
     }
 
     // 检查是否有权限修改其他用户信息
     if (this.id && userInfo.type !== "administrator") {
-      think.logger.debug("【用户】非管理员尝试修改其他用户信息，拒绝访问");
+      think.logger.debug("【user】非管理员尝试修改其他用户信息，拒绝访问");
       return this.fail();
     }
   }

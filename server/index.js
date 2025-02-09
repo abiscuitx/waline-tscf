@@ -17,11 +17,10 @@ module.exports = function (configParams = {}) {
 
       // 如果应用实例不存在，创建thinkjs实例
       if (!app) {
-        console.log( new Date(), " 【waline】实例冷启动");
+        console.log(new Date(), " 【waline】实例冷启动");
         app = new Application({
           ROOT_PATH: __dirname,
           APP_PATH: path.join(__dirname, "src"),
-          VIEW_PATH: path.join(__dirname, "view"),
           proxy: false,
           RUNTIME_PATH: "/tmp",
           env: "dev",

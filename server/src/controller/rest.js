@@ -18,7 +18,7 @@ module.exports = class extends think.Controller {
     this.id = this.getId();
     think.logger.debug("【rest】初始化控制器", {
       资源: this.resource,
-      ID: this.id
+      ID: this.id,
     });
   }
 
