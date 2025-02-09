@@ -90,6 +90,7 @@ class Github {
         return this.getLargeFile(filename);
       });
 
+    think.logger.debug("【github】获取文件成功", { 文件名: filename });
     return {
       data: Buffer.from(resp.content, "base64").toString("utf-8"),
       sha: resp.sha,

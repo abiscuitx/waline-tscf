@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "2.0.0-beta.40",
+  "version": "2.0.0-beta.42",
   "description": "Debugging, temporarily unavailable. A personal waline backend deployed on Tencent Cloud SCF",
   "main": "index.js",
   "keywords": [
@@ -53,7 +53,10 @@
     "ua-parser-js": "^2.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.19.0",
     "dotenv": "16.4.7",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
     "think-watcher": "3.0.4"
   },
   "engines": {

@@ -133,7 +133,7 @@ module.exports = class extends BaseRest {
       list: this.getAdminCommentList,
     };
 
-    think.logger.debug('【comment】开始处理获取评论请求，类型:', type);
+    think.logger.debug("【comment】开始处理获取评论请求，类型:", type);
     const fn = fnMap[type] || this.getCommentList;
     const data = await fn.call(this);
     return this.jsonOrSuccess(data);
@@ -204,7 +204,7 @@ module.exports = class extends BaseRest {
 
       if (!think.isEmpty(recent)) {
         think.logger.debug(`【comment】评论频率超限：${IPQPS}秒内已发表评论`);
-        return this.fail(this.locale("Comment too fast!"));
+        return this.fail(this.locale("Comment too fast"));
       }
 
       /** 垃圾评论检测 */
@@ -505,7 +505,7 @@ module.exports = class extends BaseRest {
       }
     }
 
-    think.logger.debug('【comment】评论总数:', totalCount);
+    think.logger.debug("【comment】评论总数:", totalCount);
 
     /**
      * 评论数据获取策略说明：
@@ -520,7 +520,7 @@ module.exports = class extends BaseRest {
      *    - 所以使用限制来避免这些问题
      */
     if (totalCount < 1000) {
-      think.logger.debug('【comment】评论数小于1000，一次性获取所有评论');
+      think.logger.debug("【comment】评论数小于1000，一次性获取所有评论");
       comments = await this.modelInstance.select(where, selectOptions);
       rootCount = comments.filter(({ rid }) => !rid).length;
       rootComments = [
@@ -536,7 +536,7 @@ module.exports = class extends BaseRest {
         (cmt) => rootIds[cmt.objectId] || rootIds[cmt.rid]
       );
     } else {
-      think.logger.debug('【comment】评论数过多，分批获取评论数据');
+      think.logger.debug("【comment】评论数过多，分批获取评论数据");
       comments = await this.modelInstance.select(
         { ...where, rid: undefined },
         { ...selectOptions }
@@ -612,7 +612,7 @@ module.exports = class extends BaseRest {
       });
     }
 
-    think.logger.debug('【comment】评论数据处理完成，准备返回');
+    think.logger.debug("【comment】评论数据处理完成，准备返回");
 
     const result = {
       page,

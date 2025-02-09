@@ -2,9 +2,9 @@
 let Model, Mongo, fetch;
 
 const load = {
-  model: () => Model || (Model = require('think-model')),
-  mongo: () => Mongo || (Mongo = require('think-mongo')),
-  fetch: () => fetch || (fetch = require('node-fetch'))
+  model: () => Model || (Model = require("think-model")),
+  mongo: () => Mongo || (Mongo = require("think-mongo")),
+  fetch: () => fetch || (fetch = require("node-fetch")),
 };
 
 // 根据环境配置决定是否需要加载数据库模块
@@ -17,18 +17,18 @@ const extensions = [];
 if (MYSQL_DB || PG_DB || POSTGRES_DATABASE || TIDB_DB) {
   try {
     extensions.push(load.model()(think.app));
-    think.logger.debug('【extend】关系型数据库支持加载成功');
+    think.logger.debug("【extend】关系型数据库支持加载成功");
   } catch (err) {
-    think.logger.error('【extend】关系型数据库支持加载失败:', err);
+    think.logger.error("【extend】关系型数据库支持加载失败:", err);
   }
 }
 
 if (MONGO_DB) {
   try {
     extensions.push(load.mongo()(think.app));
-    think.logger.debug('【extend】MongoDB支持加载成功');
+    think.logger.debug("【extend】MongoDB支持加载成功");
   } catch (err) {
-    think.logger.error('【extend】MongoDB支持加载失败:', err);
+    think.logger.error("【extend】MongoDB支持加载失败:", err);
   }
 }
 
@@ -39,12 +39,12 @@ extensions.push({
     get serverURL() {
       const { SERVER_URL } = process.env;
       if (SERVER_URL) {
-        think.logger.debug('【extend】使用环境变量中的服务器URL:', SERVER_URL);
+        think.logger.debug("【extend】使用环境变量中的服务器URL:", SERVER_URL);
         return SERVER_URL;
       }
       const { protocol, host } = this;
       const url = `${protocol}://${host}`;
-      think.logger.debug('【extend】使用动态生成的服务器URL:', url);
+      think.logger.debug("【extend】使用动态生成的服务器URL:", url);
       return url;
     },
 
@@ -56,21 +56,21 @@ extensions.push({
         return;
       }
 
-      think.logger.debug('【extend】开始发送webhook回调, 类型:', type);
+      think.logger.debug("【extend】开始发送webhook回调, 类型:", type);
       try {
         const response = await load.fetch()(WEBHOOK, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ type, data })
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type, data }),
         });
-        think.logger.debug('【extend】webhook回调发送成功');
+        think.logger.debug("【extend】webhook回调发送成功");
         return response.json();
       } catch (err) {
-        think.logger.error('【extend】webhook回调发送失败:', err);
+        think.logger.error("【extend】webhook回调发送失败:", err);
         throw err;
       }
-    }
-  }
+    },
+  },
 });
 
 // 导出扩展配置

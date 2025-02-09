@@ -5,7 +5,7 @@ const waline = require("@waline-tscf/server");
 exports.main_handler = async (event, context) => {
   // console.log( new Date(), "【serverless】event参数:"", JSON.stringify(event, null, 2));
   // console.log( new Date(), "【【serverless】context参数:"", JSON.stringify(context, null, 2));
-  console.log( [new Date()], "【serverless】转发请求到waline");
+  console.log([new Date()], "【serverless】转发请求到waline");
   try {
     const response = await waline({
       event,
@@ -17,7 +17,6 @@ exports.main_handler = async (event, context) => {
       statusCode: response.statusCode,
       headers: {
         ...response.headers,
-        "Content-Type": "application/json",
       },
       body:
         typeof response.body === "string"

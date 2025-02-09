@@ -29,6 +29,10 @@ function getCache(method, params) {
 
   if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
     // think.logger.debug(`【MongoDB】从缓存获取${method}数据`);
+    think.logger.debug("【mongodb】从缓存获取数据", {
+      方法: method,
+      参数: params,
+    });
     return cache.data;
   }
   return null;
@@ -41,10 +45,12 @@ function setCache(method, params, data) {
     data,
     timestamp: Date.now(),
   });
+  think.logger.debug("【mongodb】设置缓存", { 方法: method, 参数: params });
 }
 
 function clearCache() {
   // think.logger.debug('【MongoDB】清除MongoDB相关缓存');
+  think.logger.debug("【mongodb】清除MongoDB相关缓存");
   mongoCache.select.clear();
   mongoCache.count.clear();
 }
@@ -52,7 +58,7 @@ function clearCache() {
 module.exports = class extends Base {
   // 解析查询条件为MongoDB格式
   parseWhere(where) {
-    // think.logger.debug('【MongoDB】开始解析查询条件:', JSON.stringify(where));
+    think.logger.debug("【mongodb】开始解析查询条件", { 条件: where });
     if (think.isEmpty(where)) {
       return {};
     }
@@ -131,13 +137,13 @@ module.exports = class extends Base {
       }
     }
 
-    // think.logger.debug('【MongoDB】查询条件解析完成, 结果:', JSON.stringify(filter));
+    think.logger.debug("【mongodb】查询条件解析完成", { 结果: filter });
     return filter;
   }
 
   // 构建MongoDB查询条件
   where(instance, where) {
-    // think.logger.debug('【MongoDB】构建查询条件');
+    think.logger.debug("【mongodb】构建查询条件");
     const filter = this.parseWhere(where);
 
     if (!where._complex) {

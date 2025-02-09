@@ -15,13 +15,12 @@ module.exports = class extends think.Logic {
     this.id = this.getId();
     think.logger.debug("【base】初始化完成", {
       资源: this.resource,
-      ID: this.id
+      ID: this.id,
     });
   }
 
   // 请求前置处理方法
   async __before() {
-    // think.logger.debug('【基础逻辑】开始前置处理');
     const referrer = this.ctx.req.headers["Refer"] || this.ctx.referrer(true);
     let origin = this.ctx.req.headers["origin"];
 
@@ -34,7 +33,7 @@ module.exports = class extends think.Logic {
         const parsedOrigin = new URL(origin);
         origin = parsedOrigin.hostname;
       } catch (e) {
-        think.logger.debug("Invalid origin format:", origin, e);
+        think.logger.debug("无效格式:", origin, e);
         origin = this.ctx.req.headers["host"] || "";
       }
     }
@@ -99,7 +98,6 @@ module.exports = class extends think.Logic {
     this.ctx.state.userInfo = {};
     const { authorization } = this.ctx.req.headers;
     const { state } = this.get();
-
     if (!authorization && !state) {
       return;
     }
@@ -109,10 +107,10 @@ module.exports = class extends think.Logic {
     let userMail = "";
 
     try {
-      think.logger.debug("【基础逻辑】验证用户令牌");
+      think.logger.debug("【base】用户令牌验证");
       userMail = jwt.verify(token, think.config("jwtKey"));
     } catch (e) {
-      think.logger.debug("【基础逻辑】令牌验证失败:", e);
+      think.logger.debug("【base】令牌验证失败：", e);
     }
 
     if (think.isEmpty(userMail) || !think.isString(userMail)) {
@@ -120,7 +118,7 @@ module.exports = class extends think.Logic {
     }
 
     // 查询用户详细信息
-    think.logger.debug("【基础逻辑】查询用户信息");
+    think.logger.debug("【base】查询用户信息");
     const user = await this.modelInstance.select(
       { email: userMail },
       {
@@ -149,7 +147,7 @@ module.exports = class extends think.Logic {
 
     // 处理用户信息和头像
     const userInfo = user[0];
-    think.logger.debug("【基础逻辑】处理用户头像");
+    think.logger.debug("【base】处理用户头像");
 
     let avatarUrl = userInfo.avatar
       ? userInfo.avatar
@@ -181,7 +179,6 @@ module.exports = class extends think.Logic {
 
   // 从请求中获取资源ID
   getId() {
-    // think.logger.debug('【基础逻辑】获取资源ID');
     const id = this.get("id");
 
     if (id && (think.isString(id) || think.isNumber(id))) {
@@ -199,7 +196,6 @@ module.exports = class extends think.Logic {
 
   // 验证码检查方法
   async useCaptchaCheck() {
-    think.logger.debug("【base】开始验证码检查");
     const { RECAPTCHA_V3_SECRET, TURNSTILE_SECRET } = process.env;
     const { turnstile, recaptchaV3 } = this.post();
 
@@ -263,7 +259,10 @@ module.exports = class extends think.Logic {
 
     // 处理验证结果
     if (!response.success) {
-      think.logger.warn("【base】验证失败:", JSON.stringify(response, null, "\t"));
+      think.logger.warn(
+        "【base】验证失败:",
+        JSON.stringify(response, null, "\t")
+      );
       return this.ctx.throw(403);
     }
     think.logger.debug("【base】验证通过");

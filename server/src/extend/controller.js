@@ -49,9 +49,9 @@ module.exports = {
       load.defaultLocales()?.[lang]?.[message] ||
       load.defaultLocales()[defaultLang][message];
 
-      if (localMessage) {
-        message = localMessage;
-      }
+    if (localMessage) {
+      message = localMessage;
+    }
 
     return load.nunjucks().renderString(message, variables);
   },
@@ -59,7 +59,12 @@ module.exports = {
   // 获取数据模型实例的方法
   getModel(modelName) {
     const { storage, customModel } = this.config();
-    think.logger.debug("【controller】获取数据模型:", modelName, "存储类型:", storage);
+    think.logger.debug(
+      "【controller】获取数据模型:",
+      modelName,
+      "存储类型:",
+      storage
+    );
 
     if (typeof customModel === "function") {
       const modelInstance = customModel(modelName, this);

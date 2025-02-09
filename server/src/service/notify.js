@@ -17,6 +17,7 @@ module.exports = class extends think.Service {
     super(ctx);
     this.ctx = ctx;
   }
+
   // 从环境变量获取SMTP配置
   getTransporter() {
     if (!this._transporter) {
@@ -30,7 +31,7 @@ module.exports = class extends think.Service {
       } = process.env;
 
       if (SMTP_HOST || SMTP_SERVICE) {
-        think.logger.debug("【通知】配置SMTP邮件服务");
+        think.logger.debug("【notify】配置SMTP邮件服务");
         const config = {
           auth: { user: SMTP_USER, pass: SMTP_PASS },
         };
@@ -43,10 +44,13 @@ module.exports = class extends think.Service {
           config.secure = SMTP_SECURE && SMTP_SECURE !== "false";
         }
         this._transporter = load.nodemailer().createTransport(config);
+      } else {
+        think.logger.debug("【notify】未配置SMTP服务，无法发送邮件");
       }
     }
     return this._transporter;
   }
+
   // 延迟执行指定秒数
   async sleep(second) {
     return new Promise((resolve) => setTimeout(resolve, second * 1000));
@@ -56,10 +60,10 @@ module.exports = class extends think.Service {
   async mail({ to, title, content }, self, parent) {
     const transporter = this.getTransporter();
     if (!transporter) {
-      think.logger.debug("【通知】未配置SMTP服务，跳过邮件发送");
+      think.logger.debug("【notify】未配置SMTP服务，跳过邮件发送");
       return;
     }
-    think.logger.debug("【通知】准备发送邮件通知");
+
     // 获取站点配置信息
     const { SITE_NAME, SITE_URL, SMTP_USER, SENDER_EMAIL, SENDER_NAME } =
       process.env;
@@ -76,7 +80,7 @@ module.exports = class extends think.Service {
     title = this.ctx.locale(title, data);
     content = this.ctx.locale(content, data);
 
-    think.logger.debug("【通知】发送邮件到:", to);
+    think.logger.debug(`【notify】准备发送邮件通知到 ${to}`);
     return transporter.sendMail({
       from:
         SENDER_EMAIL && SENDER_NAME
@@ -93,12 +97,11 @@ module.exports = class extends think.Service {
     const { SC_KEY, SITE_NAME, SITE_URL } = process.env;
 
     if (!SC_KEY) {
-      think.logger.debug("【通知】未配置Server酱密钥，跳过微信通知");
+      think.logger.debug("【notify】未配置Server酱密钥，跳过微信通知");
       return false;
     }
 
-    think.logger.debug("【通知】准备发送Server酱微信通知");
-    // 构建通知数据
+    think.logger.debug("【notify】准备发送Server酱微信通知");
     const data = {
       self,
       parent,
@@ -126,7 +129,7 @@ module.exports = class extends think.Service {
     form.append("text", title);
     form.append("desp", content);
 
-    think.logger.debug("【通知】发送Server酱请求");
+    think.logger.debug("【notify】发送Server酱请求");
     return load
       .fetch(`https://sctapi.ftqq.com/${SC_KEY}.send`, {
         method: "POST",
@@ -564,7 +567,7 @@ module.exports = class extends think.Service {
 
   // 执行通知流程
   async run(comment, parent, disableAuthorNotify = false) {
-    think.logger.debug("【通知】开始执行评论通知");
+    think.logger.debug("【notify】开始执行评论通知");
     const { AUTHOR_EMAIL, DISABLE_AUTHOR_NOTIFY } = process.env;
     const { mailSubject, mailTemplate, mailSubjectAdmin, mailTemplateAdmin } =
       think.config();
@@ -587,7 +590,7 @@ module.exports = class extends think.Service {
 
     // 处理作者通知
     if (!DISABLE_AUTHOR_NOTIFY && !isAuthorComment && !disableAuthorNotify) {
-      think.logger.debug("【通知】准备发送作者通知");
+      think.logger.debug("【notify】准备发送作者通知");
       const wechat = await this.wechat({ title, content }, comment, parent);
       const qywxAmWechat = await this.qywxAmWechat(
         { title, content },
@@ -624,7 +627,7 @@ module.exports = class extends think.Service {
       !isReplyAuthor &&
       comment.status !== "waiting"
     ) {
-      think.logger.debug("【通知】准备发送回复通知");
+      think.logger.debug("【notify】准备发送回复通知");
       mailList.push({
         to: parent.mail,
         title: mailSubject || "MAIL_SUBJECT",
@@ -636,9 +639,9 @@ module.exports = class extends think.Service {
     for (const mail of mailList) {
       try {
         const response = await this.mail(mail, comment, parent);
-        think.logger.debug("【通知】邮件发送成功", response);
+        think.logger.debug("【notify】邮件发送成功", response);
       } catch (e) {
-        think.logger.debug("【通知】邮件发送失败:", e);
+        think.logger.debug("【notify】邮件发送失败:", e);
       }
     }
   }

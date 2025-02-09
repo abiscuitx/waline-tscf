@@ -4,7 +4,6 @@ const routerREST = require("think-router-rest");
 
 // 中间件配置数组
 module.exports = [
-
   // 管理界面中间件 - 处理UI路由
   {
     handle: "dashboard",

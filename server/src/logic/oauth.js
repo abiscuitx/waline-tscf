@@ -9,7 +9,7 @@ module.exports = class extends Base {
    */
   // OAuth第三方认证的处理方法
   indexAction() {
-    think.logger.debug("【OAuth】处理第三方认证请求");
+    think.logger.debug("【oauth】处理第三方认证请求");
   }
 };
 

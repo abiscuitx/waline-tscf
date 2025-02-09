@@ -103,7 +103,7 @@ module.exports = class extends BaseRest {
 
     think.logger.debug("【user】保存用户数据", {
       类型: data.type,
-      是否首个用户: think.isEmpty(count)
+      是否首个用户: think.isEmpty(count),
     });
 
     // 保存或更新用户数据
