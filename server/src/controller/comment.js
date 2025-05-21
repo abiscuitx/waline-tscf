@@ -195,8 +195,8 @@ module.exports = class extends BaseRest {
       }
 
       /** IP 频率限制 */
-      const { IPQPS = 60 } = process.env;
-
+      const { IPQPS = 10 } = process.env;
+      think.logger.debug(this.ctx.ip);
       const recent = await this.modelInstance.select({
         ip: this.ctx.ip,
         insertedAt: [">", new Date(Date.now() - IPQPS * 1000)],

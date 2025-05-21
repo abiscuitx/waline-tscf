@@ -13,7 +13,7 @@ let app = null;
 module.exports = function (configParams = {}) {
   return new Promise((resolve, reject) => {
     try {
-      const { event, context, debugLevel, ...config } = configParams;
+      const { event, context, ...config } = configParams;
 
       // 如果应用实例不存在，创建thinkjs实例
       if (!app) {
@@ -39,24 +39,41 @@ module.exports = function (configParams = {}) {
       // 构造请求，响应对象
       const server = http.createServer();
       const req = new http.IncomingMessage(server);
-      const headers = {
-        ...(event.headers || {}),
-        ...(event.headerParameters || {}),
-        "x-real-ip": event.requestContext?.sourceIp || "",
-      };
+
+      // 设置请求对象的属性
       Object.assign(req, {
+        body:
+          typeof event.body === "string"
+            ? event.body
+            : JSON.stringify(event.body || {}),
+        headers: event.headers,
         method: event.httpMethod,
-        url: `${event.path}${
-          event.queryString
-            ? "?" + new URLSearchParams(event.queryString).toString()
-            : ""
-        }`,
-        headers,
-        query: event.queryString || {},
-        body: event.body || "",
+        url: (() => {
+          // 标准化路径并防止遍历攻击
+          const safePath = normalize(event.path).replace(
+            /^(\.\.(\/|\\|$))+/,
+            ""
+          );
+          // 处理查询参数
+          let queryParams = event.queryString || {};
+          if (typeof queryParams === "string") {
+            queryParams = Object.fromEntries(new URLSearchParams(queryParams));
+          }
+          const queryString = new URLSearchParams(queryParams).toString();
+          return safePath + (queryString ? `?${queryString}` : "");
+        })(),
+        query: queryParams,
         socket: {
-          remoteAddress: headers["x-real-ip"] || headers["Refer"] || "",
+          remoteAddress: event.headers["x-scf-remote-addr"],
         },
+      });
+
+      think.logger.debug("【waline】请求参数转换完成", {
+        body: req.body,
+        headers: req.headers,
+        method: req.method,
+        url: req.url,
+        query: req.query,
       });
 
       // 重写 res.end 来捕获响应
@@ -75,16 +92,6 @@ module.exports = function (configParams = {}) {
 
       // 开始处理请求
       think.beforeStartServer();
-      think.logger.debug(
-        " 【waline】开始处理请求"
-        // ,{
-        // method: req.method,
-        // url: req.url,
-        // headers: req.headers,
-        // query: req.query,
-        // remoteAddress: req.socket.remoteAddress
-        // }
-      );
       const callback = think.app.callback();
       callback(req, res);
       think.app.emit("appReady");

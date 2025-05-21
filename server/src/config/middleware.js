@@ -13,17 +13,34 @@ module.exports = [
   // 元信息中间件 - 处理请求元数据
   {
     handle: "meta",
+    options: {
+      sendPowerBy: false, //send powerby
+      sendResponseTime: false, //send response time
+      logRequest: false, //log request
+    },
   },
 
   // CORS中间件 - 处理跨域请求
   {
     handle: () => {
       think.logger.debug(" 【middleware】加载 CORS");
+      // 跨域数组,默认为空
+      const allowedOrigins = [];
       return cors({
-        origin: "*",
-        allowMethods: "GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS",
-        allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+        origin: (ctx) => {
+          if (Array.isArray(allowedOrigins) && allowedOrigins.length > 0) {
+            const requestOrigin = ctx.request.header.origin;
+            if (allowedOrigins.includes(requestOrigin)) {
+              return requestOrigin;
+            }
+            return false;
+          }
+          return "*";
+        },
+        allowMethods: ["GET", "POST", "PUT", "DELETE"],
+        allowHeaders: ["Content-Type", "Authorization"],
         credentials: true,
+        maxAge: 86400, // 预检请求缓存时间
       });
     },
   },
@@ -33,6 +50,7 @@ module.exports = [
     handle: "trace",
     enable: true,
     options: {
+      sourceMap: true,
       debug: true,
       contentType: () => "json",
       error(err, ctx) {
@@ -42,7 +60,7 @@ module.exports = [
         if (think.isPrevent(err)) {
           return false;
         }
-        think.logger.warn(" 【middleware】请求处理发生错误:", err);
+        think.logger.error(" 【middleware】请求处理发生错误:", err);
       },
     },
   },
@@ -78,4 +96,5 @@ module.exports = [
   // 控制器中间件
   "controller",
 ];
+
 think.logger.debug(" 已加载config/middleware.js");

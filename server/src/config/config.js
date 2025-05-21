@@ -42,11 +42,11 @@ const {
   COMMENT_AUDIT,
 } = process.env;
 
-// 初始化存储类型和JWT密钥
+// 初始化数据库类型和JWT密钥
 let storage = "leancloud";
 let jwtKey = JWT_TOKEN || LEAN_KEY;
 
-// 判断使用的存储类型
+// 判断使用的数据库类型
 if (LEAN_KEY) {
   storage = "leancloud";
 } else if (MONGO_DB) {

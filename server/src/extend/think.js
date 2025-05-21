@@ -27,7 +27,7 @@ const OS_VERSION_MAP = {
 module.exports = {
   // 抛出阻止后续处理的错误
   prevent() {
-    think.logger.debug("【Think】阻止后续处理");
+    think.logger.info("【Think】阻止后续处理");
     throw new Error(preventMessage);
   },
 
@@ -138,7 +138,6 @@ module.exports = {
 
   // 根据值获取等级
   getLevel(val) {
-    think.logger.debug("【系统】计算等级值");
     const levels = this.config("levels");
     const defaultLevel = 0;
 
@@ -147,7 +146,7 @@ module.exports = {
     }
 
     const level = think.findLastIndex(levels, (l) => l <= val);
-
+    think.logger.debug("【系统】计算等级值:", level);
     return level === -1 ? defaultLevel : level;
   },
 

@@ -39,12 +39,12 @@ extensions.push({
     get serverURL() {
       const { SERVER_URL } = process.env;
       if (SERVER_URL) {
-        think.logger.debug("【extend】使用环境变量中的服务器URL:", SERVER_URL);
+        think.logger.info("【extend】使用环境变量中的服务器URL:", SERVER_URL);
         return SERVER_URL;
       }
       const { protocol, host } = this;
       const url = `${protocol}://${host}`;
-      think.logger.debug("【extend】使用动态生成的服务器URL:", url);
+      think.logger.info("【extend】使用动态生成的服务器URL:", url);
       return url;
     },
 
@@ -52,7 +52,7 @@ extensions.push({
     async webhook(type, data) {
       const { WEBHOOK } = process.env;
       if (!WEBHOOK) {
-        think.logger.debug(" 【extend】未配置webhook地址，跳过回调");
+        think.logger.warn(" 【extend】未配置webhook地址，跳过回调");
         return;
       }
 
@@ -63,7 +63,7 @@ extensions.push({
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ type, data }),
         });
-        think.logger.debug("【extend】webhook回调发送成功");
+        think.logger.info("【extend】webhook回调发送成功");
         return response.json();
       } catch (err) {
         think.logger.error("【extend】webhook回调发送失败:", err);

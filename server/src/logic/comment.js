@@ -279,14 +279,14 @@ module.exports = class extends Base {
 
     // 处理点赞操作
     if (think.isBoolean(data.like) && Object.keys(data).toString() === "like") {
-      think.logger.debug("【comment】处理点赞");
+      think.logger.debug("【comment】处理点赞更新");
       return;
     }
 
     // 检查用户是否已登录
     if (think.isEmpty(userInfo)) {
       think.logger.warn("【comment】拒绝更新: 用户未登录");
-      return this.fail(this.locale("Comment too fast!"));
+      return this.ctx.throw(401);
     }
 
     // 管理员可以修改任何评论
