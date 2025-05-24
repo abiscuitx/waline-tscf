@@ -8,7 +8,6 @@ const load = {
   basic: () => Basic || (Basic = require("think-logger3").Basic),
 };
 
-// 从环境变量获取数据库配置参数
 const {
   MONGO_AUTHSOURCE,
   MONGO_DB,
@@ -46,7 +45,7 @@ const {
   POSTGRES_USER,
   PG_SSL,
   POSTGRES_SSL,
-  DEBUG_LEVEL,
+  LOG_LEVEL,
 } = process.env;
 
 // 初始化数据库类型和MongoDB选项
@@ -197,7 +196,7 @@ exports.logger = {
     categories: {
       default: {
         appenders: ["Filter"],
-        level: DEBUG_LEVEL || "info", // 默认日志级别：info
+        level: LOG_LEVEL || "info", // 默认日志级别：info
       },
     },
   },

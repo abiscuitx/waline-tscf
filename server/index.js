@@ -40,31 +40,32 @@ module.exports = function (configParams = {}) {
       const server = http.createServer();
       const req = new http.IncomingMessage(server);
 
-      // 设置请求对象的属性
+      // 处理 queryParams
+      let queryParams = event.queryString || {};
+      if (typeof queryParams === "string") {
+        queryParams = Object.fromEntries(new URLSearchParams(queryParams));
+      }
+      const queryString = new URLSearchParams(queryParams).toString();
+
+      // 构造 url
+      const safePath = path
+        .normalize(event.path)
+        .replace(/^(\.\.(\/|\\|$))+/, "");
+      const url = safePath + (queryString ? `?${queryString}` : "");
+
+      // 构造 req
       Object.assign(req, {
         body:
           typeof event.body === "string"
             ? event.body
             : JSON.stringify(event.body || {}),
-        headers: event.headers,
+        headers: event.headers || {},
         method: event.httpMethod,
-        url: (() => {
-          // 标准化路径并防止遍历攻击
-          const safePath = normalize(event.path).replace(
-            /^(\.\.(\/|\\|$))+/,
-            ""
-          );
-          // 处理查询参数
-          let queryParams = event.queryString || {};
-          if (typeof queryParams === "string") {
-            queryParams = Object.fromEntries(new URLSearchParams(queryParams));
-          }
-          const queryString = new URLSearchParams(queryParams).toString();
-          return safePath + (queryString ? `?${queryString}` : "");
-        })(),
+        url,
         query: queryParams,
         socket: {
-          remoteAddress: event.headers["x-scf-remote-addr"],
+          remoteAddress:
+            (event.headers && event.headers["x-scf-remote-addr"]) || "",
         },
       });
 
