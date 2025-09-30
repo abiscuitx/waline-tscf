@@ -1,8 +1,8 @@
-const { version } = require("../../package.json");
+const { version } = require('../../package.json');
 
 module.exports = class extends think.Controller {
   indexAction() {
-    this.type = "html";
+    this.type = 'html';
     this.body = `
     <!DOCTYPE html>
     <html lang="en">
@@ -13,9 +13,9 @@ module.exports = class extends think.Controller {
     </head>
     <body>
       <div id="waline" style="max-width: 800px;margin: 0 auto;"></div>
-      <link href='//unpkg.com/@waline/client@v3/dist/waline.css' rel='stylesheet' />
+      <link href='//unpkg.com/@waline-tscf/client/dist/waline.css' rel='stylesheet' />
       <script type="module">
-        import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+        import { init } from 'https://unpkg.com/@waline-tscf/client/dist/waline.js';
 
         console.log(
           '%c @waline-tscf/server %c v${version} ',
@@ -28,15 +28,15 @@ module.exports = class extends think.Controller {
           path: params.get('path') || '/',
           lang: params.get('lng') || undefined,
           serverURL: location.protocol + '//' + location.host + location.pathname.replace(/\\/+$/, ''),
-          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ""}',
-          turnstileKey: '${process.env.TURNSTILE_KEY || ""}',
+          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ''}',
+          turnstileKey: '${process.env.TURNSTILE_KEY || ''}',
         });
       </script>
     </body>
     </html>`;
 
-    think.logger.debug("【首页】评论系统示例页面渲染完成");
+    think.logger.debug('【首页】评论系统示例页面渲染完成');
   }
 };
 
-think.logger.debug(" 已加载/controller/index.js");
+think.logger.debug(' 已加载/controller/index.js');
