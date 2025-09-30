@@ -1,5 +1,17 @@
 {
-  "name": "waline-root",
+  "name": "waline-tscf",
+  "version": "2.1.0",
+  "description": "Waline TSCF - A fast, safe comment system based on Waline",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abiscuitx/waline-tscf.git"
+  },
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
+  "author": "abiscuitx",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,3 +1,4 @@
+// 从环境变量获取配置参数
 const {
   JWT_TOKEN,
   LEAN_KEY,
@@ -5,7 +6,6 @@ const {
   MYSQL_PASSWORD,
   TIDB_DB,
   TIDB_PASSWORD,
-  SQLITE_PATH,
   PG_DB,
   POSTGRES_DATABASE,
   PG_PASSWORD,
@@ -13,9 +13,6 @@ const {
   MONGO_DB,
   MONGO_PASSWORD,
   FORBIDDEN_WORDS,
-  TCB_ENV,
-  TENCENTCLOUD_SECRETKEY,
-  TCB_KEY,
   SECURE_DOMAINS,
   DISABLE_USERAGENT,
   DISABLE_REGION,
@@ -23,17 +20,14 @@ const {
   GITHUB_TOKEN,
   DETA_PROJECT_KEY,
   OAUTH_URL,
-
-  MARKDOWN_CONFIG = '{}',
+  MARKDOWN_CONFIG = "{}",
   MARKDOWN_HIGHLIGHT,
   MARKDOWN_EMOJI,
   MARKDOWN_SUB,
   MARKDOWN_SUP,
-  // mathjax will be the default option for tex
-  MARKDOWN_TEX = 'mathjax',
-  MARKDOWN_MATHJAX = '{}',
-  MARKDOWN_KATEX = '{}',
-
+  MARKDOWN_TEX = "mathjax",
+  MARKDOWN_MATHJAX = "{}",
+  MARKDOWN_KATEX = "{}",
   MAIL_SUBJECT,
   MAIL_TEMPLATE,
   MAIL_SUBJECT_ADMIN,
@@ -44,50 +38,43 @@ const {
   SC_TEMPLATE,
   DISCORD_TEMPLATE,
   LARK_TEMPLATE,
-
   LEVELS,
   COMMENT_AUDIT,
 } = process.env;
 
-let storage = 'leancloud';
+// 初始化数据库类型和JWT密钥
+let storage = "leancloud";
 let jwtKey = JWT_TOKEN || LEAN_KEY;
 
+// 判断使用的数据库类型
 if (LEAN_KEY) {
-  storage = 'leancloud';
+  storage = "leancloud";
 } else if (MONGO_DB) {
-  storage = 'mongodb';
+  storage = "mongodb";
   jwtKey = jwtKey || MONGO_PASSWORD;
 } else if (PG_DB || POSTGRES_DATABASE) {
-  storage = 'postgresql';
+  storage = "postgresql";
   jwtKey = jwtKey || PG_PASSWORD || POSTGRES_PASSWORD;
-} else if (SQLITE_PATH) {
-  storage = 'sqlite';
 } else if (MYSQL_DB) {
-  storage = 'mysql';
+  storage = "mysql";
   jwtKey = jwtKey || MYSQL_PASSWORD;
 } else if (TIDB_DB) {
-  storage = 'tidb';
+  storage = "tidb";
   jwtKey = jwtKey || TIDB_PASSWORD;
 } else if (GITHUB_TOKEN) {
-  storage = 'github';
+  storage = "github";
   jwtKey = jwtKey || GITHUB_TOKEN;
-} else if (think.env === 'cloudbase' || TCB_ENV) {
-  storage = 'cloudbase';
-  jwtKey = jwtKey || TENCENTCLOUD_SECRETKEY || TCB_KEY || TCB_ENV;
 } else if (DETA_PROJECT_KEY) {
-  storage = 'deta';
+  storage = "deta";
   jwtKey = jwtKey || DETA_PROJECT_KEY;
 }
 
-if (think.env === 'cloudbase' && storage === 'sqlite') {
-  throw new Error("You can't use SQLite in CloudBase platform.");
-}
-
+// 处理禁用词配置
 const forbiddenWords = FORBIDDEN_WORDS ? FORBIDDEN_WORDS.split(/\s*,\s*/) : [];
 
+// Markdown配置项
 const isFalse = (content) =>
-  content && ['0', 'false'].includes(content.toLowerCase());
-
+  content && ["0", "false"].includes(content.toLowerCase());
 const markdown = {
   config: JSON.parse(MARKDOWN_CONFIG),
   plugin: {
@@ -102,14 +89,17 @@ const markdown = {
 
 if (isFalse(MARKDOWN_HIGHLIGHT)) markdown.config.highlight = false;
 
-let avatarProxy = '';
+// 头像代理配置
+let avatarProxy = "";
 
 if (AVATAR_PROXY) {
-  avatarProxy = !isFalse(AVATAR_PROXY) ? AVATAR_PROXY : '';
+  avatarProxy = !isFalse(AVATAR_PROXY) ? AVATAR_PROXY : "";
 }
 
-const oauthUrl = OAUTH_URL || 'https://oauth.lithub.cc';
+// OAuth配置
+const oauthUrl = OAUTH_URL || "https://oauth.lithub.cc";
 
+// 导出配置对象
 module.exports = {
   workers: 1,
   storage,
@@ -123,7 +113,6 @@ module.exports = {
     !LEVELS || isFalse(LEVELS)
       ? false
       : LEVELS.split(/\s*,\s*/).map((v) => Number(v)),
-
   audit: COMMENT_AUDIT && !isFalse(COMMENT_AUDIT),
   avatarProxy,
   oauthUrl,
@@ -139,3 +128,5 @@ module.exports = {
   DiscordTemplate: DISCORD_TEMPLATE,
   LarkTemplate: LARK_TEMPLATE,
 };
+
+console.log(new Date(), " 已加载config/config.js");

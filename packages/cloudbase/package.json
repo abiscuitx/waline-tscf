@@ -1,20 +1,27 @@
 {
-  "name": "@waline/cloudbase",
-  "version": "1.0.26",
-  "description": "cloudbase server for waline comment system",
+  "name": "@waline-tscf/cloudbase",
+  "version": "2.1.0",
+  "description": "TSCF cloudbase server for waline comment system - Enhanced cloudbase adapter",
   "keywords": [
     "waline",
-    "cloudbase"
+    "tscf",
+    "cloudbase",
+    "serverless"
   ],
   "repository": {
-    "url": "https://github.com/walinejs/waline",
+    "type": "git",
+    "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/cloudbase"
   },
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
   "license": "MIT",
-  "author": "lizheming<i@imnerd.org>",
+  "author": "abiscuitx",
   "main": "index.js",
   "dependencies": {
-    "@waline/vercel": "workspace:*",
+    "@waline-tscf/server": "workspace:*",
     "thinkjs": "^3.2.15"
   }
 }

@@ -1,5 +1,5 @@
-import type { WalineUser } from '@waline/api';
-import { getUserList } from '@waline/api';
+import type { WalineUser } from '@waline-tscf/api';
+import { getUserList } from '@waline-tscf/api';
 
 import { getLocale } from '../config/index.js';
 import type { WalineLocale } from '../typings/index.js';

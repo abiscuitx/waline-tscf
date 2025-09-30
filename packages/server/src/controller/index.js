@@ -1,8 +1,8 @@
-const { version } = require('../../package.json');
+const { version } = require("../../package.json");
 
 module.exports = class extends think.Controller {
   indexAction() {
-    this.type = 'html';
+    this.type = "html";
     this.body = `
     <!DOCTYPE html>
     <html lang="en">
@@ -18,7 +18,7 @@ module.exports = class extends think.Controller {
         import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
 
         console.log(
-          '%c @waline/server %c v${version} ',
+          '%c @waline-tscf/server %c v${version} ',
           'color: white; background: #0078E7; padding:5px 0;',
           'padding:4px;border:1px solid #0078E7;'
         );
@@ -28,11 +28,15 @@ module.exports = class extends think.Controller {
           path: params.get('path') || '/',
           lang: params.get('lng') || undefined,
           serverURL: location.protocol + '//' + location.host + location.pathname.replace(/\\/+$/, ''),
-          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ''}',
-          turnstileKey: '${process.env.TURNSTILE_KEY || ''}',
+          recaptchaV3Key: '${process.env.RECAPTCHA_V3_KEY || ""}',
+          turnstileKey: '${process.env.TURNSTILE_KEY || ""}',
         });
       </script>
     </body>
     </html>`;
+
+    think.logger.debug("【首页】评论系统示例页面渲染完成");
   }
 };
+
+think.logger.debug(" 已加载/controller/index.js");

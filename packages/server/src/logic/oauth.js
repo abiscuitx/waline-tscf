@@ -1,4 +1,5 @@
-const Base = require('./base.js');
+//引入base.js
+const Base = require("./base.js");
 
 module.exports = class extends Base {
   /**
@@ -6,5 +7,10 @@ module.exports = class extends Base {
    * @apiGroup  OAuth
    * @apiVersion  0.0.1
    */
-  indexAction() {}
+  // OAuth第三方认证的处理方法
+  indexAction() {
+    think.logger.debug("【oauth】处理第三方认证请求");
+  }
 };
+
+think.logger.debug(" 已加载/logic/oauth.js");

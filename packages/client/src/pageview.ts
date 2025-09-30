@@ -1,5 +1,5 @@
-import type { GetArticleCounterResponse } from '@waline/api';
-import { getPageview, updatePageview } from '@waline/api';
+import type { GetArticleCounterResponse } from '@waline-tscf/api';
+import { getPageview, updatePageview } from '@waline-tscf/api';
 
 import type { WalineAbort } from './typings/index.js';
 import { errorHandler, getQuery, getServerURL } from './utils/index.js';

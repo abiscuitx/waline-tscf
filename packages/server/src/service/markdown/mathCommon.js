@@ -1,91 +1,96 @@
 /*
- * Test if potential opening or closing delimiter
- * Assumes that there is a "$" at state.src[pos]
+ * 检查潜在的开闭分隔符
+ * 假定在 state.src[pos] 位置有一个 "$" 符号
  */
 const isValidDelim = (state, pos) => {
-  const prevChar = pos > 0 ? state.src.charAt(pos - 1) : '';
-  const nextChar = pos + 1 <= state.posMax ? state.src.charAt(pos + 1) : '';
+  // think.logger.debug('【数学公式】检查分隔符有效性');
+  const prevChar = pos > 0 ? state.src.charAt(pos - 1) : "";
+  const nextChar = pos + 1 <= state.posMax ? state.src.charAt(pos + 1) : "";
 
   return {
-    canOpen: nextChar !== ' ' && nextChar !== '\t',
+    canOpen: nextChar !== " " && nextChar !== "\t",
     /*
-     * Check non-whitespace conditions for opening and closing, and
-     * check that closing delimiter isn’t followed by a number
+     * 检查开闭分隔符的非空白条件
+     * 并检查闭合分隔符后面不是数字
      */
     canClose: !(
-      prevChar === ' ' ||
-      prevChar === '\t' ||
+      prevChar === " " ||
+      prevChar === "\t" ||
       /[0-9]/u.exec(nextChar)
     ),
   };
 };
 
+// 处理行内TeX公式解析
 const inlineTeX = (state, silent) => {
+  // think.logger.debug('【数学公式】处理行内TeX公式');
   let match;
   let pos;
   let res;
   let token;
 
-  if (state.src[state.pos] !== '$') return false;
+  if (state.src[state.pos] !== "$") return false;
   res = isValidDelim(state, state.pos);
 
   if (!res.canOpen) {
-    if (!silent) state.pending += '$';
+    if (!silent) state.pending += "$";
     state.pos += 1;
 
     return true;
   }
   /*
-   * First check for and bypass all properly escaped delimiters
-   * This loop will assume that the first leading backtick can not
-   * be the first character in state.src, which is known since
-   * we have found an opening delimiter already.
+   * 首先检查并跳过所有正确转义的分隔符
+   * 这个循环假定第一个前导反引号不能是state.src中的第一个字符
+   * 这是已知的，因为我们已经找到了一个开放分隔符
    */
   const start = state.pos + 1;
 
   match = start;
-  while ((match = state.src.indexOf('$', match)) !== -1) {
+  while ((match = state.src.indexOf("$", match)) !== -1) {
     /*
-     * Found potential $, look for escapes, pos will point to
-     * first non escape when complete
+     * 找到潜在的$，检查转义，pos将指向
+     * 完成时的第一个非转义字符
      */
     pos = match - 1;
-    while (state.src[pos] === '\\') pos -= 1;
-    // Even number of escapes, potential closing delimiter found
+    while (state.src[pos] === "\\") pos -= 1;
+    // 偶数个转义，找到潜在的闭合分隔符
     if ((match - pos) % 2 === 1) break;
     match += 1;
   }
 
-  // No closing delimiter found.  Consume $ and continue.
+  // 没有找到闭合分隔符，消耗$并继续
   if (match === -1) {
-    if (!silent) state.pending += '$';
+    // think.logger.debug('【数学公式】未找到闭合分隔符');
+    if (!silent) state.pending += "$";
     state.pos = start;
 
     return true;
   }
 
-  // Check if we have empty content, ie: $$.  Do not parse.
+  // 检查是否有空内容，即: $$，不进行解析
   if (match - start === 0) {
-    if (!silent) state.pending += '$$';
+    // think.logger.debug('【数学公式】检测到空内容');
+    if (!silent) state.pending += "$$";
     state.pos = start + 1;
 
     return true;
   }
 
-  // Check for valid closing delimiter
+  // 检查有效的闭合分隔符
   res = isValidDelim(state, match);
 
   if (!res.canClose) {
-    if (!silent) state.pending += '$';
+    if (!silent) state.pending += "$";
     state.pos = start;
 
     return true;
   }
 
   if (!silent) {
-    token = state.push('inlineTeX', 'math', 0);
-    token.markup = '$';
+    token = state.push("inlineTeX", "math", 0);
+    token.markup = "$";
     token.content = state.src.slice(start, match);
+    // think.logger.debug('【数学公式】成功解析行内公式');
   }
 
   state.pos = match + 1;
@@ -93,7 +98,9 @@ const inlineTeX = (state, silent) => {
   return true;
 };
 
+// 处理块级TeX公式解析
 const blockTeX = (state, start, end, silent) => {
+  // think.logger.debug('【数学公式】处理块级TeX公式');
   let firstLine;
   let lastLine;
   let next;
@@ -103,15 +110,15 @@ const blockTeX = (state, start, end, silent) => {
   let max = state.eMarks[start];
 
   if (pos + 2 > max) return false;
-  if (state.src.slice(pos, pos + 2) !== '$$') return false;
+  if (state.src.slice(pos, pos + 2) !== "$$") return false;
   pos += 2;
 
   firstLine = state.src.slice(pos, max);
 
   if (silent) return true;
 
-  if (firstLine.trim().endsWith('$$')) {
-    // Single line expression
+  if (firstLine.trim().endsWith("$$")) {
+    // 单行表达式
     firstLine = firstLine.trim().slice(0, -2);
     found = true;
   }
@@ -122,10 +129,10 @@ const blockTeX = (state, start, end, silent) => {
     pos = state.bMarks[next] + state.tShift[next];
     max = state.eMarks[next];
     if (pos < max && state.tShift[next] < state.blkIndent)
-      // non-empty line with negative indent should stop the list:
+      // 带有负缩进的非空行应该停止列表
       break;
-    if (state.src.slice(pos, max).trim().endsWith('$$')) {
-      lastPos = state.src.slice(0, max).lastIndexOf('$$');
+    if (state.src.slice(pos, max).trim().endsWith("$$")) {
+      lastPos = state.src.slice(0, max).lastIndexOf("$$");
       lastLine = state.src.slice(pos, lastPos);
       found = true;
     }
@@ -133,24 +140,28 @@ const blockTeX = (state, start, end, silent) => {
 
   state.line = next + 1;
 
-  const token = state.push('blockTeX', 'math', 0);
+  const token = state.push("blockTeX", "math", 0);
 
   token.block = true;
   token.content =
     ((firstLine === null || firstLine === void 0 ? void 0 : firstLine.trim())
       ? `${firstLine}\n`
-      : '') +
+      : "") +
     state.getLines(start + 1, next, state.tShift[start], true) +
     ((lastLine === null || lastLine === void 0 ? void 0 : lastLine.trim())
       ? lastLine
-      : '');
+      : "");
   token.map = [start, state.line];
-  token.markup = '$$';
+  token.markup = "$$";
 
+  // think.logger.debug('【数学公式】成功解析块级公式');
   return true;
 };
 
+// 导出TeX解析函数
 module.exports = {
   inlineTeX,
   blockTeX,
 };
+
+think.logger.debug(" 已加载/service/markdown/mathCommon.js");

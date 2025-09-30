@@ -1,6 +1,7 @@
 {
-  "name": "docs",
-  "version": "1.0.0",
+  "name": "@waline-tscf/docs",
+  "version": "2.1.0",
+  "description": "Documentation for Waline TSCF",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +14,7 @@
     "@vuepress/helper": "2.0.0-rc.112",
     "@vuepress/plugin-comment": "2.0.0-rc.112",
     "@vuepress/plugin-docsearch": "2.0.0-rc.112",
-    "@waline/client": "workspace:*",
+    "@waline-tscf/client": "workspace:*",
     "marked": "16.3.0",
     "mathjax-full": "3.2.2",
     "sass-embedded": "1.93.0",

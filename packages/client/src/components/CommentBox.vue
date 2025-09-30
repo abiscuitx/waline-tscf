@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDebounceFn, useEventListener, watchImmediate } from '@vueuse/core';
-import type { WalineComment, WalineCommentData, UserInfo } from '@waline/api';
-import { addComment, login, updateComment } from '@waline/api';
+import type { WalineComment, WalineCommentData, UserInfo } from '@waline-tscf/api';
+import { addComment, login, updateComment } from '@waline-tscf/api';
 import autosize from 'autosize';
 import type { DeepReadonly } from 'vue';
 import {
@@ -304,8 +304,8 @@ const submitComment = async (): Promise<void> => {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    emit('submit', response.data!);
+     
+    emit('submit', response.data);
 
     editor.value = '';
 

@@ -1,6 +1,19 @@
-# Waline 项目结构分析
+# Waline-TSCF
 
-Waline 是一个基于 Valine 衍生的简洁、安全的评论系统。
+[![License](https://img.shields.io/github/license/abiscuitx/waline-tscf)](https://github.com/abiscuitx/waline-tscf/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0--beta.48-blue)](https://github.com/abiscuitx/waline-tscf)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+
+> 基于 Waline 的腾讯云函数 SCF 评论系统 | 个人博客定制版
+
+一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署优化，包含个人博客定制化功能和样式。
+
+## 主要修改
+- 优化了腾讯云 SCF 部署适配
+- 个人博客样式定制
+- 数据库连接池管理
+- 缓存机制和懒加载支持
+- 增强的功能支持和日志分析
 
 ## 🚀 开发说明
 
@@ -13,12 +26,13 @@ Waline 是一个基于 Valine 衍生的简洁、安全的评论系统。
 5. **提交代码** (自动触发钩子检查)
 6. **推送分支** → ** 创建 Pull Request**
 7. **代码审查** → **✅合并到主分支**
+
 ### 核心命令
 
 ```bash
 # 开发环境
 pnpm admin:dev          # 启动管理后台开发服务器
-pnpm client:dev         # 启动客户端开发服务器  
+pnpm client:dev         # 启动客户端开发服务器
 pnpm server:dev         # 启动服务器开发环境
 pnpm docs:dev          # 启动文档开发服务器
 
@@ -39,23 +53,25 @@ pnpm packages:update   # 更新所有依赖
 ### 🎯 VS Code 编辑器配置
 
 #### 必装扩展
+
 ```json
 {
   "recommendations": [
-    "esbenp.prettier-vscode",           // 代码格式化
-    "dbaeumer.vscode-eslint",           // ESLint 支持
-    "stylelint.vscode-stylelint",       // 样式检查
+    "esbenp.prettier-vscode", // 代码格式化
+    "dbaeumer.vscode-eslint", // ESLint 支持
+    "stylelint.vscode-stylelint", // 样式检查
     "ms-vscode.vscode-typescript-next", // TypeScript 支持
-    "vue.volar",                        // Vue 3 支持
+    "vue.volar", // Vue 3 支持
     "ms-vscode-remote.remote-containers", // Dev Container 支持
     "streetsidesoftware.code-spell-checker", // 拼写检查
-    "yzhang.markdown-all-in-one",       // Markdown 增强
-    "davidanson.vscode-markdownlint"    // Markdown 规范检查
+    "yzhang.markdown-all-in-one", // Markdown 增强
+    "davidanson.vscode-markdownlint" // Markdown 规范检查
   ]
 }
 ```
 
 #### 工作区设置优化
+
 ```json
 {
   // 格式化配置
@@ -64,16 +80,16 @@ pnpm packages:update   # 更新所有依赖
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true
   },
-  
+
   // TypeScript 配置
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
-  
+
   // 文件关联
   "files.associations": {
     "*.vue": "vue"
   },
-  
+
   // 排除文件
   "files.exclude": {
     "**/node_modules": true,
@@ -81,7 +97,7 @@ pnpm packages:update   # 更新所有依赖
     "**/.vuepress/.cache": true,
     "**/.vuepress/.temp": true
   },
-  
+
   // 搜索排除
   "search.exclude": {
     "**/node_modules": true,
@@ -94,6 +110,7 @@ pnpm packages:update   # 更新所有依赖
 ### 🐳 Dev Container 使用指南
 
 #### 快速启动
+
 ```bash
 # 1. 安装 Docker Desktop
 # 2. 安装 VS Code Remote-Containers 扩展
@@ -102,6 +119,7 @@ pnpm packages:update   # 更新所有依赖
 ```
 
 #### Container 功能
+
 - ✅ 自动安装 Node.js 和 pnpm
 - ✅ 自动执行 `pnpm i` 安装依赖
 - ✅ 自动启动客户端开发服务器 (端口5173)
@@ -110,6 +128,7 @@ pnpm packages:update   # 更新所有依赖
 ### 🎣 Git 钩子配置
 
 #### 本地开发设置
+
 ```bash
 # 1. 确保已安装依赖
 pnpm install
@@ -122,6 +141,7 @@ git commit -m "test: commit message format"
 ```
 
 #### 提交信息规范
+
 ```bash
 # 格式: <type>(<scope>): <description>
 feat(client): add new comment component
@@ -131,8 +151,9 @@ chore(deps): update dependencies
 ```
 
 **类型说明:**
+
 - `feat`: 新功能
-- `fix`: Bug 修复  
+- `fix`: Bug 修复
 - `docs`: 文档更新
 - `style`: 代码格式调整
 - `refactor`: 代码重构
@@ -142,6 +163,7 @@ chore(deps): update dependencies
 ### 🔧 GitHub 仓库配置
 
 #### 1. 分支保护规则
+
 ```yaml
 # Settings > Branches > Add rule
 Branch name pattern: main
@@ -156,6 +178,7 @@ Branch name pattern: main
 ```
 
 #### 2. Secrets 配置
+
 ```bash
 # Settings > Secrets and variables > Actions
 NPM_TOKEN=<your-npm-token>          # npm 发布权限
@@ -165,6 +188,7 @@ LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
 ```
 
 #### 3. Issue/PR 模板激活
+
 ```bash
 # 自动激活的模板
 .github/
@@ -178,6 +202,7 @@ LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
 #### 4. 自动化功能配置
 
 **Renovate 依赖更新:**
+
 ```json
 {
   "extends": ["config:base"],
@@ -192,27 +217,31 @@ LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
 ```
 
 **Issue 自动处理:**
+
 - 🏷️ 自动标签分配
 - ⏰ 过期 Issue 自动关闭 (90天)
 - 🤖 回复模板自动化
 
-
 ### 💡 最佳实践建议
 
 #### 性能优化
+
 - 使用 `pnpm` 而非 `npm/yarn` (项目配置要求)
 - 启用 VS Code 的 TypeScript Hero 自动导入
 - 配置合适的 `.vscode/settings.json`
 
 #### 安全考虑
+
 - 永远不要提交 `.env` 文件
 - 使用 GitHub Secrets 管理敏感信息
 - 定期更新依赖版本 (Renovate 自动化)
 
 #### 团队协作
+
 - 遵循 Conventional Commits 规范
 - 编写清晰的 PR 描述
 - 及时响应 Code Review 建议
+
 ## 🏗️ 项目架构
 
 ```
@@ -230,22 +259,27 @@ waline/
 ├── ⚙️ 配置文件           # 项目配置
 └── 📄 项目文件           # 项目说明文件
 ```
+
 ### 1. Monorepo 架构
+
 - 统一依赖管理
 - 代码共享和复用
 - 统一构建流程
 
 ### 2. 模块化设计
+
 - 客户端、服务端、管理后台分离
 - 插件化扩展机制
 - 多平台适配支持
 
 ### 3. 现代化工程
+
 - TypeScript 全面覆盖
 - 自动化测试和 CI/CD
 - 规范化代码提交流程
 
 ### 4. 多技术栈支持
+
 - 前端: Vue 3 + React
 - 后端: Node.js + ThinkJS
 - 构建: Vite + Rollup
@@ -254,6 +288,7 @@ waline/
 ## 📦 核心包详解
 
 ### 1. packages/admin - 管理后台
+
 ```
 admin/
 ├── index.html           # 入口页面
@@ -271,7 +306,9 @@ admin/
 
 **技术栈**: React + Vite + TypeScript
 **功能**: 评论管理、用户管理、系统配置等
+
 ### 2. packages/client - 客户端组件
+
 ```
 client/
 ├── README.md           # 客户端文档
@@ -297,6 +334,7 @@ client/
 **功能**: 评论组件、点赞功能、用户交互界面
 
 ### 3. packages/server - 服务器端
+
 ```
 server/
 ├── README.md           # 服务端文档
@@ -321,6 +359,7 @@ server/
 **功能**: API 接口、数据库操作、用户认证、评论管理
 
 ### 4. packages/api - API 接口层
+
 ```
 api/
 ├── package.json        # 包配置
@@ -332,14 +371,17 @@ api/
 **功能**: 统一的 API 接口定义和类型声明
 
 ### 5. packages/cloudbase - 腾讯云cloudbas适配方案
+
 **功能**: 腾讯云开发平台的部署适配器
 
 ### 6. packages/hexo-next - Hexo 插件
+
 **功能**: 为 Hexo Next 主题提供的 Waline 集成插件
 
 ## 📚 文档系统
 
 ### docs/ - 项目文档
+
 ```
 docs/
 ├── README.md           # 文档说明
@@ -354,6 +396,7 @@ docs/
 ## 🧪 示例和测试
 
 ### example/ - 使用示例
+
 ```
 example/
 ├── README.md           # 示例说明
@@ -369,6 +412,7 @@ example/
 ## ⚙️ 工程化配置
 
 ### 构建和开发工具
+
 - **包管理器**: pnpm (v10.17.0)
 - **构建工具**: Vite, Rollup
 - **类型检查**: TypeScript
@@ -377,9 +421,10 @@ example/
 - **提交规范**: Commitizen + Conventional Commits
 
 ### 配置文件说明
+
 ```
 ├── .eslintrc.*         # ESLint 配置
-├── .prettierrc.*       # Prettier 配置  
+├── .prettierrc.*       # Prettier 配置
 ├── .stylelintrc.*      # Stylelint 配置
 ├── commitlint.config.* # 提交信息规范
 ├── tsconfig.*          # TypeScript 配置
@@ -390,6 +435,7 @@ example/
 ## 🔧 其他配置
 
 ### 📁 .devcontainer/ - 开发容器配置
+
 ```json
 {
   "name": "Waline Workspace",
@@ -403,13 +449,16 @@ example/
   }
 }
 ```
-**功能**: 
+
+**功能**:
+
 - 🐳 VS Code Dev Container 和 GitHub Codespaces 支持
 - 🚀 自动安装依赖并启动客户端开发服务器
 - 🌐 端口转发配置 (5173)
 - 📂 自动打开关键文件
 
 ### 📁 .github/ - GitHub 自动化配置
+
 ```
 .github/
 ├── workflows/              # GitHub Actions 工作流
@@ -426,50 +475,67 @@ example/
 ```
 
 #### 🔄 主要 CI/CD 工作流
+
 - **test.yml**: Node.js 20/22 多版本测试，包含构建、代码检查、单元测试
-- **release-*.yml**: 自动化包发布到 npm
+- **release-\*.yml**: 自动化包发布到 npm
 - **docs-deploy.yml**: 自动部署文档到 GitHub Pages
 - **codeql-analysis.yml**: GitHub 安全代码扫描
 
 ### 📁 .husky/ - Git 钩子管理
+
 ```bash
 # .husky/commit-msg
 pnpm commitlint --edit $1
 
-# .husky/pre-commit  
+# .husky/pre-commit
 pnpm nano-staged
 ```
+
 **功能**:
+
 - 🔍 **commit-msg**: 提交信息格式验证
 - 🧹 **pre-commit**: 代码格式化和 lint 检查
 - 📝 遵循 Conventional Commits 规范
 
 ### 📁 .vscode/ - VS Code 工作区配置
+
 ```json
 {
   "cSpell.words": [
-    "akismet", "aliyun", "cloudbase", "darkmode",
-    "waline", "walinejs", "pageview", "katex"
+    "akismet",
+    "aliyun",
+    "cloudbase",
+    "darkmode",
+    "waline",
+    "walinejs",
+    "pageview",
+    "katex"
   ]
 }
 ```
-**功能**: 
+
+**功能**:
+
 - 🔤 自定义拼写检查词典
 - 🚫 避免项目特定术语的拼写误报
 
 ### 📄 环境和配置文件详解
 
 #### .env.example - 环境变量模板
+
 ```bash
 LEAN_ID=<Your LeanCloud ID>
 LEAN_KEY=<Your LeanCloud Key>
 LEAN_MASTER_KEY=<Your LeanCloud Master Key>
 LEAN_SERVER=<Your LeanCloud Server>
 ```
+
 **用途**: LeanCloud 数据库配置模板
 
 #### .gitignore - Git 忽略规则
+
 关键忽略项：
+
 ```ignore
 node_modules/           # 依赖包
 dist/                  # 构建产物
@@ -480,6 +546,7 @@ coverage/              # 测试覆盖率报告
 ```
 
 #### .markdownlint-cli2.mjs - Markdown 规范配置
+
 ```javascript
 export default {
   config: {
@@ -492,6 +559,7 @@ export default {
 ```
 
 #### .stylelintrc.yml - 样式代码规范
+
 ```yaml
 extends:
   - stylelint-config-hope
@@ -500,29 +568,6 @@ rules:
   no-descending-specificity: null
 ```
 
-### 🎯 配置亮点
-
-#### 🔄 **自动化程度极高**
-- Git 提交自动格式化和检查
-- CI/CD 全流程自动化
-- 依赖更新自动化 (Renovate)
-
-#### 🛡️ **代码质量保障**
-- 多层次的代码检查 (ESLint, Prettier, Stylelint)
-- 安全扫描 (CodeQL)
-- 多版本兼容性测试
-
-#### 🚀 **开发体验优化**
-- Dev Container 即开即用
-- VS Code 工作区优化
-- 统一的开发环境配置
-
-#### 📦 **现代化工具链**
-- pnpm 工作区管理
-- Husky + nano-staged 钩子管理
-- Conventional Commits 规范
-
 ## 许可证
 
 本项目采用 GPL-2.0 许可证，详见 [LICENSE](LICENSE) 文件。
-

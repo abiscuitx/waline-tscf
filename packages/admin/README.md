@@ -1,4 +1,4 @@
 # [waline-tscf(**Beta**)](https://github.com/abiscuitx/waline-tscf)
 > Debugging, Many bugs need to be fixed.
 
-Waline-TSCF Server —— Based on Waline, compatible with Tencent Cloud SCF Deployment.
+Waline-TSCF Admin —— Based on Waline, compatible with Tencent Cloud SCF Deployment.

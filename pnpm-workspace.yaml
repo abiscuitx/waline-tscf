@@ -7,5 +7,9 @@ onlyBuiltDependencies:
   - sqlite3
   - unrs-resolver
 overrides:
-  '@waline/api': workspace:*
-  '@waline/client': workspace:*
+  '@waline-tscf/api': workspace:*
+  '@waline-tscf/client': workspace:*
+  '@waline-tscf/server': workspace:*
+  '@waline-tscf/admin': workspace:*
+  '@waline-tscf/cloudbase': workspace:*
+  '@waline-tscf/hexo-next': workspace:*

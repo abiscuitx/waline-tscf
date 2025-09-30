@@ -1,53 +1,62 @@
-const Base = require('./base.js');
+//引入base.js
+const Base = require("./base.js");
 
 module.exports = class extends Base {
   /**
-   * @api {GET} /api/token  get login user info
-   * @apiGroup User
+   * @api {GET} /api/token  获取登录用户信息
+   * @apiGroup 用户
    * @apiVersion  0.0.1
    *
-   * @apiParam  {String}  lang  language
+   * @apiParam  {String}  lang  语言设置
    *
    * @apiSuccess  (200) {Number}  errno 0
-   * @apiSuccess  (200) {String}  errmsg  return error message if error
-   * @apiSuccess  (200) {Object}  data user info
-   * @apiSuccess  (200) {String}  data.avatar user avatar
-   * @apiSuccess  (200) {String}  data.createdAt user register time
-   * @apiSuccess  (200) {String}  data.display_name user nick name
-   * @apiSuccess  (200) {String}  data.email user email address
-   * @apiSuccess  (200) {String}  data.github user github account name
-   * @apiSuccess  (200) {String}  data.mailMd5 user mail md5
-   * @apiSuccess  (200) {String}  data.objectId user id
-   * @apiSuccess  (200) {String}  data.type user type, administrator or guest
-   * @apiSuccess  (200) {String}  data.url user link
+   * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
+   * @apiSuccess  (200) {Object}  data 用户信息
+   * @apiSuccess  (200) {String}  data.avatar 用户头像
+   * @apiSuccess  (200) {String}  data.createdAt 用户注册时间
+   * @apiSuccess  (200) {String}  data.display_name 用户昵称
+   * @apiSuccess  (200) {String}  data.email 用户邮箱
+   * @apiSuccess  (200) {String}  data.github GitHub账号
+   * @apiSuccess  (200) {String}  data.mailMd5 邮箱MD5值
+   * @apiSuccess  (200) {String}  data.objectId 用户ID
+   * @apiSuccess  (200) {String}  data.type 用户类型（管理员或访客）
+   * @apiSuccess  (200) {String}  data.url 用户链接
    */
-  getAction() {}
+  getAction() {
+    think.logger.debug("【token】获取当前登录用户信息");
+  }
 
   /**
-   * @api {POST} /api/token user login
-   * @apiGroup User
+   * @api {POST} /api/token 用户登录
+   * @apiGroup 用户
    * @apiVersion  0.0.1
    *
-   * @apiParam  {String}  email login user email
-   * @apiParam  {String}  password login user password
-   * @apiParam  {String}  lang  language
+   * @apiParam  {String}  email 登录邮箱
+   * @apiParam  {String}  password 登录密码
+   * @apiParam  {String}  lang  语言设置
    *
    * @apiSuccess  (200) {Number}  errno 0
-   * @apiSuccess  (200) {String}  errmsg  return error message if error
+   * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
   postAction() {
+    think.logger.debug("【token】处理用户登录请求");
+
     return this.useCaptchaCheck();
   }
 
   /**
-   * @api {DELETE} /api/token  user logout
-   * @apiGroup User
+   * @api {DELETE} /api/token  用户登出
+   * @apiGroup 用户
    * @apiVersion  0.0.1
    *
-   * @apiParam  {String}  lang  language
+   * @apiParam  {String}  lang  语言设置
    *
    * @apiSuccess  (200) {Number}  errno 0
-   * @apiSuccess  (200) {String}  errmsg  return error message if error
+   * @apiSuccess  (200) {String}  errmsg  错误信息（如果有错误）
    */
-  deleteAction() {}
+  deleteAction() {
+    think.logger.debug("【token】处理用户登出请求");
+  }
 };
+
+think.logger.debug(" 已加载/logic/token.js");

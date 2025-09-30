@@ -1,24 +1,28 @@
 {
-  "name": "@waline/admin",
-  "version": "0.26.0",
-  "description": "management system for waline",
+  "name": "@waline-tscf/admin",
+  "version": "2.1.0-beta.1",
+  "description": "Waline-TSCF Admin —— Based on Waline, compatible with Tencent Cloud SCF Deployment.",
   "keywords": [
     "waline",
+    "tscf",
     "valine",
     "comment",
     "management",
-    "system"
+    "system",
+    "admin",
+    "react"
   ],
-  "homepage": "https://github.com/walinejs/waline#readme",
+  "homepage": "https://github.com/abiscuitx/waline-tscf#readme",
   "bugs": {
-    "url": "https://github.com/walinejs/waline/issues"
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
   "repository": {
-    "url": "https://github.com/walinejs/waline.git",
+    "type": "git",
+    "url": "git+https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/admin"
   },
   "license": "MIT",
-  "author": "lizheming <i@imnerd.org>",
+  "author": "abiscuitx",
   "type": "module",
   "exports": "./dist/admin.js",
   "main": "dist/admin.js",
@@ -67,6 +71,6 @@
     "node": ">=20"
   },
   "publishConfig": {
-    "provenance": true
+    "access": "public"
   }
 }

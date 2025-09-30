@@ -1,23 +1,27 @@
 {
-  "name": "@waline/client",
-  "version": "3.6.0",
-  "description": "client for waline comment system",
+  "name": "@waline-tscf/client",
+  "version": "2.1.0-beta.1",
+  "description": "Waline-TSCF Client —— Based on Waline, compatible with Tencent Cloud SCF Deployment.",
   "keywords": [
     "valine",
     "waline",
+    "tscf",
     "comment",
-    "blog"
+    "blog",
+    "vue",
+    "frontend"
   ],
   "repository": {
-    "url": "https://github.com/walinejs/waline",
+    "type": "git",
+    "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/client"
   },
-  "license": "MIT",
-  "author": {
-    "name": "Mr.Hope",
-    "email": "mister-hope@outlook.com",
-    "url": "https://mister-hope.com"
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
+  "license": "MIT",
+  "author": "abiscuitx",
   "type": "module",
   "exports": {
     ".": {
@@ -83,7 +87,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^13.9.0",
-    "@waline/api": "workspace:*",
+    "@waline-tscf/api": "workspace:*",
     "autosize": "^6.0.1",
     "marked": "^16.3.0",
     "marked-highlight": "^2.2.2",
@@ -103,6 +107,6 @@
     "node": ">=18"
   },
   "publishConfig": {
-    "provenance": true
+    "access": "public"
   }
 }

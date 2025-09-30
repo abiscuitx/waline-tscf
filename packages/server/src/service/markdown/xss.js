@@ -1,29 +1,35 @@
-const createDOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+const createDOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
 
-const DOMPurify = createDOMPurify(new JSDOM('').window);
+const DOMPurify = createDOMPurify(new JSDOM("").window);
 
 /**
- * Add a hook to make all links open a new window
- * and force their rel to be 'nofollow noreferrer noopener'
+ * 添加钩子函数使所有链接在新窗口打开
+ * 并强制设置它们的rel属性为'nofollow noreferrer noopener'
  */
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-  // set all elements owning target to target=_blank
-  if ('target' in node && node.href && !node.href.startsWith('about:blank#')) {
-    node.setAttribute('target', '_blank');
-    node.setAttribute('rel', 'nofollow noreferrer noopener');
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+  think.logger.debug("【xss】处理DOM节点属性");
+
+  // 为所有具有target属性的元素设置target=_blank
+  if ("target" in node && node.href && !node.href.startsWith("about:blank#")) {
+    think.logger.debug("【xss】设置链接新窗口打开");
+    node.setAttribute("target", "_blank");
+    node.setAttribute("rel", "nofollow noreferrer noopener");
   }
 
-  // set non-HTML/MathML links to xlink:show=new
+  // 为非HTML/MathML链接设置xlink:show=new
   if (
-    !node.hasAttribute('target') &&
-    (node.hasAttribute('xlink:href') || node.hasAttribute('href'))
+    !node.hasAttribute("target") &&
+    (node.hasAttribute("xlink:href") || node.hasAttribute("href"))
   ) {
-    node.setAttribute('xlink:show', 'new');
+    think.logger.debug("【xss】设置非HTML链接新窗口打开");
+    node.setAttribute("xlink:show", "new");
   }
 
-  if ('preload' in node) {
-    node.setAttribute('preload', 'none');
+  // 设置预加载属性为none
+  if ("preload" in node) {
+    think.logger.debug("【xss】禁用预加载");
+    node.setAttribute("preload", "none");
   }
 });
 
@@ -32,13 +38,16 @@ const sanitize = (content) =>
     content,
     Object.assign(
       {
-        FORBID_TAGS: ['form', 'input', 'style'],
-        FORBID_ATTR: ['autoplay', 'style'],
+        FORBID_TAGS: ["form", "input", "style"], // 禁止的HTML标签
+        FORBID_ATTR: ["autoplay", "style"], // 禁止的属性
       },
-      think.config('domPurify') || {},
-    ),
+      think.config("domPurify") || {}
+    )
   );
 
+// 导出净化函数
 module.exports = {
   sanitize,
 };
+
+think.logger.debug(" 已加载/service/markdown/xss.js");

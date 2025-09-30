@@ -1,4 +1,4 @@
-import { fetchCommentCount } from '@waline/api';
+import { fetchCommentCount } from '@waline-tscf/api';
 
 import type { WalineAbort } from './typings/index.js';
 import {

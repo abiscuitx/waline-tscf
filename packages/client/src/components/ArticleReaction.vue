@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getArticleCounter, updateArticleCounter } from '@waline/api';
+import { getArticleCounter, updateArticleCounter } from '@waline-tscf/api';
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
 
 import { LoadingIcon } from './Icons.js';

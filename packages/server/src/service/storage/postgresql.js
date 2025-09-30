@@ -1,4 +1,4 @@
-const MySQL = require('./mysql.js');
+const MySQL = require("./mysql.js");
 
 function mapKeys({ insertedat, createdat, updatedat, ...item }) {
   const mapFields = {
@@ -16,6 +16,7 @@ function mapKeys({ insertedat, createdat, updatedat, ...item }) {
 
   return item;
 }
+
 module.exports = class extends MySQL {
   model(tableName) {
     return super.model(tableName.toLowerCase());
@@ -38,24 +39,32 @@ module.exports = class extends MySQL {
 
     const data = await super.select(lowerWhere, options);
 
+    think.logger.debug("【postgresql】查询数据完成", {
+      条件: lowerWhere,
+      选项: options,
+    });
+
     return data.map(mapKeys);
   }
 
   async add(data) {
-    ['insertedAt', 'createdAt', 'updatedAt']
+    ["insertedAt", "createdAt", "updatedAt"]
       .filter((key) => data[key])
       .forEach((key) => {
         const val = data[key];
 
         data[key.toLowerCase()] =
           val instanceof Date
-            ? think.datetime(val, 'YYYY-MM-DD HH:mm:ss')
+            ? think.datetime(val, "YYYY-MM-DD HH:mm:ss")
             : val;
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete data[key];
       });
 
-    return super.add(data).then(mapKeys);
+    const result = await super.add(data).then(mapKeys);
+
+    think.logger.debug("【postgresql】添加数据完成", { 数据: result });
+
+    return result;
   }
 
   async count(...args) {
@@ -70,8 +79,10 @@ module.exports = class extends MySQL {
         result = parseInt(result);
       }
     } catch (e) {
-      console.log(e);
+      think.logger.warn("【postgresql】计数出错:", e);
     }
+
+    think.logger.debug("【postgresql】计数完成", { 结果: result });
 
     return result;
   }
@@ -80,7 +91,9 @@ module.exports = class extends MySQL {
     const instance = this.model(this.tableName);
 
     return instance.query(
-      `ALTER SEQUENCE ${instance.tableName}_seq RESTART WITH ${id};`,
+      `ALTER SEQUENCE ${instance.tableName}_seq RESTART WITH ${id};`
     );
   }
 };
+
+think.logger.debug(" 已加载/service/storage/postgresql.js");
