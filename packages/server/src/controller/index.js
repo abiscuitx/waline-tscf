@@ -13,9 +13,9 @@ module.exports = class extends think.Controller {
     </head>
     <body>
       <div id="waline" style="max-width: 800px;margin: 0 auto;"></div>
-      <link href='//unpkg.com/@waline-tscf/client/dist/waline.css' rel='stylesheet' />
+      <link href='//cdn.jsdelivr.net/npm/@waline-tscf/client/dist/waline.css' rel='stylesheet' />
       <script type="module">
-        import { init } from 'https://unpkg.com/@waline-tscf/client/dist/waline.js';
+        import { init } from 'https://cdn.jsdelivr.net/npm/@waline-tscf/client/dist/waline.js';
 
         console.log(
           '%c @waline-tscf/server %c v${version} ',

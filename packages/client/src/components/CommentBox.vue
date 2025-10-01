@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useDebounceFn, useEventListener, watchImmediate } from '@vueuse/core';
-import type { WalineComment, WalineCommentData, UserInfo } from '@waline-tscf/api';
+import type {
+  WalineComment,
+  WalineCommentData,
+  UserInfo,
+} from '@waline-tscf/api';
 import { addComment, login, updateComment } from '@waline-tscf/api';
 import autosize from 'autosize';
 import type { DeepReadonly } from 'vue';
@@ -304,7 +308,12 @@ const submitComment = async (): Promise<void> => {
       return;
     }
 
-     
+    if (!response.data) {
+      alert('Failed to get comment data');
+
+      return;
+    }
+
     emit('submit', response.data);
 
     editor.value = '';

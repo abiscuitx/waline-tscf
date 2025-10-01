@@ -9,8 +9,10 @@
 一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署优化，包含个人博客定制化功能和样式。
 
 ## 主要修改
-- 优化了腾讯云 SCF 部署适配
+
+- 适配腾讯云SCF
 - 个人博客样式定制
+- 使用cdn.jsdelivr.net替换unpkg.com
 - 数据库连接池管理
 - 缓存机制和懒加载支持
 - 增强的功能支持和日志分析

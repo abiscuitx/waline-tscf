@@ -214,7 +214,7 @@ export interface WalineProps {
    *
    * Set Emojis
    *
-   * @default ['//unpkg.com/@waline/emojis@1.1.0/weibo']
+   * @default ['//cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/weibo']
    */
   emoji?: (WalineEmojiInfo | WalineEmojiPresets)[];
 

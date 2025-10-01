@@ -319,11 +319,11 @@ onUnmounted(() => {
     <div v-if="!config.noCopyright" class="wl-power">
       Powered by
       <a
-        href="https://github.com/walinejs/waline"
+        href="https://github.com/abiscuitx/waline-tscf"
         target="_blank"
         rel="noopener noreferrer"
       >
-        Waline
+        Waline-tscf
       </a>
       v{{ version }}
     </div>

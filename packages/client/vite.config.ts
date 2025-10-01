@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
-import pkg from './package.json' with { type: 'json' };
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8')) as {
+  version: string;
+};
 
 export default defineConfig({
   // config options
@@ -13,9 +16,8 @@ export default defineConfig({
   },
   css: {
     preprocessorOptions: {
-      scss: {
-        api: 'modern',
-      },
+      scss: {},
+      // api: 'modern',
     },
   },
   plugins: [vue()],

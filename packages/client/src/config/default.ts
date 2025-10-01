@@ -13,16 +13,16 @@ export const getMeta = (meta: WalineMeta[]): WalineMeta[] =>
   meta.filter((item) => AVAILABLE_META.includes(item));
 
 export const DEFAULT_EMOJI: WalineEmojiPresets[] = [
-  '//unpkg.com/@waline/emojis@1.1.0/weibo',
+  '//cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/weibo',
 ];
 
 export const DEFAULT_REACTION = [
-  '//unpkg.com/@waline/emojis/tieba/tieba_agree.png',
-  '//unpkg.com/@waline/emojis/tieba/tieba_look_down.png',
-  '//unpkg.com/@waline/emojis/tieba/tieba_sunglasses.png',
-  '//unpkg.com/@waline/emojis/tieba/tieba_pick_nose.png',
-  '//unpkg.com/@waline/emojis/tieba/tieba_awkward.png',
-  '//unpkg.com/@waline/emojis/tieba/tieba_sleep.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_agree.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_look_down.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_sunglasses.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_pick_nose.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_awkward.png',
+  '//cdn.jsdelivr.net/npm/@waline/emojis/tieba/tieba_sleep.png',
 ];
 
 export const defaultUploadImage = (file: File): Promise<string> =>

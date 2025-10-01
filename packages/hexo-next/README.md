@@ -28,10 +28,10 @@ waline:
   serverURL: https://waline.vercel.app
 
   # Waline library CDN url, you can set this to your preferred CDN
-  # libUrl: https://unpkg.com/@waline/client@v3/dist/waline.umd.js
+  # libUrl: https://cdn.jsdelivr.net/npm/@waline/client@v3/dist/waline.umd.js
 
   # Waline CSS styles CDN url, you can set this to your preferred CDN
-  cssUrl: https://unpkg.com/@waline/client@v3/dist/waline.css
+  cssUrl: https://cdn.jsdelivr.net/npm/@waline/client@v3/dist/waline.css
 
   # Custom locales
   # locale:
@@ -45,12 +45,12 @@ waline:
 
   # Custom emoji
   # emoji:
-  #   - https://unpkg.com/@waline/emojis@1.1.0/weibo
-  #   - https://unpkg.com/@waline/emojis@1.1.0/alus
-  #   - https://unpkg.com/@waline/emojis@1.1.0/bilibili
-  #   - https://unpkg.com/@waline/emojis@1.1.0/qq
-  #   - https://unpkg.com/@waline/emojis@1.1.0/tieba
-  #   - https://unpkg.com/@waline/emojis@1.1.0/tw-emoji
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/weibo
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/alus
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/bilibili
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/qq
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/tieba
+  #   - https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/tw-emoji
 
   # Comment information, valid meta are nick, mail and link
   # meta:

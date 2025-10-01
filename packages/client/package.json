@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/client",
-  "version": "2.1.0-beta.1",
+  "version": "3.6.0-BETA.2",
   "description": "Waline-TSCF Client —— Based on Waline, compatible with Tencent Cloud SCF Deployment.",
   "keywords": [
     "valine",
@@ -11,14 +11,14 @@
     "vue",
     "frontend"
   ],
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/client"
-  },
-  "homepage": "https://github.com/abiscuitx/waline-tscf",
-  "bugs": {
-    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
   "license": "MIT",
   "author": "abiscuitx",
