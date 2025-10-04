@@ -1,6 +1,62 @@
 // 引入基础 REST 控制器
 const BaseRest = require('./rest.js');
 
+// 头像URL加密辅助函数
+function encryptAvatarUrl(avatarUrl, avatarProxy) {
+  if (!avatarProxy) {
+    return avatarUrl;
+  }
+
+  // 检查是否为 QQ 头像
+  const isQQAvatar = /^https?:\/\/q[0-9]\.qlogo\.cn\/g\?b=qq&nk=/i.test(
+    avatarUrl,
+  );
+
+  // 只对 QQ 头像进行代理和加密
+  if (!isQQAvatar) {
+    think.logger.debug('【user】非QQ头像，直接返回:', avatarUrl);
+
+    return avatarUrl;
+  }
+
+  const proxyKey = process.env.AVATAR_PROXY_KEY;
+
+  if (!proxyKey) {
+    // 没有配置密钥，使用明文模式
+    return avatarProxy + '?url=' + encodeURIComponent(avatarUrl);
+  }
+
+  // 使用加密模式
+  try {
+    const crypto = require('node:crypto');
+
+    // 生成12字节随机IV
+    const iv = crypto.randomBytes(12);
+
+    // 从密钥派生AES密钥 (SHA-256)
+    const keyHash = crypto.createHash('sha256').update(proxyKey).digest();
+
+    // AES-256-GCM加密
+    const cipher = crypto.createCipheriv('aes-256-gcm', keyHash, iv);
+    const encrypted = Buffer.concat([
+      cipher.update(avatarUrl, 'utf8'),
+      cipher.final(),
+    ]);
+    const tag = cipher.getAuthTag();
+
+    // 组合: IV + 密文 + Tag
+    const combined = Buffer.concat([iv, encrypted, tag]);
+    const encoded = encodeURIComponent(combined.toString('base64'));
+
+    return avatarProxy + '?e=' + encoded;
+  } catch (err) {
+    // 加密失败，回退到明文模式
+    think.logger.error('【user】头像URL加密失败', err);
+
+    return avatarProxy + '?url=' + encodeURIComponent(avatarUrl);
+  }
+}
+
 module.exports = class extends BaseRest {
   // 构造函数：初始化用户模型实例
   constructor(...args) {
@@ -321,7 +377,7 @@ module.exports = class extends BaseRest {
         } = users[count.user_id];
         const avatar =
           avatarProxy && !avatarUrl.includes(avatarProxy)
-            ? avatarProxy + '?url=' + encodeURIComponent(avatarUrl)
+            ? encryptAvatarUrl(avatarUrl, avatarProxy)
             : avatarUrl;
 
         Object.assign(user, { nick, link, avatar, label });
@@ -347,7 +403,7 @@ module.exports = class extends BaseRest {
       const avatarUrl = await think.service('avatar').stringify(comment);
       const avatar =
         avatarProxy && !avatarUrl.includes(avatarProxy)
-          ? avatarProxy + '?url=' + encodeURIComponent(avatarUrl)
+          ? encryptAvatarUrl(avatarUrl, avatarProxy)
           : avatarUrl;
 
       Object.assign(user, { nick, link, avatar });

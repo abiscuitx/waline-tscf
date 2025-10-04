@@ -1,22 +1,23 @@
 # Waline-TSCF
 
-[![License](https://img.shields.io/github/license/abiscuitx/waline-tscf)](https://github.com/abiscuitx/waline-tscf/blob/main/LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0.0--beta.48-blue)](https://github.com/abiscuitx/waline-tscf)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署场景优化，增强后端能力，优化个人博客的前端样式。
 
-> 基于 Waline 的腾讯云函数 SCF 评论系统 | 个人博客定制版
+## 主要更新
 
-一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署优化，包含个人博客定制化功能和样式。
+- 前端：admin/client
+  - 样式定制：更改默认主题，定制个人博客样式
+- 后端：server
+  - SCF支持：适配[腾讯云函数serverless](https://cloud.tencent.com/product/scf)运行环境，提供快速部署模板
+  - 功能增强：优化注册登录及邮件通知逻辑，支持通过环境变量输出多维度日志记录
+  - 隐私保护：针对QQ邮箱头像获取，采用AES-256-GCM加密(需部署[waline-tscf-avatar服务](https://github.com/abiscuitx/waline-tscf-avatar))
+  - 性能优化：通过依赖懒加载提升冷启动速度，结合缓存与map策略优化热启动性能
+  - 资源加速：采用 jsDelivr 提供CDN加速，针对性优化MongoDB的连接性能
 
-## 主要修改
+## 快速部署
 
-- 个人博客样式定制
-- 使用cdn.jsdelivr.net替换unpkg.com
-- 数据库连接池管理
-- 缓存机制和懒加载支持
-- 增强的功能支持和日志分析
+详情查看：[waline-tscf-starter](https://github.com/abiscuitx/waline-tscf-starter)
 
-## 🚀 开发说明
+## 开发说明
 
 ### 基本步骤
 
@@ -51,7 +52,7 @@ pnpm test              # 运行单元测试
 pnpm packages:update   # 更新所有依赖
 ```
 
-### 🎯 VS Code 编辑器配置
+### VS Code 编辑器配置
 
 #### 必装扩展
 
@@ -108,7 +109,7 @@ pnpm packages:update   # 更新所有依赖
 }
 ```
 
-### 🐳 Dev Container 使用指南
+### Dev Container 使用指南
 
 #### 快速启动
 
@@ -126,7 +127,7 @@ pnpm packages:update   # 更新所有依赖
 - ✅ 自动启动客户端开发服务器 (端口5173)
 - ✅ 预配置所有开发工具
 
-### 🎣 Git 钩子配置
+### Git 钩子配置
 
 #### 本地开发设置
 
@@ -161,7 +162,7 @@ chore(deps): update dependencies
 - `test`: 测试相关
 - `chore`: 构建/工具配置
 
-### 🔧 GitHub 仓库配置
+### GitHub 仓库配置
 
 #### 1. 分支保护规则
 
@@ -243,7 +244,7 @@ LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
 - 编写清晰的 PR 描述
 - 及时响应 Code Review 建议
 
-## 🏗️ 项目架构
+## 项目架构
 
 ```
 waline/
@@ -286,7 +287,7 @@ waline/
 - 构建: Vite + Rollup
 - 文档: VuePress
 
-## 📦 核心包详解
+## 核心包详解
 
 ### 1. packages/admin - 管理后台
 
@@ -379,7 +380,7 @@ api/
 
 **功能**: 为 Hexo Next 主题提供的 Waline 集成插件
 
-## 📚 文档系统
+## 文档系统
 
 ### docs/ - 项目文档
 
@@ -394,7 +395,7 @@ docs/
 **技术栈**: VuePress
 **内容**: 用户指南、API 文档、部署教程等
 
-## 🧪 示例和测试
+## 示例和测试
 
 ### example/ - 使用示例
 
@@ -433,9 +434,9 @@ example/
 └── pnpm-workspace.yaml # pnpm 工作区配置
 ```
 
-## 🔧 其他配置
+## 其他配置
 
-### 📁 .devcontainer/ - 开发容器配置
+### .devcontainer/ - 开发容器配置
 
 ```json
 {
@@ -475,7 +476,7 @@ example/
 └── stale.yml            # 过期 Issue/PR 处理
 ```
 
-#### 🔄 主要 CI/CD 工作流
+#### 主要 CI/CD 工作流
 
 - **test.yml**: Node.js 20/22 多版本测试，包含构建、代码检查、单元测试
 - **release-\*.yml**: 自动化包发布到 npm
@@ -498,7 +499,7 @@ pnpm nano-staged
 - 🧹 **pre-commit**: 代码格式化和 lint 检查
 - 📝 遵循 Conventional Commits 规范
 
-### 📁 .vscode/ - VS Code 工作区配置
+### .vscode/ - VS Code 工作区配置
 
 ```json
 {
@@ -520,7 +521,7 @@ pnpm nano-staged
 - 🔤 自定义拼写检查词典
 - 🚫 避免项目特定术语的拼写误报
 
-### 📄 环境和配置文件详解
+### 环境和配置文件详解
 
 #### .env.example - 环境变量模板
 

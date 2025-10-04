@@ -271,7 +271,55 @@ module.exports = class extends think.Logic {
 
     // 处理头像代理
     if (avatarProxy) {
-      avatarUrl = avatarProxy + '?url=' + encodeURIComponent(avatarUrl);
+      // 检查是否为 QQ 头像
+      const isQQAvatar = /^https?:\/\/q[0-9]\.qlogo\.cn\/g\?b=qq&nk=/i.test(
+        avatarUrl,
+      );
+
+      // 只对 QQ 头像进行代理和加密
+      if (!isQQAvatar) {
+        think.logger.debug('【base】非QQ头像，直接使用原始URL:', avatarUrl);
+        // 不对非 QQ 头像进行代理处理，直接使用原始 URL
+      } else {
+        const proxyKey = process.env.AVATAR_PROXY_KEY;
+
+        if (!proxyKey) {
+          // 没有配置密钥，使用明文模式
+          avatarUrl = avatarProxy + '?url=' + encodeURIComponent(avatarUrl);
+        } else {
+          // 使用加密模式
+          try {
+            const crypto = require('node:crypto');
+
+            // 生成12字节随机IV
+            const iv = crypto.randomBytes(12);
+
+            // 从密钥派生AES密钥 (SHA-256)
+            const keyHash = crypto
+              .createHash('sha256')
+              .update(proxyKey)
+              .digest();
+
+            // AES-256-GCM加密
+            const cipher = crypto.createCipheriv('aes-256-gcm', keyHash, iv);
+            const encrypted = Buffer.concat([
+              cipher.update(avatarUrl, 'utf8'),
+              cipher.final(),
+            ]);
+            const tag = cipher.getAuthTag();
+
+            // 组合: IV + 密文 + Tag
+            const combined = Buffer.concat([iv, encrypted, tag]);
+            const encoded = encodeURIComponent(combined.toString('base64'));
+
+            avatarUrl = avatarProxy + '?e=' + encoded;
+          } catch (err) {
+            // 加密失败，回退到明文模式
+            think.logger.error('【base】头像URL加密失败', err);
+            avatarUrl = avatarProxy + '?url=' + encodeURIComponent(avatarUrl);
+          }
+        }
+      }
     }
     userInfo.avatar = avatarUrl;
     userInfo.mailMd5 = helper.md5(userInfo.email);
