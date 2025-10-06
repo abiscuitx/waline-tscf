@@ -1,8 +1,8 @@
-# Waline-TSCF
+# waline-tscf
 
-一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署场景优化，增强后端能力，优化个人博客的前端样式。
+一个基于 [Waline](https://github.com/walinejs/waline) 的评论系统，专为 [腾讯云函数 SCF](https://cloud.tencent.com/product/scf) 部署场景优化，增强后端性能，优化个人博客的前端样式。
 
-## 主要更新
+## 主要特性
 
 - 前端：admin/client
   - 样式定制：更改默认主题，定制个人博客样式
@@ -16,233 +16,6 @@
 ## 快速部署
 
 详情查看：[waline-tscf-starter](https://github.com/abiscuitx/waline-tscf-starter)
-
-## 开发说明
-
-### 基本步骤
-
-1. **Fork 项目** → **Clone 到本地**
-2. **启动 Dev Container** 或 **本地安装依赖**
-3. **创建功能分支** (`git checkout -b feat/your-feature`)
-4. **开发代码** → **运行测试**
-5. **提交代码** (自动触发钩子检查)
-6. **推送分支** → **创建 Pull Request**
-7. **代码审查** → **✅合并到主分支**
-
-### 核心命令
-
-```bash
-# 开发环境
-pnpm admin:dev          # 启动管理后台开发服务器
-pnpm client:dev         # 启动客户端开发服务器
-pnpm server:dev         # 启动服务器开发环境
-pnpm docs:dev          # 启动文档开发服务器
-
-# 构建打包
-pnpm build             # 构建所有包
-pnpm admin:build       # 构建管理后台
-pnpm client:build      # 构建客户端
-pnpm docs:build        # 构建文档
-
-# 代码质量
-pnpm lint              # 运行所有 linter
-pnpm test              # 运行单元测试
-
-# 依赖管理
-pnpm packages:update   # 更新所有依赖
-```
-
-### VS Code 编辑器配置
-
-#### 必装扩展
-
-```json
-{
-  "recommendations": [
-    "esbenp.prettier-vscode", // 代码格式化
-    "dbaeumer.vscode-eslint", // ESLint 支持
-    "stylelint.vscode-stylelint", // 样式检查
-    "ms-vscode.vscode-typescript-next", // TypeScript 支持
-    "vue.volar", // Vue 3 支持
-    "ms-vscode-remote.remote-containers", // Dev Container 支持
-    "streetsidesoftware.code-spell-checker", // 拼写检查
-    "yzhang.markdown-all-in-one", // Markdown 增强
-    "davidanson.vscode-markdownlint" // Markdown 规范检查
-  ]
-}
-```
-
-#### 工作区设置优化
-
-```json
-{
-  // 格式化配置
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": true
-  },
-
-  // TypeScript 配置
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.suggest.autoImports": true,
-
-  // 文件关联
-  "files.associations": {
-    "*.vue": "vue"
-  },
-
-  // 排除文件
-  "files.exclude": {
-    "**/node_modules": true,
-    "**/dist": true,
-    "**/.vuepress/.cache": true,
-    "**/.vuepress/.temp": true
-  },
-
-  // 搜索排除
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/dist": true,
-    "**/pnpm-lock.yaml": true
-  }
-}
-```
-
-### Dev Container 使用指南
-
-#### 快速启动
-
-```bash
-# 1. 安装 Docker Desktop
-# 2. 安装 VS Code Remote-Containers 扩展
-# 3. 打开项目，VS Code 会提示 "Reopen in Container"
-# 4. 点击确认，自动构建开发环境
-```
-
-#### Container 功能
-
-- ✅ 自动安装 Node.js 和 pnpm
-- ✅ 自动执行 `pnpm i` 安装依赖
-- ✅ 自动启动客户端开发服务器 (端口5173)
-- ✅ 预配置所有开发工具
-
-### Git 钩子配置
-
-#### 本地开发设置
-
-```bash
-# 1. 确保已安装依赖
-pnpm install
-
-# 2. 初始化 Husky (如果需要)
-pnpm prepare
-
-# 3. 验证钩子是否生效
-git commit -m "test: commit message format"
-```
-
-#### 提交信息规范
-
-```bash
-# 格式: <type>(<scope>): <description>
-feat(client): add new comment component
-fix(server): resolve XSS security issue
-docs(readme): update configuration guide
-chore(deps): update dependencies
-```
-
-**类型说明:**
-
-- `feat`: 新功能
-- `fix`: Bug 修复
-- `docs`: 文档更新
-- `style`: 代码格式调整
-- `refactor`: 代码重构
-- `test`: 测试相关
-- `chore`: 构建/工具配置
-
-### GitHub 仓库配置
-
-#### 1. 分支保护规则
-
-```yaml
-# Settings > Branches > Add rule
-Branch name pattern: main
-☑️ Require a pull request before merging
-☑️ Require status checks to pass before merging
-  ☑️ Require branches to be up to date before merging
-  Required status checks:
-    - Test (ubuntu-latest, 20)
-    - Test (ubuntu-latest, 22)
-☑️ Require conversation resolution before merging
-☑️ Include administrators
-```
-
-#### 2. Secrets 配置
-
-```bash
-# Settings > Secrets and variables > Actions
-NPM_TOKEN=<your-npm-token>          # npm 发布权限
-CODECOV_TOKEN=<codecov-token>       # 代码覆盖率
-LEANCLOUD_ID=<leancloud-id>         # 数据库配置
-LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
-```
-
-#### 3. Issue/PR 模板激活
-
-```bash
-# 自动激活的模板
-.github/
-├── ISSUE_TEMPLATE/
-│   ├── bug_report.yml      # Bug 报告模板
-│   ├── feature_request.yml # 功能请求模板
-│   └── question.yml        # 问题咨询模板
-└── pull_request_template.md # PR 模板
-```
-
-#### 4. 自动化功能配置
-
-**Renovate 依赖更新:**
-
-```json
-{
-  "extends": ["config:base"],
-  "schedule": ["before 4am on Monday"],
-  "packageRules": [
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": true
-    }
-  ]
-}
-```
-
-**Issue 自动处理:**
-
-- 🏷️ 自动标签分配
-- ⏰ 过期 Issue 自动关闭 (90天)
-- 🤖 回复模板自动化
-
-### 💡 最佳实践建议
-
-#### 性能优化
-
-- 使用 `pnpm` 而非 `npm/yarn` (项目配置要求)
-- 启用 VS Code 的 TypeScript Hero 自动导入
-- 配置合适的 `.vscode/settings.json`
-
-#### 安全考虑
-
-- 永远不要提交 `.env` 文件
-- 使用 GitHub Secrets 管理敏感信息
-- 定期更新依赖版本 (Renovate 自动化)
-
-#### 团队协作
-
-- 遵循 Conventional Commits 规范
-- 编写清晰的 PR 描述
-- 及时响应 Code Review 建议
 
 ## 项目架构
 
@@ -380,37 +153,6 @@ api/
 
 **功能**: 为 Hexo Next 主题提供的 Waline 集成插件
 
-## 文档系统
-
-### docs/ - 项目文档
-
-```
-docs/
-├── README.md           # 文档说明
-├── package.json        # 文档构建配置
-├── tsconfig.json       # TypeScript 配置
-└── src/               # VuePress 文档源码
-```
-
-**技术栈**: VuePress
-**内容**: 用户指南、API 文档、部署教程等
-
-## 示例和测试
-
-### example/ - 使用示例
-
-```
-example/
-├── README.md           # 示例说明
-├── package.json        # 依赖配置
-├── index.cjs          # 示例服务器
-├── vercel.json        # Vercel 部署配置
-├── .env.example       # 环境变量模板
-└── robots.txt         # SEO 配置
-```
-
-**功能**: 提供完整的 Waline 使用示例和部署模板
-
 ## ⚙️ 工程化配置
 
 ### 构建和开发工具
@@ -434,141 +176,167 @@ example/
 └── pnpm-workspace.yaml # pnpm 工作区配置
 ```
 
-## 其他配置
+## 开发说明
 
-### .devcontainer/ - 开发容器配置
-
-```json
-{
-  "name": "Waline Workspace",
-  "updateContentCommand": "pnpm i",
-  "postAttachCommand": "pnpm run client:dev",
-  "forwardPorts": [5173],
-  "customizations": {
-    "codespaces": {
-      "openFiles": ["packages/client/src/init.ts"]
-    }
-  }
-}
-```
-
-**功能**:
-
-- 🐳 VS Code Dev Container 和 GitHub Codespaces 支持
-- 🚀 自动安装依赖并启动客户端开发服务器
-- 🌐 端口转发配置 (5173)
-- 📂 自动打开关键文件
-
-### 📁 .github/ - GitHub 自动化配置
-
-```
-.github/
-├── workflows/              # GitHub Actions 工作流
-│   ├── test.yml           # 测试工作流
-│   ├── codeql-analysis.yml # 代码安全扫描
-│   ├── docker-test.yml    # Docker 测试
-│   ├── docs-deploy.yml    # 文档部署
-│   ├── release-*.yml      # 包发布流程
-│   └── issue-*.yml        # Issue 自动化处理
-├── ISSUE_TEMPLATE/        # Issue 模板
-├── DISCUSSION_TEMPLATE/   # 讨论模板
-├── renovate.json         # Renovate 依赖更新配置
-└── stale.yml            # 过期 Issue/PR 处理
-```
-
-#### 主要 CI/CD 工作流
-
-- **test.yml**: Node.js 20/22 多版本测试，包含构建、代码检查、单元测试
-- **release-\*.yml**: 自动化包发布到 npm
-- **docs-deploy.yml**: 自动部署文档到 GitHub Pages
-- **codeql-analysis.yml**: GitHub 安全代码扫描
-
-### 📁 .husky/ - Git 钩子管理
+### 核心命令
 
 ```bash
-# .husky/commit-msg
-pnpm commitlint --edit $1
+# 开发环境
+pnpm admin:dev          # 启动管理后台开发服务器
+pnpm client:dev         # 启动客户端开发服务器
+pnpm server:dev         # 启动服务器开发环境
+pnpm docs:dev          # 启动文档开发服务器
 
-# .husky/pre-commit
-pnpm nano-staged
+# 构建打包
+pnpm build             # 构建所有包
+pnpm admin:build       # 构建管理后台
+pnpm client:build      # 构建客户端
+pnpm docs:build        # 构建文档
+
+# 代码质量
+pnpm lint              # 运行所有 linter
+pnpm test              # 运行单元测试
+
+# 依赖管理
+pnpm packages:update   # 更新所有依赖
 ```
 
-**功能**:
+### VS Code 编辑器配置
 
-- 🔍 **commit-msg**: 提交信息格式验证
-- 🧹 **pre-commit**: 代码格式化和 lint 检查
-- 📝 遵循 Conventional Commits 规范
-
-### .vscode/ - VS Code 工作区配置
+#### 必装扩展
 
 ```json
 {
-  "cSpell.words": [
-    "akismet",
-    "aliyun",
-    "cloudbase",
-    "darkmode",
-    "waline",
-    "walinejs",
-    "pageview",
-    "katex"
+  "recommendations": [
+    "esbenp.prettier-vscode", // 代码格式化
+    "dbaeumer.vscode-eslint", // ESLint 支持
+    "stylelint.vscode-stylelint", // 样式检查
+    "ms-vscode.vscode-typescript-next", // TypeScript 支持
+    "vue.volar", // Vue 3 支持
+    "ms-vscode-remote.remote-containers", // Dev Container 支持
+    "streetsidesoftware.code-spell-checker", // 拼写检查
+    "yzhang.markdown-all-in-one", // Markdown 增强
+    "davidanson.vscode-markdownlint" // Markdown 规范检查
   ]
 }
 ```
 
-**功能**:
+#### 工作区设置优化
 
-- 🔤 自定义拼写检查词典
-- 🚫 避免项目特定术语的拼写误报
+```json
+{
+  // 格式化配置
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
 
-### 环境和配置文件详解
+  // TypeScript 配置
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
 
-#### .env.example - 环境变量模板
+  // 文件关联
+  "files.associations": {
+    "*.vue": "vue"
+  },
 
-```bash
-LEAN_ID=<Your LeanCloud ID>
-LEAN_KEY=<Your LeanCloud Key>
-LEAN_MASTER_KEY=<Your LeanCloud Master Key>
-LEAN_SERVER=<Your LeanCloud Server>
-```
+  // 排除文件
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.vuepress/.cache": true,
+    "**/.vuepress/.temp": true
+  },
 
-**用途**: LeanCloud 数据库配置模板
-
-#### .gitignore - Git 忽略规则
-
-关键忽略项：
-
-```ignore
-node_modules/           # 依赖包
-dist/                  # 构建产物
-.env*                  # 环境变量文件
-coverage/              # 测试覆盖率报告
-**/.vuepress/.cache/   # VuePress 缓存
-.DS_Store              # macOS 系统文件
-```
-
-#### .markdownlint-cli2.mjs - Markdown 规范配置
-
-```javascript
-export default {
-  config: {
-    MD013: false,        # 禁用行长度限制
-    MD033: {            # 允许特定 HTML 标签
-      allowed_elements: ['br', 'kbd', 'script', 'span']
-    }
+  // 搜索排除
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/pnpm-lock.yaml": true
   }
 }
 ```
 
-#### .stylelintrc.yml - 样式代码规范
+### Git 钩子配置
+
+#### 本地开发设置
+
+```bash
+# 1. 确保已安装依赖
+pnpm install
+
+# 2. 初始化 Husky (如果需要)
+pnpm prepare
+
+# 3. 验证钩子是否生效
+git commit -m "test: commit message format"
+```
+
+#### 提交信息规范
+
+```bash
+# 格式: <type>(<scope>): <description>
+feat(client): add new comment component
+fix(server): resolve XSS security issue
+docs(readme): update configuration guide
+chore(deps): update dependencies
+```
+
+**类型说明:**
+
+- `feat`: 新功能
+- `fix`: Bug 修复
+- `docs`: 文档更新
+- `style`: 代码格式调整
+- `refactor`: 代码重构
+- `test`: 测试相关
+- `chore`: 构建/工具配置
+
+### GitHub 仓库配置
+
+#### 1. 分支保护规则
 
 ```yaml
-extends:
-  - stylelint-config-hope
-rules:
-  media-feature-range-notation: prefix
-  no-descending-specificity: null
+# Settings > Branches > Add rule
+Branch name pattern: main
+☑️ Require a pull request before merging
+☑️ Require status checks to pass before merging
+  ☑️ Require branches to be up to date before merging
+  Required status checks:
+    - Test (ubuntu-latest, 20)
+    - Test (ubuntu-latest, 22)
+☑️ Require conversation resolution before merging
+☑️ Include administrators
 ```
+
+#### 2. Secrets 配置
+
+```bash
+# Settings > Secrets and variables > Actions
+NPM_TOKEN=<your-npm-token>          # npm 发布权限
+CODECOV_TOKEN=<codecov-token>       # 代码覆盖率
+LEANCLOUD_ID=<leancloud-id>         # 数据库配置
+LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
+```
+
+#### 3. Issue/PR 模板激活
+
+```bash
+# 自动激活的模板
+.github/
+├── ISSUE_TEMPLATE/
+│   ├── bug_report.yml      # Bug 报告模板
+│   ├── feature_request.yml # 功能请求模板
+│   └── question.yml        # 问题咨询模板
+└── pull_request_template.md # PR 模板
+```
+
+**Issue 自动处理:**
+
+- 🏷️ 自动标签分配
+- ⏰ 过期 Issue 自动关闭 (90天)
+- 🤖 回复模板自动化
 
 ## 许可证
 

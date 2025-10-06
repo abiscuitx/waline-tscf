@@ -93,6 +93,20 @@ module.exports = class extends think.Logic {
 
       secureDomains = [...new Set([...secureDomains, ...defaultDomains])];
 
+      // 从环境变量读取域名匹配模式
+      // SECURE_DOMAIN_MODE: 'strict' (严格模式，完全匹配) 或 'loose' (宽松模式，支持子域名)
+      // 默认为 'loose'
+      const domainMode = process.env.SECURE_DOMAIN_MODE || 'loose';
+      const isStrictMode = domainMode === 'strict';
+
+      think.logger.debug('【base】域名安全检查模式', {
+        mode: domainMode,
+        isStrictMode: isStrictMode,
+        description: isStrictMode
+          ? '严格模式：域名必须完全匹配'
+          : '宽松模式：支持子域名匹配',
+      });
+
       // 转换可能的正则表达式字符串为正则表达式对象
       secureDomains = secureDomains
         .map((domain) => {
@@ -159,7 +173,23 @@ module.exports = class extends think.Logic {
 
       const matchResults = secureDomains.map((domain) => {
         const isRegex = think.isFunction(domain.test);
-        const matches = isRegex ? domain.test(checking) : domain === checking;
+        let matches = false;
+
+        if (isRegex) {
+          // 正则表达式匹配
+          matches = domain.test(checking);
+        } else {
+          // 字符串匹配：根据模式选择匹配方式
+          if (isStrictMode) {
+            // 严格模式：完全匹配
+            matches = checking === domain;
+          } else {
+            // 宽松模式：支持精确匹配和子域名匹配
+            // 1. 精确匹配：checking === domain
+            // 2. 子域名匹配：checking 以 ".domain" 结尾
+            matches = checking === domain || checking.endsWith('.' + domain);
+          }
+        }
 
         // 只在匹配成功时打印详细信息，减少日志输出
         if (matches) {
@@ -167,6 +197,8 @@ module.exports = class extends think.Logic {
             domain: isRegex ? `RegExp(${domain.source})` : domain,
             checking: checking,
             type: isRegex ? 'regex' : 'string',
+            mode: isStrictMode ? 'strict' : 'loose',
+            matchType: checking === domain ? 'exact' : 'subdomain',
           });
         }
 

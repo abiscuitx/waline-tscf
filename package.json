@@ -1,18 +1,17 @@
 {
   "name": "waline-tscf",
-  "version": "2.1.0",
-  "description": "Waline TSCF - A fast, safe comment system based on Waline",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/abiscuitx/waline-tscf.git"
-  },
+  "private": true,
+  "description": "A comment system compatible with Tencent SCF deployment based on Waline",
   "homepage": "https://github.com/abiscuitx/waline-tscf",
   "bugs": {
     "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
-  "author": "abiscuitx",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abiscuitx/waline-tscf.git"
+  },
   "license": "MIT",
-  "private": true,
+  "author": "abiscuitx",
   "type": "module",
   "scripts": {
     "admin:build": "pnpm --dir=packages/admin build",

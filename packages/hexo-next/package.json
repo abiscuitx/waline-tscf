@@ -1,7 +1,7 @@
 {
   "name": "@waline-tscf/hexo-next",
-  "version": "2.1.0",
-  "description": "TSCF Waline comment system for NexT - Enhanced Hexo plugin",
+  "version": "3.0.1-Beta.1",
+  "description": "A comment system compatible for NexT based on Waline - Enhanced Hexo plugin",
   "keywords": [
     "Hexo",
     "NexT",

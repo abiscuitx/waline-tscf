@@ -1,7 +1,7 @@
 {
   "name": "@waline-tscf/server",
-  "version": "2.1.0-beta.1",
-  "description": "Waline-TSCF Server —— Based on Waline, compatible with Tencent Cloud SCF Deployment",
+  "version": "1.32.3-Beta.7",
+  "description": "A comment system server compatible with Tencent SCF deployment based on Waline",
   "keywords": [
     "waline",
     "tscf",
@@ -9,14 +9,14 @@
     "blog",
     "serverless"
   ],
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/server"
-  },
-  "homepage": "https://github.com/abiscuitx/waline-tscf",
-  "bugs": {
-    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
   "license": "MIT",
   "author": "abiscuitx",

@@ -1,7 +1,7 @@
 {
   "name": "@waline-tscf/client",
-  "version": "3.6.0-BETA.2",
-  "description": "Waline-TSCF Client —— Based on Waline, compatible with Tencent Cloud SCF Deployment.",
+  "version": "3.6.0-Beta.2",
+  "description": "A comment system client compatible with Tencent SCF deployment based on Waline",
   "keywords": [
     "valine",
     "waline",

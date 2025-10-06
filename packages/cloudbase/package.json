@@ -1,21 +1,21 @@
 {
   "name": "@waline-tscf/cloudbase",
-  "version": "2.1.0",
-  "description": "TSCF cloudbase server for waline comment system - Enhanced cloudbase adapter",
+  "version": "2.1.0-Beta.1",
+  "description": "A comment system compatible with Tencent cloudbase deployment based on Waline",
   "keywords": [
     "waline",
     "tscf",
     "cloudbase",
     "serverless"
   ],
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/cloudbase"
-  },
-  "homepage": "https://github.com/abiscuitx/waline-tscf",
-  "bugs": {
-    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
   "license": "MIT",
   "author": "abiscuitx",

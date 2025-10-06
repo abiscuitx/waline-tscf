@@ -1,7 +1,7 @@
 {
   "name": "@waline-tscf/api",
-  "version": "2.1.0-beta.1",
-  "description": "Waline-TSCF Api —— Based on Waline, compatible with Tencent Cloud SCF Deployment.",
+  "version": "1.0.0-Beta.3",
+  "description": "A comment system api compatible with Tencent SCF deployment based on Waline",
   "keywords": [
     "api",
     "waline",
@@ -9,14 +9,14 @@
     "typescript",
     "client"
   ],
+  "homepage": "https://github.com/abiscuitx/waline-tscf",
+  "bugs": {
+    "url": "https://github.com/abiscuitx/waline-tscf/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/abiscuitx/waline-tscf.git",
     "directory": "packages/api"
-  },
-  "homepage": "https://github.com/abiscuitx/waline-tscf",
-  "bugs": {
-    "url": "https://github.com/abiscuitx/waline-tscf/issues"
   },
   "license": "MIT",
   "author": "abiscuitx",
