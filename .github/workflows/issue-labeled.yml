@@ -1,8 +1,6 @@
 name: Issue Labeled
 
-on:
-  issues:
-    types: [labeled]
+on: {}
 
 jobs:
   issue-labeled:
