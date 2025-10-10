@@ -178,6 +178,21 @@ exports.model = {
   },
 };
 
+// 计算日志级别（优先级：环境变量 LOG_LEVEL > 运行环境默认值）
+const getDefaultLogLevel = () => {
+  // 优先使用环境变量 LOG_LEVEL
+  if (LOG_LEVEL) {
+    return LOG_LEVEL;
+  }
+
+  // 根据运行环境设置默认日志级别
+  // think.env 在启动时由 Application 初始化（index.js/development.js/vanilla.js）
+  // 注意：这里 think 可能还未完全初始化，需要在运行时读取
+  const env = think.env || 'production'; // 后备方案
+
+  return env === 'development' ? 'debug' : 'error';
+};
+
 // 导出日志配置对象
 exports.logger = {
   type: 'advanced',
@@ -190,17 +205,24 @@ exports.logger = {
       Filter: {
         type: 'logLevelFilter',
         appender: 'everything',
-        level: 'debug', // 日志级别：debug、info、warn、error
+        level: 'debug', // 过滤日志级别：debug、info、warn、error
       },
     },
 
     categories: {
       default: {
         appenders: ['Filter'],
-        level: LOG_LEVEL || 'error', // 默认日志级别：info
+        level: getDefaultLogLevel(), // 动态计算日志级别
       },
     },
   },
 };
 
-console.log(new Date(), ' 已加载config/adapter.js', '数据库:', type);
+console.log(
+  new Date(),
+  ' 已加载config/adapter.js',
+  '数据库:',
+  type,
+  '日志级别:',
+  exports.logger.advanced.categories.default.level,
+);
