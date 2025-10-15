@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "1.32.3-Beta.8",
+  "version": "1.32.7-Beta.1",
   "description": "A comment system server compatible with Tencent SCF deployment based on Waline",
   "keywords": [
     "waline",
@@ -26,10 +26,10 @@
   "dependencies": {
     "@cloudbase/node-sdk": "^3.10.1",
     "@koa/cors": "^5.0.0",
-    "@mdit/plugin-katex": "0.23.1",
-    "@mdit/plugin-mathjax": "0.23.1",
-    "@mdit/plugin-sub": "0.22.1",
-    "@mdit/plugin-sup": "0.22.1",
+    "@mdit/plugin-katex": "0.23.4",
+    "@mdit/plugin-mathjax": "0.23.4",
+    "@mdit/plugin-sub": "0.22.5",
+    "@mdit/plugin-sup": "0.22.5",
     "akismet": "^2.0.7",
     "deta": "^2.0.0",
     "dompurify": "^3.2.7",
@@ -43,7 +43,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-emoji": "^3.0.0",
     "mathjax-full": "^3.2.2",
-    "nodemailer": "^7.0.6",
+    "nodemailer": "^7.0.9",
     "nunjucks": "^3.2.4",
     "phpass": "^0.1.1",
     "prismjs": "^1.30.0",
@@ -57,10 +57,10 @@
     "think-mongo": "^2.2.1",
     "think-router-rest": "^1.0.5",
     "thinkjs": "4.0.0-alpha.0",
-    "ua-parser-js": "^2.0.5"
+    "ua-parser-js": "^2.0.6"
   },
   "devDependencies": {
-    "dotenv": "17.2.2",
+    "dotenv": "17.2.3",
     "think-watcher": "3.0.4"
   },
   "engines": {
