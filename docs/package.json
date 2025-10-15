@@ -1,25 +1,25 @@
 {
   "name": "@waline-tscf/docs",
   "version": "2.1.0",
-  "description": "Documentation for Waline TSCF",
   "private": true,
+  "description": "Documentation for Waline TSCF",
   "type": "module",
   "scripts": {
     "build": "vuepress build src",
     "dev": "vuepress dev src"
   },
   "devDependencies": {
-    "@fancyapps/ui": "6.0.32",
+    "@fancyapps/ui": "6.0.34",
     "@vuepress/bundler-vite": "2.0.0-rc.24",
     "@vuepress/helper": "2.0.0-rc.112",
     "@vuepress/plugin-comment": "2.0.0-rc.112",
     "@vuepress/plugin-docsearch": "2.0.0-rc.112",
     "@waline-tscf/client": "workspace:*",
-    "marked": "16.3.0",
+    "marked": "16.4.0",
     "mathjax-full": "3.2.2",
-    "sass-embedded": "1.93.0",
+    "sass-embedded": "1.93.2",
     "vidstack": "1.12.13",
-    "vue": "3.5.21",
+    "vue": "3.5.22",
     "vuepress": "2.0.0-rc.24",
     "vuepress-shared": "2.0.0-rc.94",
     "vuepress-theme-hope": "2.0.0-rc.94"

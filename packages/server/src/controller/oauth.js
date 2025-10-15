@@ -34,16 +34,10 @@ module.exports = class extends think.Controller {
     if (!hasCode) {
       const { serverURL } = this.ctx;
 
-      // 构建回调 URL 参数，只添加有效的参数
-      const callbackParams = { type };
-
-      if (redirect) {
-        callbackParams.redirect = redirect;
-      }
-
-      const redirectUrl = `${serverURL}/api/oauth?${new URLSearchParams(
-        callbackParams,
-      ).toString()}`;
+      const redirectUrl = think.buildUrl(`${serverURL}/api/oauth`, {
+        redirect,
+        type,
+      });
 
       think.logger.debug('【OAuth】重定向到第三方认证服务', {
         oauthUrl,
@@ -52,10 +46,10 @@ module.exports = class extends think.Controller {
       });
 
       return this.redirect(
-        `${oauthUrl}/${type}?${new URLSearchParams({
+        think.buildUrl(`${oauthUrl}/${type}`, {
           redirect: redirectUrl,
           state: this.ctx.state.token || '',
-        }).toString()}`,
+        }),
       );
     }
 
@@ -69,18 +63,12 @@ module.exports = class extends think.Controller {
     if (type === 'facebook') {
       const { serverURL } = this.ctx;
 
-      // 构建回调 URL 参数，只添加有效的参数
-      const callbackParams = { type };
+      const redirectUrl = think.buildUrl(`${serverURL}/api/oauth`, {
+        redirect,
+        type,
+      });
 
-      if (redirect) {
-        callbackParams.redirect = redirect;
-      }
-
-      const redirectUrl = `${serverURL}/api/oauth?${new URLSearchParams(
-        callbackParams,
-      ).toString()}`;
-
-      params.state = new URLSearchParams({
+      params.state = think.buildUrl(undefined, {
         redirect: redirectUrl,
         state: this.ctx.state.token || '',
       });
@@ -88,15 +76,12 @@ module.exports = class extends think.Controller {
 
     // 从 OAuth 服务获取用户信息
     think.logger.debug('【OAuth】从第三方服务获取用户信息', { type });
-    const user = await fetch(
-      `${oauthUrl}/${type}?${new URLSearchParams(params).toString()}`,
-      {
-        method: 'GET',
-        headers: {
-          'user-agent': '@waline',
-        },
+    const user = await fetch(think.buildUrl(`${oauthUrl}/${type}`, params), {
+      method: 'GET',
+      headers: {
+        'user-agent': '@waline',
       },
-    ).then((resp) => resp.json());
+    }).then((resp) => resp.json());
 
     // 验证用户信息是否有效
     if (!user?.id) {
@@ -128,9 +113,7 @@ module.exports = class extends think.Controller {
       if (redirect) {
         think.logger.debug('【OAuth】正常登录流程，生成令牌并重定向');
 
-        return this.redirect(
-          redirect + (redirect.includes('?') ? '&' : '?') + 'token=' + token,
-        );
+        return this.redirect(think.buildUrl(redirect, { token }));
       }
 
       // 如果没有 redirect 参数，说明是重复绑定操作

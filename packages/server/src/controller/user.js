@@ -192,10 +192,10 @@ module.exports = class extends BaseRest {
         return this.fail('邮件服务未配置，请联系管理员');
       }
 
-      const apiUrl =
-        this.ctx.serverURL +
-        '/verification?' +
-        new URLSearchParams({ token, email: data.email }).toString();
+      const apiUrl = think.buildUrl(this.ctx.serverURL + '/verification', {
+        token,
+        email: data.email,
+      });
 
       await transporter.sendMail({
         from:
