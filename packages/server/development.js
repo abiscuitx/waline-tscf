@@ -10,7 +10,7 @@ const watcher = require('think-watcher');
 const Application = require('thinkjs');
 
 // 初始化Waline开发服务实例
-console.log(new Date(), "【Waline Dev】初始化应用实例");
+console.log(new Date(), '【waline-tscf dev】初始化应用实例');
 const instance = new Application({
   ROOT_PATH: __dirname,
   APP_PATH: path.join(__dirname, 'src'),
@@ -41,4 +41,4 @@ try {
 for (const k in config) {
   think.config(k, config[k]);
 }
-console.log(new Date(), "【Waline Dev】服务初始化完成");
+console.log(new Date(), '【waline-tscf dev】服务初始化完成');

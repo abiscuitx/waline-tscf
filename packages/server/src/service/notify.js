@@ -5,7 +5,20 @@ let crypto, FormData, fetch, nodemailer, nunjucks;
 const load = {
   crypto: () => crypto || (crypto = require('node:crypto')),
   formData: () => FormData || (FormData = require('form-data')),
-  fetch: () => fetch || (fetch = require('node-fetch')),
+  fetch: () => {
+    if (fetch) return fetch;
+
+    if (
+      typeof globalThis !== 'undefined' &&
+      typeof globalThis.fetch === 'function'
+    ) {
+      fetch = globalThis.fetch.bind(globalThis);
+
+      return fetch;
+    }
+
+    throw new Error('Missing native fetch: Node.js 18+ is required');
+  },
   nodemailer: () => nodemailer || (nodemailer = require('nodemailer')),
   nunjucks: () => nunjucks || (nunjucks = require('nunjucks')),
 };
@@ -138,7 +151,7 @@ module.exports = class extends think.Service {
     think.logger.debug('【notify】发送Server酱请求');
 
     return load
-      .fetch(`https://sctapi.ftqq.com/${SC_KEY}.send`, {
+      .fetch()(`https://sctapi.ftqq.com/${SC_KEY}.send`, {
         method: 'POST',
         headers: form.getHeaders(),
         body: form,
@@ -211,7 +224,7 @@ module.exports = class extends think.Service {
 
     // 获取访问令牌
     const { access_token } = await load
-      .fetch(`${baseUrl}/cgi-bin/gettoken?${querystring.toString()}`, {
+      .fetch()(`${baseUrl}/cgi-bin/gettoken?${querystring.toString()}`, {
         headers: {
           'content-type': 'application/json',
         },
@@ -220,7 +233,7 @@ module.exports = class extends think.Service {
 
     // 发送企业微信通知
     return load
-      .fetch(`${baseUrl}/cgi-bin/message/send?access_token=${access_token}`, {
+      .fetch()(`${baseUrl}/cgi-bin/message/send?access_token=${access_token}`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -294,7 +307,7 @@ module.exports = class extends think.Service {
 
     // 发送QQ通知
     return load
-      .fetch(`${qmsgHost}/send/${QMSG_KEY}`, {
+      .fetch()(`${qmsgHost}/send/${QMSG_KEY}`, {
         method: 'POST',
         header: form.getHeaders(),
         body: form,
@@ -374,7 +387,7 @@ module.exports = class extends think.Service {
 
     // 发送Telegram通知
     const resp = await load
-      .fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      .fetch()(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         header: form.getHeaders(),
         body: form,
@@ -433,7 +446,7 @@ module.exports = class extends think.Service {
 
     // 发送PushPlus通知
     return load
-      .fetch(`http://www.pushplus.plus/send/${PUSH_PLUS_KEY}`, {
+      .fetch()(`http://www.pushplus.plus/send/${PUSH_PLUS_KEY}`, {
         method: 'POST',
         header: form.getHeaders(),
         body: form,
@@ -479,7 +492,7 @@ module.exports = class extends think.Service {
 
     // 发送Discord通知
     return load
-      .fetch(DISCORD_WEBHOOK, {
+      .fetch()(DISCORD_WEBHOOK, {
         method: 'POST',
         header: form.getHeaders(),
         body: form,
@@ -560,25 +573,82 @@ module.exports = class extends think.Service {
       signData = { timestamp: timestamp, sign: sign(timestamp, LARK_SECRET) };
     }
 
-    // 发送飞书通知
-    const resp = await load
-      .fetch(LARK_WEBHOOK, {
+    // 发送飞书通知（带详细日志）
+    const payload = JSON.stringify({ ...signData, ...msg });
+
+    think.logger.debug('【notify][lark] 准备发送飞书通知', {
+      webhook: LARK_WEBHOOK,
+      timestamp: signData.timestamp,
+      sign: signData.sign,
+      payload,
+    });
+
+    try {
+      const rawResp = await load.fetch()(LARK_WEBHOOK, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...signData,
-          ...msg,
-        }),
-      })
-      .then((resp) => resp.json());
+        body: payload,
+      });
 
-    if (resp.status !== 200) {
-      think.logger.debug('Lark Notification Failed:' + JSON.stringify(resp));
+      const statusCode = rawResp.status;
+
+      think.logger.debug('【notify][lark] 收到飞书响应', {
+        status: statusCode,
+        ok: rawResp.ok,
+        statusText: rawResp.statusText,
+      });
+
+      let respJson;
+
+      // 先读取响应文本，然后尝试解析 JSON（避免 body stream 只能读取一次的问题）
+      try {
+        const text = await rawResp.text();
+
+        think.logger.debug('【notify][lark] 响应文本', {
+          textLength: text.length,
+          textPreview: text.substring(0, 200),
+        });
+
+        try {
+          respJson = JSON.parse(text);
+        } catch (parseErr) {
+          // 非 JSON 响应，直接返回文本
+          think.logger.debug('【notify][lark] JSON 解析失败', {
+            error: String(parseErr),
+          });
+          respJson = { status: statusCode, text };
+        }
+      } catch (readErr) {
+        // 读取响应失败
+        think.logger.debug('【notify][lark] 响应读取失败', {
+          error: String(readErr),
+        });
+        respJson = { status: statusCode, text: '<<read-failed>>' };
+      }
+
+      if (respJson.status !== 200 && respJson.StatusCode !== 0) {
+        think.logger.debug('【notify][lark] 飞书通知返回非成功状态', {
+          status: statusCode,
+          body: respJson,
+        });
+      } else {
+        think.logger.debug('【notify][lark] 飞书通知发送成功', {
+          status: statusCode,
+          body: respJson,
+        });
+      }
+
+      return respJson;
+    } catch (err) {
+      think.logger.debug('【notify][lark] 飞书通知发送异常', {
+        error: String(err),
+        stack: err.stack,
+      });
+
+      return { error: String(err) };
     }
-
-    think.logger.debug('FeiShu Notification Success:' + JSON.stringify(resp));
   }
 
   // 执行通知流程
@@ -600,6 +670,23 @@ module.exports = class extends think.Service {
     const isCommentSelf =
       parent &&
       (parent.mail || '').toLowerCase() === (comment.mail || '').toLowerCase();
+
+    // 记录决策相关信息，帮助排查为何作者通知分支未被触发（例如 Lark 未调用）
+    try {
+      think.logger.debug('【notify][decision] 决策日志', {
+        ENV_DISABLE_AUTHOR_NOTIFY: DISABLE_AUTHOR_NOTIFY,
+        ARG_disableAuthorNotify: disableAuthorNotify,
+        AUTHOR_EMAIL: AUTHOR,
+        isAuthorComment,
+        isReplyAuthor,
+        isCommentSelf,
+        commentStatus: comment && comment.status,
+        parentMail: parent && parent.mail,
+      });
+    } catch (e) {
+      // 防止日志记录破坏主流程
+      think.logger.debug('【notify][decision] 记录决策日志时出错', String(e));
+    }
 
     const title = mailSubjectAdmin || 'MAIL_SUBJECT_ADMIN';
     const content = mailTemplateAdmin || 'MAIL_TEMPLATE_ADMIN';
