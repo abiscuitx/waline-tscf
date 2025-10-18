@@ -384,7 +384,10 @@ module.exports = class extends BaseRest {
   async putAction() {
     const { userInfo } = this.ctx.state;
     const isAdmin = userInfo.type === 'administrator';
-    let data = isAdmin ? this.post() : this.post('comment,like');
+    // 管理员只能更新评论内容、状态等字段，不能覆盖原作者信息
+    let data = isAdmin
+      ? this.post('comment,status,sticky,like')
+      : this.post('comment,like');
     let oldData = await this.modelInstance.select({ objectId: this.id });
 
     think.logger.debug('【comment】开始处理评论更新请求');

@@ -1,16 +1,18 @@
 const { MONGO_DB, MONGO_PASSWORD } = process.env;
 
-// 如果缺少必要的环境变量配置，直接返回空类
+// 如果缺少必要的环境变量配置,直接返回占位类
 if (!MONGO_DB || !MONGO_PASSWORD) {
+  // eslint-disable-next-line @typescript-eslint/no-extraneous-class
   module.exports = class {};
 
   return;
 }
+
 // 引入MongoDB ObjectId类型
-const { ObjectID: ObjectId } = require("think-mongo/lib/model");
+const { ObjectID: ObjectId } = require('think-mongo/lib/model');
 
 // 引入基础存储类
-const Base = require("./base.js");
+const Base = require('./base.js');
 
 // 添加缓存相关变量
 const CACHE_EXPIRE = 12 * 60 * 60 * 1000; // 12小时过期
@@ -31,7 +33,7 @@ function getCache(method, params) {
 
   if (cache && Date.now() - cache.timestamp < CACHE_EXPIRE) {
     // think.logger.debug(`【MongoDB】从缓存获取${method}数据`);
-    think.logger.debug("【mongodb】从缓存获取数据", {
+    think.logger.debug('【mongodb】从缓存获取数据', {
       方法: method,
       参数: params,
     });
@@ -50,12 +52,12 @@ function setCache(method, params, data) {
     data,
     timestamp: Date.now(),
   });
-  think.logger.debug("【mongodb】设置缓存", { 方法: method, 参数: params });
+  think.logger.debug('【mongodb】设置缓存', { 方法: method, 参数: params });
 }
 
 function clearCache() {
   // think.logger.debug('【MongoDB】清除MongoDB相关缓存');
-  think.logger.debug("【mongodb】清除MongoDB相关缓存");
+  think.logger.debug('【mongodb】清除MongoDB相关缓存');
   mongoCache.select.clear();
   mongoCache.count.clear();
 }
@@ -63,23 +65,23 @@ function clearCache() {
 module.exports = class extends Base {
   // 解析查询条件为MongoDB格式
   parseWhere(where) {
-    think.logger.debug("【mongodb】开始解析查询条件", { 条件: where });
+    think.logger.debug('【mongodb】开始解析查询条件', { 条件: where });
     if (think.isEmpty(where)) {
       return {};
     }
 
     const filter = {};
     // 转换字段名，将objectId转换为MongoDB的_id
-    const parseKey = (k) => (k === "objectId" ? "_id" : k);
+    const parseKey = (k) => (k === 'objectId' ? '_id' : k);
 
     for (let k in where) {
-      if (k === "_complex") {
+      if (k === '_complex') {
         continue;
       }
       // 处理字符串类型的等值查询
       if (think.isString(where[k])) {
         filter[parseKey(k)] = {
-          $eq: k === "objectId" ? ObjectId(where[k]) : where[k],
+          $eq: k === 'objectId' ? ObjectId(where[k]) : where[k],
         };
         continue;
       }
@@ -93,35 +95,45 @@ module.exports = class extends Base {
           const handler = where[k][0].toUpperCase();
 
           switch (handler) {
-            case "IN":
+            case 'IN':
               // IN查询，对objectId特殊处理
-              if (k === "objectId") {
+              if (k === 'objectId') {
                 filter[parseKey(k)] = { $in: where[k][1].map(ObjectId) };
               } else {
                 filter[parseKey(k)] = {
-                  $regex: new RegExp(`^(${where[k][1].join("|")})$`),
+                  $regex: new RegExp(`^(${where[k][1].join('|')})$`),
                 };
               }
               break;
-            case "NOT IN":
+            case 'NOT IN':
               // NOT IN查询，对objectId特殊处理
               filter[parseKey(k)] = {
                 $nin:
-                  k === "objectId" ? where[k][1].map(ObjectId) : where[k][1],
+                  k === 'objectId' ? where[k][1].map(ObjectId) : where[k][1],
               };
               break;
-            case "LIKE": {
+            case 'LIKE': {
               // LIKE查询，支持前缀、后缀和包含匹配
               const first = where[k][1][0];
               const last = where[k][1].slice(-1);
               let reg;
 
-              if (first === "%" && last === "%") {
-                reg = new RegExp(where[k][1].slice(1, -1));
-              } else if (first === "%") {
-                reg = new RegExp(where[k][1].slice(1) + "$");
-              } else if (last === "%") {
-                reg = new RegExp("^" + where[k][1].slice(0, -1));
+              // 转义正则表达式特殊字符的函数
+              const escapeRegExp = (str) =>
+                str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+              if (first === '%' && last === '%') {
+                const searchText = escapeRegExp(where[k][1].slice(1, -1));
+
+                reg = new RegExp(searchText, 'i'); // 添加 'i' 标志进行不区分大小写搜索
+              } else if (first === '%') {
+                const searchText = escapeRegExp(where[k][1].slice(1));
+
+                reg = new RegExp(searchText + '$', 'i');
+              } else if (last === '%') {
+                const searchText = escapeRegExp(where[k][1].slice(0, -1));
+
+                reg = new RegExp('^' + searchText, 'i');
               }
 
               if (reg) {
@@ -129,11 +141,11 @@ module.exports = class extends Base {
               }
               break;
             }
-            case "!=":
+            case '!=':
               // 不等于查询
               filter[parseKey(k)] = { $ne: where[k][1] };
               break;
-            case ">":
+            case '>':
               // 大于查询
               filter[parseKey(k)] = { $gt: where[k][1] };
               break;
@@ -142,14 +154,14 @@ module.exports = class extends Base {
       }
     }
 
-    think.logger.debug("【mongodb】查询条件解析完成", { 结果: filter });
+    think.logger.debug('【mongodb】查询条件解析完成', { 结果: filter });
 
     return filter;
   }
 
   // 构建MongoDB查询条件
   where(instance, where) {
-    think.logger.debug("【mongodb】构建查询条件");
+    think.logger.debug('【mongodb】构建查询条件');
     const filter = this.parseWhere(where);
 
     if (!where._complex) {
@@ -160,7 +172,7 @@ module.exports = class extends Base {
     const filters = [];
 
     for (const k in where._complex) {
-      if (k === "_logic") {
+      if (k === '_logic') {
         continue;
       }
       filters.push({
@@ -178,7 +190,7 @@ module.exports = class extends Base {
   // 修改 select 方法
   async select(where, options = {}) {
     // 尝试获取缓存
-    const cacheData = getCache("select", { where, options });
+    const cacheData = getCache('select', { where, options });
 
     if (cacheData) return cacheData;
     // think.logger.debug('【MongoDB】执行查询操作');
@@ -206,12 +218,12 @@ module.exports = class extends Base {
         }));
 
         // 设置缓存
-        setCache("select", { where, options }, result);
+        setCache('select', { where, options }, result);
 
         return result;
       } catch (err) {
         retries--;
-        if (retries === 0 || err.name !== "MongoServerError") {
+        if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
         // think.logger.warn(`【MongoDB】查询操作失败，剩余重试次数: ${retries}`);
@@ -223,7 +235,7 @@ module.exports = class extends Base {
   // 修改 count 方法
   async count(where = {}, options = {}) {
     // 尝试获取缓存
-    const cacheData = getCache("count", { where, options });
+    const cacheData = getCache('count', { where, options });
 
     if (cacheData) return cacheData;
     // think.logger.debug('【MongoDB】执行统计操作');
@@ -243,12 +255,12 @@ module.exports = class extends Base {
           : data;
 
         // 设置缓存
-        setCache("count", { where, options }, result);
+        setCache('count', { where, options }, result);
 
         return result;
       } catch (err) {
         retries--;
-        if (retries === 0 || err.name !== "MongoServerError") {
+        if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
         // think.logger.warn(`【MongoDB】统计操作失败，剩余重试次数: ${retries}`);
@@ -277,7 +289,7 @@ module.exports = class extends Base {
         return { ...data, objectId: id.toString() };
       } catch (err) {
         retries--;
-        if (retries === 0 || err.name !== "MongoServerError") {
+        if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
         // think.logger.warn(`【MongoDB】添加操作失败，剩余重试次数: ${retries}`);
@@ -301,14 +313,14 @@ module.exports = class extends Base {
         // 批量更新数据
         const result = await Promise.all(
           list.map(async (item) => {
-            const updateData = typeof data === "function" ? data(item) : data;
+            const updateData = typeof data === 'function' ? data(item) : data;
             const instance = this.mongo(this.tableName);
 
             this.where(instance, where);
             await instance.update(updateData);
 
             return { ...item, ...updateData };
-          })
+          }),
         );
 
         clearCache(); // 更新数据后清除缓存
@@ -316,7 +328,7 @@ module.exports = class extends Base {
         return result;
       } catch (err) {
         retries--;
-        if (retries === 0 || err.name !== "MongoServerError") {
+        if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
         // think.logger.warn(`【MongoDB】更新操作失败，剩余重试次数: ${retries}`);
@@ -340,7 +352,7 @@ module.exports = class extends Base {
         return instance.delete();
       } catch (err) {
         retries--;
-        if (retries === 0 || err.name !== "MongoServerError") {
+        if (retries === 0 || err.name !== 'MongoServerError') {
           throw err;
         }
         // think.logger.warn(`【MongoDB】删除操作失败，剩余重试次数: ${retries}`);
@@ -350,4 +362,4 @@ module.exports = class extends Base {
   }
 };
 
-think.logger.debug(" 已加载/service/storage/mongodb.js");
+think.logger.debug(' 已加载/service/storage/mongodb.js');

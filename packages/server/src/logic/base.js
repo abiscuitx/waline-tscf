@@ -29,8 +29,6 @@ module.exports = class extends think.Logic {
       origin: origin,
       host: this.ctx.req.headers['host'],
     });
-
-    // 统一处理 referrer，提取 hostname
     if (referrer) {
       try {
         if (referrer.includes('://')) {
@@ -49,11 +47,8 @@ module.exports = class extends think.Logic {
         referrer = '';
       }
     }
-
-    // 统一处理 origin，提取 hostname
     if (origin && origin.length > 0) {
       try {
-        // 检查 origin 是否是一个完整的 URL
         if (!origin.includes('://')) {
           think.logger.debug('【base】Origin缺少协议，添加http://', {
             originalOrigin: origin,
@@ -69,14 +64,16 @@ module.exports = class extends think.Logic {
           originalOrigin: origin,
           error: e.message,
         });
-        // 解析失败时，将 origin 设为空，后续会使用 host
         origin = '';
       }
     }
-
     let { secureDomains } = this.config();
+    const hasConfiguredDomains =
+      secureDomains && secureDomains !== 'false' && secureDomains !== false;
 
-    if (secureDomains) {
+    if (hasConfiguredDomains) {
+      think.logger.debug('【base】已配置 SECURE_DOMAINS，执行域名安全检查');
+
       secureDomains = think.isArray(secureDomains)
         ? secureDomains
         : [secureDomains];
@@ -92,32 +89,15 @@ module.exports = class extends think.Logic {
       ];
 
       secureDomains = [...new Set([...secureDomains, ...defaultDomains])];
-
-      // 从环境变量读取域名匹配模式
-      // SECURE_DOMAIN_MODE: 'strict' (严格模式，完全匹配) 或 'loose' (宽松模式，支持子域名)
-      // 默认为 'loose'
-      const domainMode = process.env.SECURE_DOMAIN_MODE || 'loose';
-      const isStrictMode = domainMode === 'strict';
-
-      think.logger.debug('【base】域名安全检查模式', {
-        mode: domainMode,
-        isStrictMode: isStrictMode,
-        description: isStrictMode
-          ? '严格模式：域名必须完全匹配'
-          : '宽松模式：支持子域名匹配',
-      });
-
-      // 转换可能的正则表达式字符串为正则表达式对象
       secureDomains = secureDomains
         .map((domain) => {
-          // 如果是正则表达式字符串，创建一个 RegExp 对象
           if (
             typeof domain === 'string' &&
             domain.startsWith('/') &&
             domain.endsWith('/')
           ) {
             try {
-              const regex = new RegExp(domain.slice(1, -1)); // 去掉斜杠并创建 RegExp 对象
+              const regex = new RegExp(domain.slice(1, -1));
 
               think.logger.debug('【base】正则表达式域名转换成功', {
                 originalPattern: domain,
@@ -137,29 +117,22 @@ module.exports = class extends think.Logic {
 
           return domain;
         })
-        .filter(Boolean); // 过滤掉无效的正则表达式
-
-      // 优先检查 referrer，其次 origin，最后使用 host
-      // 此时 referrer 和 origin 已经是纯 hostname 了
+        .filter(Boolean);
       let checking = referrer || origin;
       let checkingType = referrer ? 'referrer' : origin ? 'origin' : 'host';
 
-      // 如果 referrer 和 origin 都不存在或解析失败，使用 host header
       if (!checking) {
         const host = this.ctx.req.headers['host'];
 
         if (host) {
-          // 移除端口号，只保留主机名
           checking = host.split(':')[0];
           checkingType = 'host';
-          think.logger.debug('【base】使用host header作为检查值', {
+          think.logger.debug('【base】使用 host header 作为检查值', {
             originalHost: host,
             extractedHostname: checking,
           });
         }
       }
-
-      // 如果没有任何检查值，记录警告但不抛出错误
       if (!checking) {
         think.logger.warn('【base】无法获取请求来源信息', {
           referrer: referrer,
@@ -168,36 +141,23 @@ module.exports = class extends think.Logic {
           path: this.ctx.path,
         });
 
-        return this.ctx.throw(403); // 严格模式：取消注释这行
+        return this.ctx.throw(403);
       }
-
       const matchResults = secureDomains.map((domain) => {
         const isRegex = think.isFunction(domain.test);
         let matches = false;
 
         if (isRegex) {
-          // 正则表达式匹配
           matches = domain.test(checking);
         } else {
-          // 字符串匹配：根据模式选择匹配方式
-          if (isStrictMode) {
-            // 严格模式：完全匹配
-            matches = checking === domain;
-          } else {
-            // 宽松模式：支持精确匹配和子域名匹配
-            // 1. 精确匹配：checking === domain
-            // 2. 子域名匹配：checking 以 ".domain" 结尾
-            matches = checking === domain || checking.endsWith('.' + domain);
-          }
+          matches = checking === domain || checking.endsWith('.' + domain);
         }
 
-        // 只在匹配成功时打印详细信息，减少日志输出
         if (matches) {
           think.logger.debug('【base】域名匹配成功', {
             domain: isRegex ? `RegExp(${domain.source})` : domain,
             checking: checking,
             type: isRegex ? 'regex' : 'string',
-            mode: isStrictMode ? 'strict' : 'loose',
             matchType: checking === domain ? 'exact' : 'subdomain',
           });
         }
@@ -208,7 +168,7 @@ module.exports = class extends think.Logic {
       const isSafe = matchResults.some((match) => match);
 
       if (!isSafe) {
-        think.logger.error('【base】域名安全检查失败 - 403错误', {
+        think.logger.error('【base】域名安全检查失败 - 403 错误', {
           requestPath: this.ctx.path,
           requestMethod: this.ctx.method,
           clientIP: this.ctx.ip,
@@ -221,7 +181,6 @@ module.exports = class extends think.Logic {
           secureDomains: secureDomains.map((domain) =>
             think.isFunction(domain.test) ? `RegExp(${domain.source})` : domain,
           ),
-          allHeaders: this.ctx.req.headers,
         });
 
         return this.ctx.throw(403);
@@ -233,6 +192,8 @@ module.exports = class extends think.Logic {
           (domain, index) => matchResults[index],
         ),
       });
+    } else {
+      think.logger.debug('【base】未配置 SECURE_DOMAINS，API 路由全部通过');
     }
 
     // 初始化用户状态
