@@ -23,6 +23,43 @@ const load = {
   nunjucks: () => nunjucks || (nunjucks = require('nunjucks')),
 };
 
+/**
+ * 安全地清理HTML标签
+ * 防止多字符清理导致的注入攻击
+ * @param {string} html - 包含HTML的字符串
+ * @param {object} options - 清理选项
+ * @returns {string} 清理后的字符串
+ */
+function sanitizeHtml(html, options = {}) {
+  if (!html) return '';
+
+  let result = html;
+
+  // 处理链接标签
+  if (options.linkReplace !== undefined) {
+    // 重复替换直到没有更多匹配，防止嵌套注入
+    let previous;
+
+    do {
+      previous = result;
+      result = result.replace(
+        /<a\s+href="([^"]*)"[^>]*>([^<]*)<\/a>/gi,
+        options.linkReplace,
+      );
+    } while (result !== previous);
+  }
+
+  // 移除所有HTML标签 - 重复执行直到完全清理
+  let previous;
+
+  do {
+    previous = result;
+    result = result.replace(/<[^>]*>/g, '');
+  } while (result !== previous);
+
+  return result;
+}
+
 // 导出通知服务类
 module.exports = class extends think.Service {
   // 初始化通知服务
@@ -170,10 +207,10 @@ module.exports = class extends think.Service {
 
     // 解析企业微信配置参数
     const QYWX_AM_AY = QYWX_AM.split(',');
-    // 清理评论内容中的HTML标签
-    const comment = self.comment
-      .replace(/<a href="(.*?)">(.*?)<\/a>/g, '\n[$2] $1\n')
-      .replace(/<[^>]+>/g, '');
+    // 清理评论内容中的HTML标签（安全方式）
+    const comment = sanitizeHtml(self.comment, {
+      linkReplace: '\n[$2] $1\n',
+    });
     const postName = self.url;
 
     // 构建通知数据
@@ -267,10 +304,8 @@ module.exports = class extends think.Service {
       return false;
     }
 
-    // 清理评论内容中的HTML标签
-    const comment = self.comment
-      .replace(/<a href="(.*?)">(.*?)<\/a>/g, '')
-      .replace(/<[^>]+>/g, '');
+    // 清理评论内容中的HTML标签（安全方式）
+    const comment = sanitizeHtml(self.comment, { linkReplace: '' });
 
     // 构建通知数据
     const data = {
@@ -323,29 +358,31 @@ module.exports = class extends think.Service {
       return false;
     }
 
-    // 处理评论中的链接
+    // 处理评论中的链接（安全方式）
     let commentLink = '';
-    const href = self.comment.match(/<a href="(.*?)">(.*?)<\/a>/g);
+    const href = self.comment.match(/<a\s+href="([^"]*)"[^>]*>([^<]*)<\/a>/gi);
 
     if (href !== null) {
+      // 使用安全的正则提取，防止嵌套注入
       for (let i = 0; i < href.length; i++) {
-        href[i] =
-          '[Link: ' +
-          href[i].replace(/<a href="(.*?)">(.*?)<\/a>/g, '$2') +
-          '](' +
-          href[i].replace(/<a href="(.*?)">(.*?)<\/a>/g, '$1') +
-          ')  ';
-        commentLink = commentLink + href[i];
+        const linkMatch = href[i].match(
+          /<a\s+href="([^"]*)"[^>]*>([^<]*)<\/a>/i,
+        );
+
+        if (linkMatch) {
+          const [, url, text] = linkMatch;
+
+          href[i] = `[Link: ${text}](${url})  `;
+          commentLink = commentLink + href[i];
+        }
       }
     }
     if (commentLink !== '') {
       commentLink = `\n` + commentLink + `\n`;
     }
 
-    // 清理评论内容中的HTML标签
-    const comment = self.comment
-      .replace(/<a href="(.*?)">(.*?)<\/a>/g, '[Link:$2]')
-      .replace(/<[^>]+>/g, '');
+    // 清理评论内容中的HTML标签（安全方式）
+    const comment = sanitizeHtml(self.comment, { linkReplace: '[Link:$2]' });
 
     // 获取Telegram通知模板
     const contentTG =

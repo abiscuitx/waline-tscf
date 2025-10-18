@@ -1,4 +1,4 @@
-const path = require("node:path");
+const path = require('node:path');
 
 module.exports = class extends think.Controller {
   // 标识当前类为 REST 控制器
@@ -8,7 +8,7 @@ module.exports = class extends think.Controller {
 
   // 定义请求方法的属性名
   static get _method() {
-    return "method";
+    return 'method';
   }
 
   // 构造函数：初始化资源和ID
@@ -16,7 +16,7 @@ module.exports = class extends think.Controller {
     super(ctx);
     this.resource = this.getResource();
     this.id = this.getId();
-    think.logger.debug("【rest】初始化控制器", {
+    think.logger.debug('【rest】初始化控制器', {
       资源: this.resource,
       ID: this.id,
     });
@@ -37,7 +37,7 @@ module.exports = class extends think.Controller {
 
   // 从请求中获取资源ID
   getId() {
-    const id = this.get("id");
+    const id = this.get('id');
 
     // 检查请求参数中的ID
     if (id && (think.isString(id) || think.isNumber(id))) {
@@ -46,16 +46,17 @@ module.exports = class extends think.Controller {
     }
 
     // 从URL路径中获取ID
-    const last = decodeURIComponent(this.ctx.path.split("/").pop());
+    const last = decodeURIComponent(this.ctx.path.split('/').pop());
 
-    // 验证URL中的ID格式
-    if (last !== this.resource && /^([a-z0-9]+,?)*$/i.test(last)) {
+    // 验证URL中的ID格式 (修复正则表达式以避免回溯攻击)
+    // 允许格式: a-z0-9字符,可以用逗号分隔,如 "abc123" 或 "abc,def,123"
+    if (last !== this.resource && /^[a-z0-9]+(?:,[a-z0-9]+)*$/i.test(last)) {
       // think.logger.debug('【REST】从URL路径获取ID:', last);
       return last;
     }
 
     // think.logger.debug('【REST】未找到有效ID');
-    return "";
+    return '';
   }
 
   // 检查用户登录状态
@@ -63,14 +64,14 @@ module.exports = class extends think.Controller {
     const { userInfo } = this.ctx.state;
     const isEmpty = think.isEmpty(userInfo);
 
-    think.logger.debug("【rest】用户登录状态:", isEmpty ? "未登录" : "已登录");
+    think.logger.debug('【rest】用户登录状态:', isEmpty ? '未登录' : '已登录');
 
     return isEmpty;
   }
 
   // 执行钩子函数链
   async hook(name, ...args) {
-    think.logger.debug("【rest】执行钩子:", name);
+    think.logger.debug('【rest】执行钩子:', name);
 
     // 获取配置的钩子函数和插件钩子
     const fn = this.config(name);
@@ -91,17 +92,17 @@ module.exports = class extends think.Controller {
 
       // 如果钩子返回结果，中断执行并返回
       if (resp) {
-        think.logger.debug("【rest】钩子执行完成，返回结果");
+        think.logger.debug('【rest】钩子执行完成，返回结果');
 
         return resp;
       }
     }
 
-    think.logger.debug("【rest】钩子执行完成");
+    think.logger.debug('【rest】钩子执行完成');
   }
 
   // 默认调用方法，处理未定义的方法调用
   __call() {}
 };
 
-think.logger.debug(" 已加载/controller/rest.js");
+think.logger.debug(' 已加载/controller/rest.js');

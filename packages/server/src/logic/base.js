@@ -339,7 +339,9 @@ module.exports = class extends think.Logic {
 
     const last = decodeURIComponent(this.ctx.path.split('/').pop());
 
-    if (last !== this.resource && /^([a-z0-9]+,?)*$/i.test(last)) {
+    // 修复正则表达式以避免回溯攻击
+    // 允许格式: a-z0-9字符,可以用逗号分隔,如 "abc123" 或 "abc,def,123"
+    if (last !== this.resource && /^[a-z0-9]+(?:,[a-z0-9]+)*$/i.test(last)) {
       return last;
     }
 
