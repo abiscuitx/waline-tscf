@@ -30,9 +30,7 @@ module.exports = function () {
     window.turnstileKey = ${JSON.stringify(
       process.env.TURNSTILE_KEY,
     )}; // Turnstile密钥
-    window.serverURL = '${
-      ctx.serverURL
-    }/api/';                         // API服务器地址
+    window.serverURL = location.protocol + '//' + location.host + '/api/';    // 服务端api serverURL  
     </script>
     <!-- 加载管理界面脚本 -->
     <script src="${

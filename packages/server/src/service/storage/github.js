@@ -2,6 +2,7 @@ const { GITHUB_TOKEN, GITHUB_REPO, GITHUB_PATH } = process.env;
 
 // 如果缺少必要的环境变量配置，直接返回空类
 if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_PATH) {
+  // eslint-disable-next-line @typescript-eslint/no-extraneous-class
   module.exports = class {};
 
   return;
@@ -10,10 +11,10 @@ if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_PATH) {
 let path, parseString, writeToString;
 
 const load = {
-  path: () => path || (path = require("node:path")),
+  path: () => path || (path = require('node:path')),
   fastCsv: () => {
     if (!parseString || !writeToString) {
-      const fastCsv = require("fast-csv");
+      const fastCsv = require('fast-csv');
 
       parseString = fastCsv.parseString;
       writeToString = fastCsv.writeToString;
@@ -23,44 +24,44 @@ const load = {
   },
 };
 
-const Base = require("./base.js");
+const Base = require('./base.js');
 
 const CSV_HEADERS = {
   Comment: [
-    "objectId",
-    "user_id",
-    "comment",
-    "insertedAt",
-    "ip",
-    "link",
-    "mail",
-    "nick",
-    "pid",
-    "rid",
-    "status",
-    "ua",
-    "url",
-    "createdAt",
-    "updatedAt",
+    'objectId',
+    'user_id',
+    'comment',
+    'insertedAt',
+    'ip',
+    'link',
+    'mail',
+    'nick',
+    'pid',
+    'rid',
+    'status',
+    'ua',
+    'url',
+    'createdAt',
+    'updatedAt',
   ],
-  Counter: ["objectId", "time", "url", "createdAt", "updatedAt"],
+  Counter: ['objectId', 'time', 'url', 'createdAt', 'updatedAt'],
   Users: [
-    "objectId",
-    "display_name",
-    "email",
-    "password",
-    "type",
-    "url",
-    "avatar",
-    "label",
-    "github",
-    "twitter",
-    "facebook",
-    "google",
-    "weibo",
-    "qq",
-    "createdAt",
-    "updatedAt",
+    'objectId',
+    'display_name',
+    'email',
+    'password',
+    'type',
+    'url',
+    'avatar',
+    'label',
+    'github',
+    'twitter',
+    'facebook',
+    'google',
+    'weibo',
+    'qq',
+    'createdAt',
+    'updatedAt',
   ],
 };
 
@@ -73,15 +74,15 @@ class Github {
   // content api can only get file < 1MB
   async get(filename) {
     const resp = await fetch(
-      "https://api.github.com/repos/" +
-        load.path().join(this.repo, "contents", filename),
+      'https://api.github.com/repos/' +
+        load.path().join(this.repo, 'contents', filename),
       {
         headers: {
-          accept: "application/vnd.github.v3+json",
-          authorization: "token " + this.token,
-          "user-agent": "Waline",
+          accept: 'application/vnd.github.v3+json',
+          authorization: 'token ' + this.token,
+          'user-agent': 'Waline',
         },
-      }
+      },
     )
       .then((resp) => resp.json())
       .catch((e) => {
@@ -94,10 +95,10 @@ class Github {
         return this.getLargeFile(filename);
       });
 
-    think.logger.debug("【github】获取文件成功", { 文件名: filename });
+    think.logger.debug('【github】获取文件成功', { 文件名: filename });
 
     return {
-      data: Buffer.from(resp.content, "base64").toString("utf-8"),
+      data: Buffer.from(resp.content, 'base64').toString('utf-8'),
       sha: resp.sha,
     };
   }
@@ -105,22 +106,22 @@ class Github {
   // blob api can get file larger than 1MB
   async getLargeFile(filename) {
     const { tree } = await fetch(
-      "https://api.github.com/repos/" +
-        load.path().join(this.repo, "git/trees/HEAD") +
-        "?recursive=1",
+      'https://api.github.com/repos/' +
+        load.path().join(this.repo, 'git/trees/HEAD') +
+        '?recursive=1',
       {
         headers: {
-          accept: "application/vnd.github.v3+json",
-          authorization: "token " + this.token,
-          "user-agent": "Waline",
+          accept: 'application/vnd.github.v3+json',
+          authorization: 'token ' + this.token,
+          'user-agent': 'Waline',
         },
-      }
+      },
     ).then((resp) => resp.json());
 
     const file = tree.find(({ path }) => path === filename);
 
     if (!file) {
-      const error = new Error("NOT FOUND");
+      const error = new Error('NOT FOUND');
 
       error.statusCode = 404;
       throw error;
@@ -128,30 +129,30 @@ class Github {
 
     return fetch(file.url, {
       headers: {
-        accept: "application/vnd.github.v3+json",
-        authorization: "token " + this.token,
-        "user-agent": "Waline",
+        accept: 'application/vnd.github.v3+json',
+        authorization: 'token ' + this.token,
+        'user-agent': 'Waline',
       },
     }).then((resp) => resp.json());
   }
 
   async set(filename, content, { sha }) {
     return fetch(
-      "https://api.github.com/repos/" +
-        load.path().join(this.repo, "contents", filename),
+      'https://api.github.com/repos/' +
+        load.path().join(this.repo, 'contents', filename),
       {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          accept: "application/vnd.github.v3+json",
-          authorization: "token " + this.token,
-          "user-agent": "Waline",
+          accept: 'application/vnd.github.v3+json',
+          authorization: 'token ' + this.token,
+          'user-agent': 'Waline',
         },
         body: JSON.stringify({
           sha,
-          message: "feat(waline): update comment data",
-          content: Buffer.from(content, "utf-8").toString("base64"),
+          message: 'feat(waline): update comment data',
+          content: Buffer.from(content, 'utf-8').toString('base64'),
         }),
-      }
+      },
     );
   }
 }
@@ -166,10 +167,10 @@ module.exports = class extends Base {
   }
 
   async collection(tableName) {
-    const filename = load.path().join(this.basePath, tableName + ".csv");
+    const filename = load.path().join(this.basePath, tableName + '.csv');
     const file = await this.git.get(filename).catch((e) => {
       if (e.statusCode === 404) {
-        return "";
+        return '';
       }
       throw e;
     });
@@ -184,14 +185,14 @@ module.exports = class extends Base {
         .parseString(file.data, {
           headers: file ? true : CSV_HEADERS[tableName],
         })
-        .on("error", reject)
-        .on("data", (row) => data.push(row))
-        .on("end", () => resolve(data));
+        .on('error', reject)
+        .on('data', (row) => data.push(row))
+        .on('end', () => resolve(data));
     });
   }
 
   async save(tableName, data, sha) {
-    const filename = load.path().join(this.basePath, tableName + ".csv");
+    const filename = load.path().join(this.basePath, tableName + '.csv');
     const csv = await load.fastCsv().writeToString(data, {
       headers: sha ? true : CSV_HEADERS[tableName],
       writeHeaders: true,
@@ -210,11 +211,11 @@ module.exports = class extends Base {
     const filters = [];
 
     for (let k in where) {
-      if (k === "_complex") {
+      if (k === '_complex') {
         continue;
       }
 
-      if (k === "objectId") {
+      if (k === 'objectId') {
         filters.push((item) => item.id === where[k]);
         continue;
       }
@@ -232,31 +233,31 @@ module.exports = class extends Base {
       const handler = where[k][0].toUpperCase();
 
       switch (handler) {
-        case "IN":
+        case 'IN':
           filters.push((item) => where[k][1].includes(item[k]));
           break;
-        case "NOT IN":
+        case 'NOT IN':
           filters.push((item) => !where[k][1].includes(item[k]));
           break;
-        case "LIKE": {
+        case 'LIKE': {
           const first = where[k][1][0];
           const last = where[k][1].slice(-1);
           let reg;
 
-          if (first === "%" && last === "%") {
+          if (first === '%' && last === '%') {
             reg = new RegExp(where[k][1].slice(1, -1));
-          } else if (first === "%") {
-            reg = new RegExp(where[k][1].slice(1) + "$");
-          } else if (last === "%") {
-            reg = new RegExp("^" + where[k][1].slice(0, -1));
+          } else if (first === '%') {
+            reg = new RegExp(where[k][1].slice(1) + '$');
+          } else if (last === '%') {
+            reg = new RegExp('^' + where[k][1].slice(0, -1));
           }
           filters.push((item) => reg.test(item[k]));
           break;
         }
-        case "!=":
+        case '!=':
           filters.push((item) => item[k] !== where[k][1]);
           break;
-        case ">":
+        case '>':
           filters.push((item) => item[k] >= where[k][1]);
           break;
       }
@@ -279,7 +280,7 @@ module.exports = class extends Base {
     const filters = [];
 
     for (const k in where._complex) {
-      if (k === "_logic") {
+      if (k === '_logic') {
         continue;
       }
 
@@ -289,7 +290,7 @@ module.exports = class extends Base {
     const logicFn = logicMap[where._complex._logic];
 
     return data.filter((item) =>
-      logicFn.call(filters, (filter) => filter.every((fn) => fn(item)))
+      logicFn.call(filters, (filter) => filter.every((fn) => fn(item))),
     );
   }
 
@@ -299,7 +300,7 @@ module.exports = class extends Base {
 
     if (desc) {
       data.sort((a, b) => {
-        if (["insertedAt", "createdAt", "updatedAt"].includes(desc)) {
+        if (['insertedAt', 'createdAt', 'updatedAt'].includes(desc)) {
           const aTime = new Date(a[desc]).getTime();
           const bTime = new Date(b[desc]).getTime();
 
@@ -312,7 +313,7 @@ module.exports = class extends Base {
 
     data = data.slice(limit || 0, offset || data.length);
     if (field) {
-      field.push("id");
+      field.push('id');
       const fieldObj = {};
 
       field.forEach((f) => (fieldObj[f] = true));
@@ -360,7 +361,7 @@ module.exports = class extends Base {
   }
 
   async add(
-    data
+    data,
     // { access: { read = true, write = true } = { read: true, write: true } } = {}
   ) {
     const instance = await this.collection(this.tableName);
@@ -379,7 +380,7 @@ module.exports = class extends Base {
     const list = this.where(instance, where);
 
     list.forEach((item) => {
-      if (typeof data === "function") {
+      if (typeof data === 'function') {
         data(item);
       } else {
         for (const k in data) {
@@ -402,4 +403,4 @@ module.exports = class extends Base {
   }
 };
 
-think.logger.debug(" 已加载/service/storage/github.js");
+think.logger.debug(' 已加载/service/storage/github.js');
