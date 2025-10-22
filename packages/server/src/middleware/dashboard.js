@@ -12,8 +12,9 @@ module.exports = function () {
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Waline 管理系统</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>waline-tscf 管理系统</title>
+    <link rel="icon" href='${process.env.SITE_LOGO || ''}'>
   </head>
   <body>
     <script>

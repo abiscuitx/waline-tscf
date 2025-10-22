@@ -204,7 +204,7 @@ module.exports = class extends BaseRest {
             : SMTP_USER,
         to: data.email,
         subject: this.locale('[{{name | safe}}] Registration Confirm Mail', {
-          name: SITE_NAME || 'Waline',
+          name: SITE_NAME || 'Waline-tscf',
         }),
         html: this.locale(
           'Please click <a href="{{url}}">{{url}}<a/> to confirm registration, the link is valid for 1 hour. If you are not registering, please ignore this email.',

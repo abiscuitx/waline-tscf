@@ -118,14 +118,21 @@ module.exports = class extends think.Service {
     }
 
     // 获取站点配置信息
-    const { SITE_NAME, SITE_URL, SMTP_USER, SENDER_EMAIL, SENDER_NAME } =
-      process.env;
+    const {
+      SITE_NAME,
+      SITE_URL,
+      SITE_LOGO,
+      SMTP_USER,
+      SENDER_EMAIL,
+      SENDER_NAME,
+    } = process.env;
     const data = {
       self,
       parent,
       site: {
         name: SITE_NAME,
         url: SITE_URL,
+        logo: SITE_LOGO,
         postUrl: SITE_URL + self.url + '#' + self.objectId,
       },
     };

@@ -30,7 +30,7 @@ module.exports = class extends think.Controller {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>waline-tscf</title>
-      <link rel="icon" href="https://pic.abiscuit.top/favicon.png">
+      <link rel="icon" href='${process.env.SITE_LOGO || ''}'>
     </head>
     <body>
       <div id="waline" style="max-width: 800px;margin: 0 auto;"></div>
