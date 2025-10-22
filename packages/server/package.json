@@ -1,6 +1,6 @@
 {
   "name": "@waline-tscf/server",
-  "version": "1.32.7-Beta.1",
+  "version": "1.32.8-Beta.1",
   "description": "A comment system server compatible with Tencent SCF deployment based on Waline",
   "keywords": [
     "waline",
@@ -36,7 +36,7 @@
     "dy-node-ip2region": "^1.0.1",
     "fast-csv": "^5.0.5",
     "form-data": "^4.0.4",
-    "jsdom": "^27.0.0",
+    "jsdom": "^19.0.0",
     "jsonwebtoken": "^9.0.2",
     "koa-compose": "^4.1.0",
     "leancloud-storage": "^4.15.2",
