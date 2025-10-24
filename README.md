@@ -19,50 +19,29 @@
 
 ## 项目架构
 
+### 主要目录
+
 ```
 waline/
 ├── 📦 packages/           # 核心包目录
 │   ├── admin/            # 管理后台
-│   ├── api/              # API 接口层
-│   ├── client/           # 客户端组件
-│   ├── cloudbase/        # 腾讯云开发适配
-│   ├── hexo-next/        # Hexo Next 主题插件
+│   ├── api/              # API工具集
+│   ├── client/           # 客户端
 │   └── server/           # 服务器端
 ├── 📚 docs/              # 项目文档
 ├── 🧪 example/           # 使用示例
 ├── 🛠️ scripts/          # 构建脚本
 ├── ⚙️ 配置文件           # 项目配置
-└── 📄 项目文件           # 项目说明文件
+
 ```
 
-### 1. Monorepo 架构
-
-- 统一依赖管理
-- 代码共享和复用
-- 统一构建流程
-
-### 2. 模块化设计
-
-- 客户端、服务端、管理后台分离
-- 插件化扩展机制
-- 多平台适配支持
-
-### 3. 现代化工程
-
-- TypeScript 全面覆盖
-- 自动化测试和 CI/CD
-- 规范化代码提交流程
-
-### 4. 多技术栈支持
-
+- 项目:Monorepo
 - 前端: Vue 3 + React
 - 后端: Node.js + ThinkJS
 - 构建: Vite + Rollup
 - 文档: VuePress
 
-## 核心包详解
-
-### 1. packages/admin - 管理后台
+### packages/admin - 管理后台
 
 ```
 admin/
@@ -79,10 +58,10 @@ admin/
     └── locales/        # 国际化文件
 ```
 
-**技术栈**: React + Vite + TypeScript
-**功能**: 评论管理、用户管理、系统配置等
+- 技术栈: React + Vite + TypeScript
+- 功能: 评论管理、用户管理、系统配置等
 
-### 2. packages/client - 客户端组件
+### packages/client - 客户端
 
 ```
 client/
@@ -105,10 +84,10 @@ client/
     └── widgets/        # 小部件
 ```
 
-**技术栈**: Vue 3 + TypeScript + Rollup
-**功能**: 评论组件、点赞功能、用户交互界面
+- 技术栈: Vue 3 + TypeScript + Rollup
+- 功能: 评论组件、点赞功能、用户交互界面
 
-### 3. packages/server - 服务器端
+### packages/server - 服务器端
 
 ```
 server/
@@ -130,10 +109,10 @@ server/
     └── locales/        # 国际化
 ```
 
-**技术栈**: Node.js + ThinkJS 框架
-**功能**: API 接口、数据库操作、用户认证、评论管理
+- 技术栈: Node.js + ThinkJS 框架
+- 功能: API 接口、数据库操作、用户认证、评论管理
 
-### 4. packages/api - API 接口层
+### packages/api - API工具集
 
 ```
 api/
@@ -143,28 +122,10 @@ api/
 └── src/               # API 定义和类型
 ```
 
-**功能**: 统一的 API 接口定义和类型声明
+- 技术栈：TypeScript
+- 功能: 统一的 API 接口定义和类型声明
 
-### 5. packages/cloudbase - 腾讯云cloudbas适配方案
-
-**功能**: 腾讯云开发平台的部署适配器
-
-### 6. packages/hexo-next - Hexo 插件
-
-**功能**: 为 Hexo Next 主题提供的 Waline 集成插件
-
-## ⚙️ 工程化配置
-
-### 构建和开发工具
-
-- **包管理器**: pnpm (v10.17.0)
-- **构建工具**: Vite, Rollup
-- **类型检查**: TypeScript
-- **代码规范**: ESLint + Prettier + Stylelint
-- **Git 钩子**: Husky + nano-staged
-- **提交规范**: Commitizen + Conventional Commits
-
-### 配置文件说明
+### 工程化配置
 
 ```
 ├── .eslintrc.*         # ESLint 配置
@@ -176,9 +137,16 @@ api/
 └── pnpm-workspace.yaml # pnpm 工作区配置
 ```
 
+- 包管理器: pnpm
+- 构建工具: Vite, Rollup
+- 类型检查: TypeScript
+- 代码规范: ESLint + Prettier + Stylelint
+- Git 钩子: Husky + nano-staged
+- 提交规范: Commitizen + Conventional Commits
+
 ## 开发说明
 
-### 核心命令
+### pnpm脚本
 
 ```bash
 # 开发环境
@@ -201,9 +169,17 @@ pnpm test              # 运行单元测试
 pnpm packages:update   # 更新所有依赖
 ```
 
-### VS Code 编辑器配置
+### 提交规范
 
-#### 必装扩展
+- feat: 新功能
+- fix: Bug 修复
+- docs: 文档更新
+- style: 代码格式调整
+- refactor: 代码重构
+- test: 测试相关
+- chore: 构建/工具配置
+
+### VS Code配置扩展
 
 ```json
 {
@@ -221,7 +197,7 @@ pnpm packages:update   # 更新所有依赖
 }
 ```
 
-#### 工作区设置优化
+### VS Code工作区
 
 ```json
 {
@@ -257,86 +233,6 @@ pnpm packages:update   # 更新所有依赖
   }
 }
 ```
-
-### Git 钩子配置
-
-#### 本地开发设置
-
-```bash
-# 1. 确保已安装依赖
-pnpm install
-
-# 2. 初始化 Husky (如果需要)
-pnpm prepare
-
-# 3. 验证钩子是否生效
-git commit -m "test: commit message format"
-```
-
-#### 提交信息规范
-
-```bash
-# 格式: <type>(<scope>): <description>
-feat(client): add new comment component
-fix(server): resolve XSS security issue
-docs(readme): update configuration guide
-chore(deps): update dependencies
-```
-
-**类型说明:**
-
-- `feat`: 新功能
-- `fix`: Bug 修复
-- `docs`: 文档更新
-- `style`: 代码格式调整
-- `refactor`: 代码重构
-- `test`: 测试相关
-- `chore`: 构建/工具配置
-
-### GitHub 仓库配置
-
-#### 1. 分支保护规则
-
-```yaml
-# Settings > Branches > Add rule
-Branch name pattern: main
-☑️ Require a pull request before merging
-☑️ Require status checks to pass before merging
-  ☑️ Require branches to be up to date before merging
-  Required status checks:
-    - Test (ubuntu-latest, 20)
-    - Test (ubuntu-latest, 22)
-☑️ Require conversation resolution before merging
-☑️ Include administrators
-```
-
-#### 2. Secrets 配置
-
-```bash
-# Settings > Secrets and variables > Actions
-NPM_TOKEN=<your-npm-token>          # npm 发布权限
-CODECOV_TOKEN=<codecov-token>       # 代码覆盖率
-LEANCLOUD_ID=<leancloud-id>         # 数据库配置
-LEANCLOUD_KEY=<leancloud-key>       # 数据库密钥
-```
-
-#### 3. Issue/PR 模板激活
-
-```bash
-# 自动激活的模板
-.github/
-├── ISSUE_TEMPLATE/
-│   ├── bug_report.yml      # Bug 报告模板
-│   ├── feature_request.yml # 功能请求模板
-│   └── question.yml        # 问题咨询模板
-└── pull_request_template.md # PR 模板
-```
-
-**Issue 自动处理:**
-
-- 🏷️ 自动标签分配
-- ⏰ 过期 Issue 自动关闭 (90天)
-- 🤖 回复模板自动化
 
 ## 许可证
 

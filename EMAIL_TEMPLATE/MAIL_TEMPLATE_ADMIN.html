@@ -1,14 +1,60 @@
-<table
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  role="presentation"
-  style="width: 100%; height: 100%; background-color: #f4f6f8"
->
+<!-- 
+site: 网站配置
+'站点名'
+{{site.name | safe}}
+'站点网址'
+{{site.url | safe}}
+'站点logo'
+{{site.logo | safe}}
+'评论完整地址'
+{{site.postUrl | safe}}
+
+self: 该条评论本身
+'评论者名称'
+{{self.nick}}
+'评论者邮箱'
+{{self.mail}}
+'评论者网址'
+{{self.link}}
+'审核状态'
+{{self.status}}
+'评论内容'
+{{self.comment | safe}}
+'文章地址'
+{{self.url}}
+评论者名
+{{self.browser}}
+'操作系统'
+{{self.os}}
+'操作系统'
+{{self.addr}}
+'头像地址'
+{{self.avatar}}
+'评论链接，仅TG'
+{{self.commentLink}}
+
+parent: 该条评论的回复对象(父评论)
+'父评论名称'
+{{parent.nick}}
+'父评论邮箱'
+{{parent.mail}}
+'父评论网址'
+{{parent.link}}
+'父评论内容'
+{{parent.comment | safe}}
+'浏览器'
+{{parent.browser}}
+'操作系统'
+{{parent.os}}
+'操作系统'
+{{parent.addr}}
+'头像地址'
+{{parent.avatar}}
+-->
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
   <tbody>
     <tr>
       <td>
-        <!-- preheader: hidden preview text for some mail clients -->
         <span
           style="
             display: none;
@@ -20,50 +66,83 @@
             overflow: hidden;
             color: transparent;
           "
-          >{{site.name}} 有新评论 — 点击查看详情</span
+          >点击查看详情：{{self.nick}}评论{{self.comment |
+          safe}}，原文链接{{site.postUrl}}</span
         >
-
         <div
           style="
             max-width: 666px;
             margin: 28px auto;
             border-radius: 10px;
             overflow: hidden;
-            background: #ffffff;
+            background: #fff;
             border: 1px solid #eee;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-            font-family: Helvetica, Arial, sans-serif;
             color: #555;
             font-size: 16px;
           "
         >
-          <div
-            style="
-              background-color: #4af6de;
-              color: #fff;
-              padding: 18px 20px;
-              text-align: center;
-            "
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            role="presentation"
+            style="background-color: #ff9849; color: #fff"
+            align="center"
           >
-            <h1 style="font-size: 20px; margin: 0">{{site.name}} 有新评论</h1>
-          </div>
-
-          <div style="text-align: center; padding: 18px 0 8px 0">
-            <img
-              src="{{site.logo || ''}}"
-              alt="{{site.name}}"
-              width="220"
-              height="44"
-              style="border: 0; display: inline-block"
-            />
-          </div>
-
-          <div style="padding: 0 20px 24px 20px">
-            <p style="font-size: 16px; margin: 0 0 12px 0">
-              你好，<strong style="color: #222">{{site.name}}</strong>
-              有一条新的评论通知，摘要如下：
-            </p>
-
+            <tr>
+              <td align="center" style="padding: 12px 20px">
+                <table
+                  cellpadding="0"
+                  cellspacing="0"
+                  role="presentation"
+                  style="border-collapse: collapse; margin: 0 auto"
+                  align="center"
+                >
+                  <tr>
+                    <td
+                      valign="middle"
+                      style="vertical-align: middle; text-align: center"
+                    >
+                      <img
+                        src="{{site.logo | safe}}"
+                        style="
+                          border: 0;
+                          display: block;
+                          width: auto;
+                          max-height: 24px;
+                          margin: 0;
+                        "
+                      />
+                    </td>
+                    <td
+                      valign="middle"
+                      style="
+                        vertical-align: middle;
+                        text-align: center;
+                        white-space: nowrap;
+                      "
+                    >
+                      <h1
+                        valign="middle"
+                        style="
+                          font-size: 18px;
+                          margin: 0;
+                          color: #fff;
+                          font-weight: 600;
+                          display: inline-block;
+                          vertical-align: middle;
+                        "
+                      >
+                        {{site.name | safe}}站长通知
+                      </h1>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <div style="padding: 5px 20px 10px">
             <table
               width="100%"
               cellpadding="0"
@@ -72,7 +151,7 @@
               style="margin-top: 8px; border-collapse: collapse"
             >
               <tr>
-                <td style="vertical-align: top; padding-right: 12px">
+                <td style="vertical-align: top">
                   <div
                     style="
                       background: #f7f7f7;
@@ -81,57 +160,117 @@
                       border: 1px solid #eee;
                     "
                   >
-                    <p style="margin: 0 0 8px 0; font-size: 14px">
-                      <strong>评论者：</strong> {{self.nick || '匿名'}}
-                    </p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px">
-                      <strong>邮箱：</strong> {{self.mail || ''}}
-                    </p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px">
-                      <strong>内容：</strong>
-                    </p>
-                    <div
-                      style="
-                        background: #fff;
-                        padding: 10px;
-                        border-radius: 4px;
-                        border: 1px solid #eee;
-                        color: #333;
-                        line-height: 1.45;
-                      "
+                    <table
+                      role="presentation"
+                      width="100%"
+                      cellpadding="0"
+                      cellspacing="0"
+                      style="border-collapse: collapse; font-size: 14px"
                     >
-                      {{self.comment | safe}}
+                      <tr>
+                        <td
+                          style="
+                            vertical-align: top;
+                            padding-right: 8px;
+                            width: 50%;
+                          "
+                        >
+                          <p style="margin: 0 0 6px 0">
+                            <strong>昵称：</strong> {{self.nick}}
+                          </p>
+                        </td>
+                        <td
+                          style="
+                            vertical-align: top;
+                            padding-right: 8px;
+                            width: 50%;
+                          "
+                        >
+                          <p style="margin: 0 0 6px 0">
+                            <strong>邮箱：</strong> {{self.mail}}
+                          </p>
+                        </td>
+                      </tr>
+                      <tr></tr>
+                      <tr>
+                        <td
+                          style="
+                            vertical-align: top;
+                            padding-right: 8px;
+                            width: 50%;
+                          "
+                        >
+                          <p style="margin: 0 0 6px 0">
+                            <strong>博客：</strong> {{self.link}}
+                          </p>
+                        </td>
+                        <td
+                          style="
+                            vertical-align: top;
+                            padding-right: 8px;
+                            width: 50%;
+                          "
+                        >
+                          <p style="margin: 0 0 6px 0">
+                            <strong>审核：</strong> {{self.status}}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                    <div style="margin: 0; font-size: 14px">
+                      <strong>内容：</strong>
+                      <div
+                        style="
+                          margin: 6px 0;
+                          background: #eee;
+                          padding: 8px;
+                          border-radius: 4px;
+                          border: 1px solid #eee;
+                          color: #333;
+                          font-size: 14px;
+                          line-height: 1.4;
+                          word-break: break-word;
+                        "
+                      >
+                        {{self.comment | safe}}
+                      </div>
+                      {% if parent.comment %}
+                      <strong>父评论内容：</strong>
+                      <div
+                        style="
+                          margin: 6px 0;
+                          background: #eee;
+                          padding: 8px;
+                          border-radius: 4px;
+                          border: 1px solid #eee;
+                          color: #333;
+                          font-size: 14px;
+                          line-height: 1.4;
+                          word-break: break-word;
+                        "
+                      >
+                        {{ parent.comment | safe }}
+                      </div>
+                      {% else %} {% endif %}
+                      <p style="margin: 0; font-size: 14px">
+                        <strong>原文链接：</strong
+                        ><a
+                          href="{{site.postUrl}}"
+                          style="color: #ff9849; text-decoration: none"
+                          >{{site.postUrl}}</a
+                        >
+                      </p>
                     </div>
                   </div>
                 </td>
-                <td
-                  style="
-                    width: 160px;
-                    vertical-align: middle;
-                    text-align: center;
-                  "
-                >
-                  <a
-                    href="{{site.postUrl}}"
-                    role="button"
-                    aria-label="查看详情"
-                    style="
-                      display: inline-block;
-                      padding: 12px 18px;
-                      background: #ea9448;
-                      color: #ffffff;
-                      border-radius: 6px;
-                      text-decoration: none;
-                      font-weight: 600;
-                    "
-                    >查看详情</a
-                  >
-                </td>
               </tr>
             </table>
-
             <p style="font-size: 12px; color: #999; margin-top: 14px">
-              如果不希望收到此类邮件，请在站点设置中关闭通知。
+              此邮件为自动发送，若您不想接收此类通知，可联系站长邮箱：<a
+                href="mailto:abiscuit@vip.qq.com"
+                style="color: #999; text-decoration: underline"
+                >abiscuit@vip.qq.com</a
+              >
             </p>
           </div>
         </div>
